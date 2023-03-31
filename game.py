@@ -4,6 +4,9 @@ from viewports.uidemo import UiDemo
 from utils import Util
 from myenviorment import Environment
 
+
+#https://opengameart.org/content/iron-plague-pointercursor
+
 pygame.init()
 
 # keeping most of the important stuff in a dict lets me pass it around easily, probably not the best way to do it but it works
