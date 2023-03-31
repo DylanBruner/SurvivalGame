@@ -13,7 +13,8 @@ class Component:
         pass
 
 class Viewport:
-    def __init__(self):
+    def __init__(self, size: tuple[int, int]):
+        self.size = size
         self.components: list[Component] = []
         self.customCursor: pygame.Surface = None
         self.components = {
@@ -30,6 +31,9 @@ class Viewport:
         if self.theme != None:
             self.theme.apply(component)
         self.components['components'].append(component)
+        
+    def registerComponents(self, components: list[Component]):
+        for component in components: self.registerComponent(component)
 
     def registerUnthemedComponent(self, component: Component):
         if component.EVENT_SYSTEM_HOOKED:
@@ -40,6 +44,9 @@ class Viewport:
         if component.EVENT_SYSTEM_HOOKED:
             del self.components['hooks'][component]
         self.components['components'].remove(component)
+    
+    def unregisterComponents(self, components: list[Component]):
+        for component in components: self.unregisterComponent(component)
     
     def setCursor(self, cursor: pygame.Surface):
         surf = pygame.Surface(cursor.get_size(), pygame.SRCALPHA) # this might not actually do anything / be needed 
@@ -55,11 +62,19 @@ class Viewport:
             component.draw(enviorment["window"], enviorment)
         if self._customCursorEnabled:
             enviorment["window"].blit(self.customCursor, pygame.mouse.get_pos())
+    
+    # Should be handled by each viewport but we can add some basic default behavior here
+    def resize(self, old: tuple[int, int], new: tuple[int, int]):
+        sfX = new[0] / old[0]
+        sfY = new[1] / old[1]
+        for component in self.components['components']:
+            newLocation = (int(component.location[0] * sfX), int(component.location[1] * sfY))
+            component.location = newLocation
         
     def onEvent(self, event: pygame.event.Event):
         for component in self.components['hooks']:
             component.onEvent(event)
-
+        
 class Theme:
     def __init__(self):
         self.THEME_TREE = {

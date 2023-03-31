@@ -8,7 +8,8 @@
         "**/Thumbs.db": true,
         "__pycache__": true,
         "**/__pycache__": true,
-        ".vscode": true
+        ".vscode": true,
+        ".gitignore": true
     },
     "explorerExclude.backup": {}
 }

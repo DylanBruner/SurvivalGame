@@ -152,7 +152,7 @@ class Button(Component):
                  background_color: tuple[int, int, int] = (0, 0, 0),
                  hover_background_color: tuple[int, int, int] = (0, 0, 0),
                  border_radius: int = 0,
-                 padding_left: int = 5, padding_right: int = 0,
+                 padding_left: int = 0, padding_right: int = 0,
                  padding_top: int = 0, padding_bottom: int = 0,
                  on_click: callable = lambda: None):
         super().__init__(location, size)

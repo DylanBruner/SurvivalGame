@@ -9,6 +9,7 @@ class Environment:
         self.overlays: list[Viewport]
         self.clock: pygame.time.Clock
         self.time_delta: int
+        self.current_size: tuple[int, int]
         self.__dict__.update(kwargs)
     def __getitem__(self, key):
         return self.__dict__[key]

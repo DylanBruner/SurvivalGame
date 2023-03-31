@@ -1,9 +1,8 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
 import pygame
-from viewports.uidemo import UiDemo
+from viewports.mainmenu import MainMenu
 from utils import Util
 from myenviorment import Environment
-
 
 #https://opengameart.org/content/iron-plague-pointercursor
 
@@ -11,8 +10,9 @@ pygame.init()
 
 # keeping most of the important stuff in a dict lets me pass it around easily, probably not the best way to do it but it works
 environment = Environment(**{
-    "window": pygame.display.set_mode((800, 600)),
-    "viewport": UiDemo(),
+    "window": pygame.display.set_mode((800, 600), pygame.RESIZABLE),
+    "current_size": (800, 600),
+    "viewport": MainMenu((800, 600)),
     "overlays": [],
     "clock": pygame.time.Clock(),
     "time_delta": 0
@@ -26,6 +26,11 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+
+        if event.type == pygame.VIDEORESIZE:
+            environment.viewport.resize(environment.current_size, (event.w, event.h))
+            environment.window = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            environment.current_size = (event.w, event.h)
         
         environment.viewport.onEvent(event)
 

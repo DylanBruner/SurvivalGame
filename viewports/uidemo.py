@@ -3,8 +3,8 @@ from componentsystem import Viewport, Component
 from components import *
 
 class UiDemo(Viewport):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, size: tuple[int, int]):
+        super().__init__(size)
 
         # Create components
         self.progbar = ProgressBar((10, 10), (100, 20), 50)
@@ -12,10 +12,12 @@ class UiDemo(Viewport):
         self.TextInput = TextInput((10, 70), (100, 20))
         self.testButton = Button((10, 100), (100, 20), "Test Button")
         self.testButton.on_click = lambda: print("Button clicked!")
+        self.middleButton = Button((self.size[0] / 2 - 50, self.size[1] / 2 - 10), (100, 20), "Middle Button")
         self.registerComponent(self.progbar)
         self.registerComponent(self.fpsDisplay)
         self.registerComponent(self.TextInput)
         self.registerComponent(self.testButton)
+        self.registerComponent(self.middleButton)
         self.barMoving = False
     
     def draw(self, enviorment: dict):
