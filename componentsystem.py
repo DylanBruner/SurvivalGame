@@ -15,11 +15,14 @@ class Component:
 class Viewport:
     def __init__(self):
         self.components: list[Component] = []
+        self.customCursor: pygame.Surface = None
         self.components = {
             'components': [],
             'hooks': {}
         }
         self.theme: Theme = Theme()
+
+        self._customCursorEnabled = False
     
     def registerComponent(self, component: Component):
         if component.EVENT_SYSTEM_HOOKED:
@@ -37,10 +40,21 @@ class Viewport:
         if component.EVENT_SYSTEM_HOOKED:
             del self.components['hooks'][component]
         self.components['components'].remove(component)
-
+    
+    def setCursor(self, cursor: pygame.Surface):
+        surf = pygame.Surface(cursor.get_size(), pygame.SRCALPHA) # this might not actually do anything / be needed 
+        surf.blit(cursor, (0, 0))
+        self.customCursor = surf
+    
+    def setCustomCursorEnabled(self, enabled: bool):
+        self._customCursorEnabled = enabled
+        pygame.mouse.set_visible(not enabled)
+    
     def draw(self, enviorment: dict):
         for component in self.components['components']:
             component.draw(enviorment["window"], enviorment)
+        if self._customCursorEnabled:
+            enviorment["window"].blit(self.customCursor, pygame.mouse.get_pos())
         
     def onEvent(self, event: pygame.event.Event):
         for component in self.components['hooks']:
