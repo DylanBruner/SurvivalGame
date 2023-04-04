@@ -10,7 +10,7 @@ class Environment:
         self.clock: pygame.time.Clock
         self.time_delta: int
         self.current_size: tuple[int, int]
-        self.last_viewport: Viewport
+        self.last_viewports: list[Viewport] = []
         self.GAME_NAME: str
         self.__dict__.update(kwargs)
     def __getitem__(self, key):

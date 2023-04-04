@@ -6,6 +6,7 @@ from components import *
 from componentsystem import Viewport
 from myenviorment import Environment
 from utils import Util
+from viewports.newsavemenu import NewSaveMenu
 
 
 class PlayGame(Viewport):
@@ -21,8 +22,8 @@ class PlayGame(Viewport):
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
-        save_names = [name for name in list(os.listdir("data/saves")) if name.endswith(".json")]
-        nice_names = [name.replace("_", " ").replace(".json", "").title() for name in save_names]
+        save_names = [name for name in list(os.listdir("data/saves")) if name.endswith(".json")][:3]
+        nice_names = [name.replace("_", " ").replace(".json", "").title() for name in save_names][:3]
 
         self.save_buttons = []
         for i in range(len(save_names)):
@@ -30,12 +31,17 @@ class PlayGame(Viewport):
             self.save_buttons[i].on_click = lambda save_file=save_names[i]: self.launchSave(save_file)
             self.registerComponent(self.save_buttons[i])
         
-        self.back_button = Button((self.size[0] / 2 - 100, 200 + len(save_names) * 50), (200, 40), "Back")
-        self.back_button.on_click = lambda: Util.launchViewport(self, self.enviorment.last_viewport, self.enviorment)
-        self.registerComponent(self.back_button)
+        if len(save_names) < 3:
+            self.new_game_button = Button((self.size[0] / 2 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
+            self.new_game_button.on_click = lambda: Util.launchViewport(self, NewSaveMenu(self.size, self.enviorment), self.enviorment)
+            self.registerComponent(self.new_game_button, {'border_radius': 4})
+
+        self.back_button = Button((self.size[0] / 2 - 100, 250 + len(save_names) * 50), (200, 40), "Back")
+        self.back_button.on_click = lambda: Util.backViewport(self.enviorment)
+        self.registerComponent(self.back_button, {'border_radius': 4})
     
     def launchSave(self, save_file: str):
         print(f"Launching save: {save_file}")
-
+    
     def draw(self, enviorment: dict):
         super().draw(enviorment)

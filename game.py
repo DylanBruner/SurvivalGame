@@ -12,7 +12,6 @@ pygame.init()
 environment = Environment(**{
     "GAME_NAME": "A Game",
     "window": pygame.display.set_mode((800, 600), pygame.RESIZABLE),
-    "last_viewport": None,
     "current_size": (800, 600),
     "overlays": [],
     "clock": pygame.time.Clock(),

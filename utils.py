@@ -17,5 +17,13 @@ class Util:
     def launchViewport(old: Viewport, new: Viewport, enviorment: Environment) -> None:
         old.setCustomCursorEnabled(False)
         enviorment.viewport = new
-        enviorment.last_viewport = old
+        enviorment.last_viewports.append(old)
+        new.setCustomCursorEnabled(True)
+    
+    @staticmethod
+    def backViewport(enviorment: Environment) -> None:
+        old = enviorment.viewport
+        new = enviorment.last_viewports.pop()
+        old.setCustomCursorEnabled(False)
+        enviorment.viewport = new
         new.setCustomCursorEnabled(True)

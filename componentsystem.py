@@ -26,11 +26,13 @@ class Viewport:
 
         self._customCursorEnabled = False
     
-    def registerComponent(self, component: Component):
+    def registerComponent(self, component: Component, theme_overrides: dict[str, any] = None):
         if component.EVENT_SYSTEM_HOOKED:
             self.components['hooks'][component] = component.onEvent
         if self.theme != None:
             self.theme.apply(component)
+        if theme_overrides != None: Theme.cApply(component, theme_overrides)
+            
         self.components['components'].append(component)
         
     def registerComponents(self, components: list[Component]):
@@ -109,3 +111,11 @@ class Theme:
                     setattr(component, key, self.THEME_TREE[component.__class__.__name__][key])
                 else:
                     print(f"Warning: {component.__class__.__name__} does not have attribute {key}.")
+
+    @staticmethod
+    def cApply(component: Component, tree: dict[str, any]) -> None:
+        for key in tree:
+            if hasattr(component, key):
+                setattr(component, key, tree[key])
+            else:
+                print(f"Warning: {component.__class__.__name__} does not have attribute {key}.")
