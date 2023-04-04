@@ -10,16 +10,15 @@ pygame.init()
 
 # keeping most of the important stuff in a dict lets me pass it around easily, probably not the best way to do it but it works
 environment = Environment(**{
+    "GAME_NAME": "A Game",
     "window": pygame.display.set_mode((800, 600), pygame.RESIZABLE),
+    "last_viewport": None,
     "current_size": (800, 600),
-    "viewport": MainMenu((800, 600)),
     "overlays": [],
     "clock": pygame.time.Clock(),
     "time_delta": 0
 })
-
-environment.viewport.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
-environment.viewport.setCustomCursorEnabled(True)
+environment.viewport = MainMenu(environment.current_size, environment)
 
 while True:
     for event in pygame.event.get():

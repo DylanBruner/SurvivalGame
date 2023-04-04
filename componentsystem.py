@@ -13,8 +13,9 @@ class Component:
         pass
 
 class Viewport:
-    def __init__(self, size: tuple[int, int]):
+    def __init__(self, size: tuple[int, int], enviorment):
         self.size = size
+        self.enviorment = enviorment
         self.components: list[Component] = []
         self.customCursor: pygame.Surface = None
         self.components = {
@@ -62,14 +63,16 @@ class Viewport:
             component.draw(enviorment["window"], enviorment)
         if self._customCursorEnabled:
             enviorment["window"].blit(self.customCursor, pygame.mouse.get_pos())
+        
+    def setup(self) -> None:
+        ... # Should be where the components are registered
     
     # Should be handled by each viewport but we can add some basic default behavior here
     def resize(self, old: tuple[int, int], new: tuple[int, int]):
-        sfX = new[0] / old[0]
-        sfY = new[1] / old[1]
-        for component in self.components['components']:
-            newLocation = (int(component.location[0] * sfX), int(component.location[1] * sfY))
-            component.location = newLocation
+        self.size = new
+        self.components['components'] = []
+        self.components['hooks'] = {}
+        self.setup()
         
     def onEvent(self, event: pygame.event.Event):
         for component in self.components['hooks']:

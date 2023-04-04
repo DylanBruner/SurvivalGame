@@ -1,10 +1,11 @@
 import pygame
 from componentsystem import Viewport, Component
 from components import *
+from myenviorment import Environment
 
 class UiDemo(Viewport):
-    def __init__(self, size: tuple[int, int]):
-        super().__init__(size)
+    def __init__(self, size: tuple[int, int], enviorment: Environment):
+        super().__init__(size, enviorment)
 
         # Create components
         self.progbar = ProgressBar((10, 10), (100, 20), 50)
