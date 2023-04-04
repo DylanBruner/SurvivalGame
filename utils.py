@@ -18,7 +18,6 @@ class Util:
         old.setCustomCursorEnabled(False)
         enviorment.viewport = new
         enviorment.last_viewports.append(old)
-        new.setCustomCursorEnabled(True)
     
     @staticmethod
     def backViewport(enviorment: Environment) -> None:
@@ -26,4 +25,3 @@ class Util:
         new = enviorment.last_viewports.pop()
         old.setCustomCursorEnabled(False)
         enviorment.viewport = new
-        new.setCustomCursorEnabled(True)

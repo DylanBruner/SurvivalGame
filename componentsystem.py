@@ -22,6 +22,7 @@ class Viewport:
             'components': [],
             'hooks': {}
         }
+        self.closed = False
         self.theme: Theme = Theme()
 
         self._customCursorEnabled = False
@@ -68,6 +69,11 @@ class Viewport:
         
     def setup(self) -> None:
         ... # Should be where the components are registered
+    
+    def reload(self) -> None:
+        self.components['components'] = []
+        self.components['hooks'] = {}
+        self.setup()
     
     # Should be handled by each viewport but we can add some basic default behavior here
     def resize(self, old: tuple[int, int], new: tuple[int, int]):

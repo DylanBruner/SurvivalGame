@@ -1,8 +1,9 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
 import pygame
-from viewports.mainmenu import MainMenu
-from utils import Util
+
 from myenviorment import Environment
+from utils import Util
+from viewports.mainmenu import MainMenu
 
 #https://opengameart.org/content/iron-plague-pointercursor
 
@@ -31,13 +32,17 @@ while True:
             environment.current_size = (event.w, event.h)
         
         environment.viewport.onEvent(event)
+        for overlay in environment.overlays:
+            if not overlay.closed:
+                overlay.onEvent(event)
 
     environment.window.fill((255, 255, 255))
     
     environment.viewport.draw(environment)
     for overlay in environment.overlays:
-        overlay.draw(environment) # basically just more viewports
+        if not overlay.closed:
+            overlay.draw(environment)
 
     pygame.display.update()
-    environment.time_delta = min(environment.clock.tick(1000), 500) # if we exceed 500ms, something is probably wrong so this'll help avoid
+    environment.time_delta = min(environment.clock.tick(60), 500) # if we exceed 500ms, something is probably wrong so this'll help avoid
                                                                         # really bad lag spikes and weird behavior

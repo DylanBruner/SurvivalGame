@@ -7,7 +7,8 @@ from componentsystem import Viewport
 from myenviorment import Environment
 from utils import Util
 from viewports.newsavemenu import NewSaveMenu
-
+from viewports.gameview import GameView
+from game.savemanager import SaveGame
 
 class PlayGame(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment):
@@ -42,6 +43,9 @@ class PlayGame(Viewport):
     
     def launchSave(self, save_file: str):
         print(f"Launching save: {save_file}")
+        save_game = SaveGame(save_file=save_file)
+        game_view = GameView(self.size, self.enviorment, save_game)
+        Util.launchViewport(self, game_view, self.enviorment)
     
     def draw(self, enviorment: dict):
         super().draw(enviorment)

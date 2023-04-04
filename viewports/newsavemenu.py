@@ -4,7 +4,7 @@ from components import *
 from componentsystem import Viewport
 from myenviorment import Environment
 from utils import Util
-
+from game.savemanager import SaveGame
 
 class NewSaveMenu(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment):
@@ -32,5 +32,7 @@ class NewSaveMenu(Viewport):
         save_file = self.save_name.text.replace(" ", "_").lower().strip() + ".json"
         if save_file == ".json":
             return
-    
-        print(f"Creating save: {save_file}")
+
+        SaveGame.createNewSave(save_file)
+        Util.backViewport(self.enviorment)
+        self.enviorment['viewport'].reload()

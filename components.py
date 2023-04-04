@@ -26,10 +26,9 @@ class ProgressBar(Component):
         pygame.draw.rect(surface, self.bar_color, (self.location[0] + 1, self.location[1] + 1, (self.size[0] - 2) * (self.value / self.max), self.size[1] - 2), border_radius=self.border_radius)
 
 class TextDisplay(Component):
-    def __init__(self, location: tuple[int, int],
-                 size: tuple[int, int], text: str,
-                 font: pygame.font.Font, color: tuple[int, int, int] = (0, 0, 0)):
-        super().__init__(location, size)
+    def __init__(self, location: tuple[int, int], text: str,
+                 font: pygame.font.Font = DEFAULT_FONT, color: tuple[int, int, int] = (0, 0, 0)):
+        super().__init__(location, (0, 0))
         self.text = text
         self.font = font
         self.color = color
@@ -38,7 +37,6 @@ class TextDisplay(Component):
         self.text = text
     
     def draw(self, surface: pygame.Surface, enviorment: dict):
-        # draw the prompt with a lowish alpha
         surface.blit(self.font.render(self.text, True, self.color), self.location)
 
 class TextInput(Component):

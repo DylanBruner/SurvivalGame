@@ -1,9 +1,10 @@
 import pygame
-from componentsystem import Viewport
-from viewports.playgame import PlayGame
+
 from components import *
-from utils import Util
+from componentsystem import Viewport
 from myenviorment import Environment
+from utils import Util
+from viewports.playgame import PlayGame
 
 class MainMenu(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment):
@@ -17,7 +18,7 @@ class MainMenu(Viewport):
     def setup(self):
         pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - Main Menu")
         y_offset = self.size[1] / 4 - 100
-        self.menu_text = TextDisplay((self.size[0] / 2 - 100 + DEFAULT_FONT.size("Main Menu")[0] / 4, 50 + y_offset), (200, 40), "Main Menu", pygame.font.SysFont("Arial", 40))
+        self.menu_text = TextDisplay(location=(self.size[0] / 2 - 100 + DEFAULT_FONT.size("Main Menu")[0] / 4, 50 + y_offset), text="Main Menu", font=pygame.font.SysFont("Arial", 40))
         self.play_button = Button((self.size[0] / 2 - 100, 150 + y_offset), (200, 40), "Play")
         self.options_button = Button((self.size[0] / 2 - 100, 200 + y_offset), (200, 40), "Options")
         self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), "Quit")
