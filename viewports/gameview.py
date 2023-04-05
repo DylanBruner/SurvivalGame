@@ -1,6 +1,4 @@
-import time
-
-import pygame
+import pygame, math, time
 
 from components import *
 from componentsystem import Viewport
@@ -29,8 +27,8 @@ class GameView(Viewport):
         self.paused: bool = False
         self.paused_overlay: Viewport = None
 
-        self.move_pos: tuple[int, int]   = (self.save.save_data['player']['x'], self.save.save_data['player']['y'])
-        self.player_pos: tuple[int, int] = (int(self.move_pos[0]), int(self.move_pos[1]))
+        self.player_pos: tuple[int, int] = (self.save.save_data['player']['x'], self.save.save_data['player']['y'])
+        self.player_velocity: tuple[int, int] = [0, 0]
         self.keys_pressed: dict[int, bool] = {}
 
         self.game_time: float = self.save.save_data['game_time']
@@ -54,7 +52,7 @@ class GameView(Viewport):
         self.registerComponent(self.FPS_DISPLAY)
 
         # Location display
-        self.LOC_DISPLAY = TextDisplay(location=(80, 210), text="Location: ???", color=(255, 255, 255))
+        self.LOC_DISPLAY = TextDisplay(location=(90, 210), text="Location: ???", color=(255, 255, 255))
         self.LOC_DISPLAY._LAST_UPDATE_FRAME = 0
         self.registerComponent(self.LOC_DISPLAY)
 
@@ -82,53 +80,37 @@ class GameView(Viewport):
             
     def canMove(self, dir: int, speed: int) -> bool:
         # forward, backward, left, right
-        projected_pos = None
-        if dir == 0:
-            projected_pos = (self.move_pos[0], self.move_pos[1] - speed)
-        elif dir == 1:
-            projected_pos = (self.move_pos[0], self.move_pos[1] + speed)
-        elif dir == 2:
-            projected_pos = (self.move_pos[0] - speed, self.move_pos[1])
-        elif dir == 3:
-            projected_pos = (self.move_pos[0] + speed, self.move_pos[1])
-        else:
-            raise Exception(f"Invalid direction: {dir}")
-        projected_pos = (int(projected_pos[0]), int(projected_pos[1]))
-
-        # if projected_pos is out of bounds, return False
-        if projected_pos[0] < 0 or projected_pos[0] >= len(self.save.save_data['world']['map_data'][0]):
-            return False
-        if projected_pos[1] < 0 or projected_pos[1] >= len(self.save.save_data['world']['map_data']):
-            return False
-
-        tileAt = self.save.save_data['world']['map_data'][projected_pos[1]][projected_pos[0]]
-
-        return not Tiles.getTile(tileAt).collidable
+        return True
     
-    def doGameLogic(self, enviorment: dict):
-        # handle key presses
-        speed = 0.05 * enviorment['time_delta']
-        if self.keys_pressed.get(Bindings.get("LEFT"), False) and self.canMove(2, speed):
-            self.move_pos = (self.move_pos[0] - speed, self.move_pos[1])
-        if self.keys_pressed.get(Bindings.get("RIGHT"), False) and self.canMove(3, speed):
-            self.move_pos = (self.move_pos[0] + speed, self.move_pos[1])
-        if self.keys_pressed.get(Bindings.get("FORWARD"), False) and self.canMove(0, speed):
-            self.move_pos = (self.move_pos[0], self.move_pos[1] - speed)
-        if self.keys_pressed.get(Bindings.get("BACKWARD"), False) and self.canMove(1, speed):
-            self.move_pos = (self.move_pos[0], self.move_pos[1] + speed)
-        
-        self.save.save_data['player']['x'] = self.move_pos[0]
-        self.save.save_data['player']['y'] = self.move_pos[1]
-        
-        # limit the player to the map
-        self.player_pos = (max(0, min(int(self.move_pos[0]), len(self.save.save_data['world']['map_data'][0]) - 1)),
-                           max(0, min(int(self.move_pos[1]), len(self.save.save_data['world']['map_data']) - 1)))
-    
-        # stamina regen
+    def doGameLogic(self, environment: dict):
+        speed = 0.01 * environment['time_delta']
+        self.player_velocity = [0, 0]
+        if self.keys_pressed.get(Bindings.get("FORWARD"), False):
+            self.player_velocity[1] = -speed
+        if self.keys_pressed.get(Bindings.get("BACKWARD"), False):
+            self.player_velocity[1] = speed
+        if self.keys_pressed.get(Bindings.get("LEFT"), False):
+            self.player_velocity[0] = -speed
+        if self.keys_pressed.get(Bindings.get("RIGHT"), False):
+            self.player_velocity[0] = speed
+
+        # make diagonal movement look less like teleporting
+        if self.player_velocity[0] != 0 and self.player_velocity[1] != 0:
+            self.player_velocity[0] /= math.sqrt(2)
+            self.player_velocity[1] /= math.sqrt(2)
+
+        # update player position
+        self.player_pos = (self.player_pos[0] + self.player_velocity[0], self.player_pos[1] + self.player_velocity[1])        
+
+        # update save data
+        self.save.save_data['player']['x'] = self.player_pos[0]
+        self.save.save_data['player']['y'] = self.player_pos[1]
+
+        # regenerate stamina if below max
         if self.player_stamina < self.player_max_stamina:
-            self.player_stamina += 0.01 * enviorment['time_delta']
+            self.player_stamina += 0.01 * environment['time_delta']
             self.player_stamina = min(self.player_max_stamina, self.player_stamina)
-            
+
     def draw(self, enviorment: dict):
         if self.paused:
             if self.paused_overlay.closed:
@@ -145,7 +127,7 @@ class GameView(Viewport):
             self.FPS_DISPLAY.setText(f"FPS: {enviorment['clock'].get_fps():.0f}")
         if time.time() - self.LOC_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.LOC_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.LOC_DISPLAY.setText(f"({self.player_pos[0]}, {self.player_pos[1]})")
+            self.LOC_DISPLAY.setText(f"({self.player_pos[0]:.0f}, {self.player_pos[1]:.0f})")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} - Day {self.day_count}")
@@ -167,34 +149,38 @@ class GameView(Viewport):
         self.enviorment['window'].fill((0, 0, 0))
 
         # draw the map
-        map: list[list[int]] = self.save.save_data['world']['map_data']
+        map_data: list[list[int]] = self.save.save_data['world']['map_data']
 
         # it should be centered on the player
-        VIEW_WIDTH  = self.size[0]
+        VIEW_WIDTH = self.size[0]
         VIEW_HEIGHT = self.size[1]
 
-        startX = self.player_pos[0] - (VIEW_WIDTH // TILE_SIZE) // 2
-        startY = self.player_pos[1] - (VIEW_HEIGHT // TILE_SIZE) // 2
+        startX = int(self.player_pos[0]) - (VIEW_WIDTH // TILE_SIZE) // 2
+        startY = int(self.player_pos[1]) - (VIEW_HEIGHT // TILE_SIZE) // 2
 
-        for y in range(startY, startY + (VIEW_HEIGHT // TILE_SIZE) + 1):
-            for x in range(startX, startX + (VIEW_WIDTH // TILE_SIZE) + 1):
-                if y < 0 or y >= len(map) or x < 0 or x >= len(map[y]):
-                    continue
+        # calculate the visible tile range
+        minX = max(startX, 0)
+        maxX = min(startX + (VIEW_WIDTH // TILE_SIZE) + 1, len(map_data[0]))
+        minY = max(startY, 0)
+        maxY = min(startY + (VIEW_HEIGHT // TILE_SIZE) + 1, len(map_data))
 
-                tile: int = map[y][x]
-
+        # draw only the visible tiles
+        for y in range(minY, maxY):
+            for x in range(minX, maxX):
+                tile = map_data[y][x]
                 tile_texture = TEXTURE_MAPPINGS[tile]
-                enviorment['window'].blit(tile_texture, (x * TILE_SIZE - startX * TILE_SIZE, y * TILE_SIZE - startY * TILE_SIZE))
+                tile_pos = (x * TILE_SIZE - startX * TILE_SIZE, y * TILE_SIZE - startY * TILE_SIZE)
+                self.enviorment['window'].blit(tile_texture, tile_pos)
 
-        # draw the player relative to the map as a red square
-        pygame.draw.rect(enviorment['window'], (255, 0, 0), (self.player_pos[0] * TILE_SIZE - startX * TILE_SIZE, self.player_pos[1] * TILE_SIZE - startY * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+        # draw the player in the middle of the screen
+        pygame.draw.rect(enviorment['window'], (255, 0, 0), (VIEW_WIDTH // 2 - TILE_SIZE // 2, VIEW_HEIGHT // 2 - TILE_SIZE // 2, TILE_SIZE, TILE_SIZE))
 
         # draw the selected tile, along with if it's reachable/valid
         mouse_pos = pygame.mouse.get_pos()
         mouse_pos = (mouse_pos[0] + startX * TILE_SIZE, mouse_pos[1] + startY * TILE_SIZE)
         mouse_pos = (mouse_pos[0] // TILE_SIZE, mouse_pos[1] // TILE_SIZE)
         # red if not reachable, white if reachable (5 from player and in the map)
-        if mouse_pos[0] < 0 or mouse_pos[0] >= len(map[0]) or mouse_pos[1] < 0 or mouse_pos[1] >= len(map) or Util.distance(self.player_pos, mouse_pos) > 5:
+        if mouse_pos[0] < 0 or mouse_pos[0] >= len(map_data[0]) or mouse_pos[1] < 0 or mouse_pos[1] >= len(map_data) or Util.distance(self.player_pos, mouse_pos) > 5:
             color = (255, 0, 0)
         else:
             color = (255, 255, 255)
@@ -218,7 +204,7 @@ class GameView(Viewport):
                 self.paused_overlay = PauseMenu(self.size, self.enviorment)
                 self.enviorment['overlays'].append(self.paused_overlay)
                 return
-        
+
         if event.type == pygame.KEYUP:
             self.keys_pressed[event.key] = False
 

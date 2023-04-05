@@ -17,6 +17,7 @@
 - particles :D [DONE]
 - fix movement so that it's not forced to snap to the grid
 - foliage so we can actually see ourself moving
+- make movement not SUCK
 
 Things that would be cool to have but are not a priority:
 - biomes

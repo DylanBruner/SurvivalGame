@@ -34,7 +34,7 @@ class Util:
     def getTileLocation(mouse_pos: tuple, player_pos: tuple, window_size: tuple, tile_size: int) -> tuple:
         startX = player_pos[0] - (window_size[0] // tile_size) // 2
         startY = player_pos[1] - (window_size[1] // tile_size) // 2
-        return ((mouse_pos[0] // tile_size) + startX, (mouse_pos[1] // tile_size) + startY)
+        return (int((mouse_pos[0] // tile_size) + startX), int((mouse_pos[1] // tile_size) + startY))
 
     @staticmethod
     def gameTimeToNice(gameTime: int) -> str: #00:00 AM/PM
