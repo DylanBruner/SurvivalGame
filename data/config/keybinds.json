@@ -8,8 +8,8 @@
     "SLOT_7": 55,
     "SLOT_8": 56,
     "SLOT_9": 57,
-    "FORWARD": 87,
-    "BACKWARD": 83, 
-    "LEFT": 65,
-    "RIGHT": 68
+    "FORWARD": 119,
+    "BACKWARD": 115, 
+    "LEFT": 97,
+    "RIGHT": 100
 }

@@ -8,3 +8,7 @@ class Bindings:
     @staticmethod
     def check(event: pygame.event.Event, action: str) -> bool:
         return KEYBINDS.get(action, None) == event.key
+    
+    @staticmethod
+    def get(action: str) -> int:
+        return KEYBINDS.get(action, None)

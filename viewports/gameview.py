@@ -9,7 +9,8 @@ from game.minimap import MiniMap
 from game.particlesystem import ParticleDisplay
 from game.savemanager import SaveGame
 from game.tiles import Tiles
-from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
+from game.world import TEXTURE_MAPPINGS, TILE_SIZE
+from game.keybinding import Bindings
 from myenvironment import Environment
 from utils import Util
 from viewports.pausemenu import PauseMenu
@@ -107,13 +108,13 @@ class GameView(Viewport):
     def doGameLogic(self, enviorment: dict):
         # handle key presses
         speed = 0.05 * enviorment['time_delta']
-        if self.keys_pressed.get(pygame.K_a, False) and self.canMove(2, speed):
+        if self.keys_pressed.get(Bindings.get("LEFT"), False) and self.canMove(2, speed):
             self.move_pos = (self.move_pos[0] - speed, self.move_pos[1])
-        if self.keys_pressed.get(pygame.K_d, False) and self.canMove(3, speed):
+        if self.keys_pressed.get(Bindings.get("RIGHT"), False) and self.canMove(3, speed):
             self.move_pos = (self.move_pos[0] + speed, self.move_pos[1])
-        if self.keys_pressed.get(pygame.K_w, False) and self.canMove(0, speed):
+        if self.keys_pressed.get(Bindings.get("FORWARD"), False) and self.canMove(0, speed):
             self.move_pos = (self.move_pos[0], self.move_pos[1] - speed)
-        if self.keys_pressed.get(pygame.K_s, False) and self.canMove(1, speed):
+        if self.keys_pressed.get(Bindings.get("BACKWARD"), False) and self.canMove(1, speed):
             self.move_pos = (self.move_pos[0], self.move_pos[1] + speed)
         
         self.save.save_data['player']['x'] = self.move_pos[0]
