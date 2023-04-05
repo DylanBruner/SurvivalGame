@@ -1,0 +1,20 @@
+- manage saves from in game: delete, upgrade/repair*, rename, copy
+  * upgrade/repair will repair the save if it is corrupted, or upgrade it to the latest version if it is an older version and is missing some data
+- add ennemies
+- add more things to build with
+- crafting system
+- add items (weapons, armor, tools, consumables, etc)
+- better UI
+- better random generation
+- possibly more inventory slots, not just the hotbar
+- health bar & health system
+- stamina bar & stamina system
+- actual assets
+- title screen art
+- full screen support
+- rebinding of keys in the options menu
+- a difficulty setting
+- particles :D
+
+Things that would be cool to have but are not a priority:
+- biomes
