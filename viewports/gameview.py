@@ -9,7 +9,7 @@ from game.minimap import MiniMap
 from game.savemanager import SaveGame
 from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
-from myenviorment import Environment
+from myenvironment import Environment
 from utils import Util
 from viewports.pausemenu import PauseMenu
 
@@ -182,3 +182,5 @@ class GameView(Viewport):
         
         if event.type == pygame.KEYUP:
             self.keys_pressed[event.key] = False
+
+VIEWPORT_CLASS = GameView

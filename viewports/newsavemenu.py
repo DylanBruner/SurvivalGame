@@ -2,7 +2,7 @@ import pygame
 
 from components import *
 from componentsystem import Viewport
-from myenviorment import Environment
+from myenvironment import Environment
 from utils import Util
 from game.savemanager import SaveGame
 
@@ -37,3 +37,5 @@ class NewSaveMenu(Viewport):
         SaveGame.createNewSave(save_file)
         Util.backViewport(self.enviorment)
         self.enviorment['viewport'].reload()
+
+VIEWPORT_CLASS = NewSaveMenu

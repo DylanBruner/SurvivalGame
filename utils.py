@@ -1,6 +1,6 @@
-import pygame
+import pygame, importlib, inspect
 from componentsystem import Viewport
-from myenviorment import Environment
+from myenvironment import Environment
 
 class Util:
     @staticmethod
@@ -50,3 +50,31 @@ class Util:
         hours = str(hours).zfill(2)
         minutes = str(minutes).zfill(2)
         return f"{hours}:{minutes} {ampm}"
+
+    class MonkeyUtils:
+        RELOAD_BLACKLIST = ["pygame"]
+
+        @staticmethod
+        def reloadModules(globs: dict):
+            for key, value in globs.items():
+                if type(value) == type(importlib) and key not in Util.MonkeyUtils.RELOAD_BLACKLIST:
+                    importlib.reload(value)
+
+        @staticmethod
+        def getViewportFromName(name: str):
+            module = importlib.import_module(f"viewports.{name}")
+            if not hasattr(module, "VIEWPORT_CLASS"):
+                raise AttributeError(f"Module {name} does not have a VIEWPORT_CLASS attribute")
+            return getattr(module, "VIEWPORT_CLASS")
+        
+        @staticmethod
+        def reload(environment: Environment, globs: dict):
+            Util.MonkeyUtils.reloadModules(globs)
+            environment.window = pygame.display.set_mode(environment.window.get_size())
+            # print(environment.viewport.__class__.__name__)
+            # get the parent module of the viewport
+            module = inspect.getmodule(environment.viewport).__name__.split(".")[-1]
+            environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment)
+
+if __name__ == "__main__":
+    Util.MonkeyUtils.getViewportFromName("mainmenu")

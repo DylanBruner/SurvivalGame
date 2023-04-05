@@ -2,7 +2,7 @@ import pygame, time
 
 from components import *
 from componentsystem import Viewport
-from myenviorment import Environment
+from myenvironment import Environment
 from utils import Util
 
 class PauseMenu(Viewport):
@@ -29,3 +29,5 @@ class PauseMenu(Viewport):
     
     def draw(self, enviorment: dict):
         super().draw(enviorment)
+
+VIEWPORT_CLASS = PauseMenu

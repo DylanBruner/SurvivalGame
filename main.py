@@ -1,19 +1,17 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
-import pygame
-
-from myenviorment import Environment
-from utils import Util
-from viewports.mainmenu import MainMenu
+import pygame, myenvironment, utils, time
+import viewports.mainmenu as mainmenu
 
 #https://opengameart.org/content/iron-plague-pointercursor
 
 pygame.init()
+DEV_MODE = True # if true, the game will let you do some things that you shouldn't be able to do in a normal game
 
 STEPPING_MODE = False # if true, the game will only update when you press enter, only works for game logic and some rendering
 STEPS         = 0 # how many steps we have that haven't been processed yet
 
 # keeping most of the important stuff in a dict lets me pass it around easily, probably not the best way to do it but it works
-environment = Environment(**{
+environment = myenvironment.Environment(**{
     "GAME_NAME": "A Game",
     "window": pygame.display.set_mode((800, 600), pygame.RESIZABLE),
     "current_size": (800, 600),
@@ -21,7 +19,7 @@ environment = Environment(**{
     "clock": pygame.time.Clock(),
     "time_delta": 0
 })
-environment.viewport = MainMenu(environment.current_size, environment)
+environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
 
 while True:
     for event in pygame.event.get():
@@ -35,12 +33,19 @@ while True:
             environment.current_size = (event.w, event.h)
         
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F3:
-                STEPPING_MODE = not STEPPING_MODE
-                print("Stepping mode:", STEPPING_MODE)
-            if STEPPING_MODE and event.key == pygame.K_RETURN:
+            # DEV/STEPPING MODE
+            if event.key == pygame.K_F3 and DEV_MODE:
+                STEPPING_MODE = (not STEPPING_MODE)
+                print("[DEV] Stepping mode:", STEPPING_MODE)
+            if STEPPING_MODE and event.key == pygame.K_RETURN and DEV_MODE:
                 STEPS += 1
-        
+            
+            # DEV/RELOADING Warning: this is a very bad thing to use!
+            if event.key == pygame.K_F5 and DEV_MODE:
+                startTime = time.time()
+                utils.Util.MonkeyUtils.reload(environment, globals())
+                print(f"[DEV] Reloaded in {time.time() - startTime:.4f} seconds!")
+
         environment.viewport.onEvent(event)
         for overlay in environment.overlays:
             if not overlay.closed:

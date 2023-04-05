@@ -2,7 +2,7 @@ import pygame
 
 from components import *
 from componentsystem import Viewport
-from myenviorment import Environment
+from myenvironment import Environment
 from utils import Util
 from viewports.playgame import PlayGame
 
@@ -34,3 +34,5 @@ class MainMenu(Viewport):
 
     def draw(self, enviorment: dict):
         super().draw(enviorment)
+
+VIEWPORT_CLASS = MainMenu
