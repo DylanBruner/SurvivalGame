@@ -18,6 +18,7 @@ class NewSaveMenu(Viewport):
 
         self.save_name = TextInput(location=(self.size[0] / 2 - 100, 150), size=(200, 40), prompt_text="Save Name",
                                    max_length=20)
+        self.save_name._selected = True
         self.registerComponent(self.save_name)
 
         self.create_button = Button((self.size[0] / 2 - 100, 200), (200, 40), "Create")
