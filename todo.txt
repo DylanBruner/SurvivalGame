@@ -14,7 +14,8 @@
 - full screen support
 - rebinding of keys in the options menu
 - a difficulty setting
-- particles :D
+- particles :D [DONE]
+- fix movement so that it's not forced to snap to the grid
 
 Things that would be cool to have but are not a priority:
 - biomes
