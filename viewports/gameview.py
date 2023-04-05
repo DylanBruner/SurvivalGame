@@ -11,6 +11,7 @@ from game.world import TEXTURE_MAPPINGS, TILE_SIZE
 from game.keybinding import Bindings
 from myenvironment import Environment
 from utils import Util
+from game.player import Player
 from viewports.pausemenu import PauseMenu
 
 # 1 one day in game is 20 minutes irl
@@ -27,19 +28,19 @@ class GameView(Viewport):
         self.paused: bool = False
         self.paused_overlay: Viewport = None
 
-        self.player_pos: tuple[int, int] = (self.save.save_data['player']['x'], self.save.save_data['player']['y'])
         self.player_velocity: tuple[int, int] = [0, 0]
         self.keys_pressed: dict[int, bool] = {}
 
         self.game_time: float = self.save.save_data['game_time']
         self.last_time_update: float = time.time()
 
-        self.player_health: int = self.save.save_data['player']['health']
-        self.player_max_health: int = self.save.save_data['player']['max_health']
-        self.player_max_stamina: int = self.save.save_data['player']['max_stamina']
-        self.player_stamina = self.player_max_stamina // 4 # spawn with 1/4 stamina
-
-        self.player_xp = self.save.save_data['player']['xp']
+        self.player = Player()
+        self.player.max_health  = self.save.save_data['player']['max_health']
+        self.player.health      = self.save.save_data['player']['health']
+        self.player.max_stamina = self.save.save_data['player']['max_stamina']
+        self.player.stamina     = self.save.save_data['player']['max_stamina'] // 4
+        self.player.xp          = self.save.save_data['player']['xp']
+        self.player.location    = [self.save.save_data['player']['x'], self.save.save_data['player']['y']]
 
         self.day_count: int = self.save.save_data['day_count']
 
@@ -68,11 +69,11 @@ class GameView(Viewport):
         self.registerComponent(self.hotbar)
 
         # Health display
-        self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player_max_health, border_color = (0, 0, 0), border_radius=4)
+        self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player.max_health, border_color = (0, 0, 0), border_radius=4)
         self.registerComponent(self.HEALTH_DISPLAY)
 
         # Stamina display
-        self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player_max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
+        self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player.max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
         self.registerComponent(self.STAMINA_DISPLAY)
 
         # XP display, thin and above the hotbar
@@ -106,10 +107,10 @@ class GameView(Viewport):
             self.player_velocity[0] = speed
 
         if self.keys_pressed.get(Bindings.get("SPRINT"), False) and (self.player_velocity[0] != 0 or self.player_velocity[1] != 0):
-            if self.player_stamina - 0.02 * environment['time_delta'] > 0:
+            if self.player.stamina - 0.02 * environment['time_delta'] > 0:
                 self.player_velocity[0] *= 2
                 self.player_velocity[1] *= 2
-                self.player_stamina -= 0.03 * environment['time_delta']
+                self.player.stamina -= 0.03 * environment['time_delta']
 
         # make diagonal movement look less like teleporting
         if self.player_velocity[0] != 0 and self.player_velocity[1] != 0:
@@ -117,16 +118,16 @@ class GameView(Viewport):
             self.player_velocity[1] /= math.sqrt(2)
 
         # update player position
-        self.player_pos = (self.player_pos[0] + self.player_velocity[0], self.player_pos[1] + self.player_velocity[1])        
+        self.player.location = (self.player.location[0] + self.player_velocity[0], self.player.location[1] + self.player_velocity[1])        
 
         # update save data
-        self.save.save_data['player']['x'] = self.player_pos[0]
-        self.save.save_data['player']['y'] = self.player_pos[1]
+        self.save.save_data['player']['x'] = self.player.location[0]
+        self.save.save_data['player']['y'] = self.player.location[1]
 
         # regenerate stamina if below max
-        if self.player_stamina < self.player_max_stamina:
-            self.player_stamina += 0.01 * environment['time_delta']
-            self.player_stamina = min(self.player_max_stamina, self.player_stamina)
+        if self.player.stamina < self.player.max_stamina:
+            self.player.stamina += 0.01 * environment['time_delta']
+            self.player.stamina = min(self.player.max_stamina, self.player.stamina)
 
     def draw(self, enviorment: dict):
         if self.paused:
@@ -144,7 +145,7 @@ class GameView(Viewport):
             self.FPS_DISPLAY.setText(f"FPS: {enviorment['clock'].get_fps():.0f}")
         if time.time() - self.LOC_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.LOC_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.LOC_DISPLAY.setText(f"({self.player_pos[0]:.0f}, {self.player_pos[1]:.0f})")
+            self.LOC_DISPLAY.setText(f"({self.player.location[0]:.0f}, {self.player.location[1]:.0f})")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} - Day {self.day_count}")
@@ -160,11 +161,11 @@ class GameView(Viewport):
                 self.save.save_data['day_count'] = self.day_count
             self.save.save_data['game_time'] = self.game_time
         
-        self.HEALTH_DISPLAY.value  = self.player_health
-        self.STAMINA_DISPLAY.value = self.player_stamina
-        self.XP_DISPLAY.value      = self.player_xp % 100
-        self.XP_LEVEL_DISPLAY.setText(str(self.player_xp // 100))
-        self.XP_LEVEL_DISPLAY.location = (self.size[0] // 2 - (DEFAULT_FONT.size(str(self.player_xp // 100))[0] // 2), self.XP_DISPLAY.location[1] - 24)
+        self.HEALTH_DISPLAY.value  = self.player.health
+        self.STAMINA_DISPLAY.value = self.player.stamina
+        self.XP_DISPLAY.value      = self.player.xp % 100
+        self.XP_LEVEL_DISPLAY.setText(str(self.player.xp // 100))
+        self.XP_LEVEL_DISPLAY.location = (self.size[0] // 2 - (DEFAULT_FONT.size(str(self.player.xp // 100))[0] // 2), self.XP_DISPLAY.location[1] - 24)
 
         self.enviorment['window'].fill((0, 0, 0))
 
@@ -175,8 +176,8 @@ class GameView(Viewport):
         VIEW_WIDTH = self.size[0]
         VIEW_HEIGHT = self.size[1]
 
-        startX = int(self.player_pos[0]) - (VIEW_WIDTH // TILE_SIZE) // 2
-        startY = int(self.player_pos[1]) - (VIEW_HEIGHT // TILE_SIZE) // 2
+        startX = int(self.player.location[0]) - (VIEW_WIDTH // TILE_SIZE) // 2
+        startY = int(self.player.location[1]) - (VIEW_HEIGHT // TILE_SIZE) // 2
 
         # calculate the visible tile range
         minX = max(startX, 0)
@@ -208,7 +209,7 @@ class GameView(Viewport):
         mouse_pos = (mouse_pos[0] + startX * TILE_SIZE, mouse_pos[1] + startY * TILE_SIZE)
         mouse_pos = (mouse_pos[0] // TILE_SIZE, mouse_pos[1] // TILE_SIZE)
         # red if not reachable, white if reachable (5 from player and in the map)
-        if mouse_pos[0] < 0 or mouse_pos[0] >= len(map_data[0]) or mouse_pos[1] < 0 or mouse_pos[1] >= len(map_data) or Util.distance(self.player_pos, mouse_pos) > 5:
+        if mouse_pos[0] < 0 or mouse_pos[0] >= len(map_data[0]) or mouse_pos[1] < 0 or mouse_pos[1] >= len(map_data) or Util.distance(self.player.location, mouse_pos) > 5:
             color = (255, 0, 0)
         else:
             color = (255, 255, 255)

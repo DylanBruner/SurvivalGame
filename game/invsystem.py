@@ -78,7 +78,7 @@ class HotbarComponent(Component):
                 pygame.draw.rect(surface, (0, 0, 0), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), 2, border_radius=4)
 
         if self.breaking:
-            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
             if selected_tile != self.real_tile:
                 self.breaking = False
                 self.breaking_percent = 0
@@ -90,10 +90,10 @@ class HotbarComponent(Component):
 
             self.breaking_percent += Tiles.calculateHitPercent(self._breaking_power, tile.breaking_power, tile.durability)
 
-            if self.breaking_percent >= 100 and self.parent.player_stamina - Util.calculateStaminaCost(self._breaking_power) >= 0:
-                self.parent.player_stamina -= Util.calculateStaminaCost(self._breaking_power)
-                self.parent.player_xp += 5 * self.parent.save.save_data['player']['xp_multiplier']
-                self.parent.save.save_data['player']['xp'] = self.parent.player_xp
+            if self.breaking_percent >= 100 and self.parent.player.stamina - Util.calculateStaminaCost(self._breaking_power) >= 0:
+                self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
+                self.parent.player.xp += 5 * self.parent.save.save_data['player']['xp_multiplier']
+                self.parent.save.save_data['player']['xp'] = self.parent.player.xp
                 self.breaking = False
                 self.breaking_percent = 0
 
@@ -145,18 +145,18 @@ class HotbarComponent(Component):
                     self._selected_slot = i            
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
-            if Util.distance(selected_tile, self.parent.player_pos) > 5:
+            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
+            if Util.distance(selected_tile, self.parent.player.location) > 5:
                 return
             if event.button == 1:
-                if Util.calculateStaminaCost(self._breaking_power) > self.parent.player_stamina:
+                if Util.calculateStaminaCost(self._breaking_power) > self.parent.player.stamina:
                     p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
                                          shape=pSys.Shape.RANDOM_POLYGON, count=200,
                                          speed=10, lifetime=200, size=1)
                     self.parent.particle_displays.append(p)
 
                 else:
-                    self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+                    self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
                     tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
                     if tile.breakable:
                         self.breaking = True
@@ -165,7 +165,7 @@ class HotbarComponent(Component):
 
             # place block
             elif event.button == 3:
-                selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+                selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
                 if self._items[self._selected_slot] and self.parent.save.getTile(selected_tile[0], selected_tile[1]) == TileIDS.GRASS:
                     self.parent.save.setTile(selected_tile[0], selected_tile[1], self._items[self._selected_slot].item_id)
                     self._items[self._selected_slot].count -= 1
