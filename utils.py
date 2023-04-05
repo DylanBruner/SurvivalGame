@@ -1,4 +1,4 @@
-import pygame, importlib, inspect, sys
+import pygame, importlib, inspect, sys, math
 from componentsystem import Viewport
 from myenvironment import Environment
 

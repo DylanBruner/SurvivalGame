@@ -1,18 +1,20 @@
-import pygame, math, time
+import math, time, pygame
 
 from components import *
 from componentsystem import Viewport
+from game.enemy import Enemy
 from game.invsystem import HotbarComponent
+from game.keybinding import Bindings
 from game.minimap import MiniMap
 from game.particlesystem import ParticleDisplay
+from game.player import Player
 from game.savemanager import SaveGame
 from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE
-from game.keybinding import Bindings
 from myenvironment import Environment
 from utils import Util
-from game.player import Player
 from viewports.pausemenu import PauseMenu
+from enemies.testpathfinder import TestPathfinderEnemy
 
 # 1 one day in game is 20 minutes irl
 REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
@@ -27,13 +29,17 @@ class GameView(Viewport):
 
         self.paused: bool = False
         self.paused_overlay: Viewport = None
-
-        self.player_velocity: tuple[int, int] = [0, 0]
         self.keys_pressed: dict[int, bool] = {}
+
 
         self.game_time: float = self.save.save_data['game_time']
         self.last_time_update: float = time.time()
+        self.day_count: int = self.save.save_data['day_count']
 
+        self.enemies: list[Enemy] = []
+
+
+        self.player_velocity: tuple[int, int] = [0, 0]
         self.player = Player()
         self.player.max_health  = self.save.save_data['player']['max_health']
         self.player.health      = self.save.save_data['player']['health']
@@ -42,7 +48,6 @@ class GameView(Viewport):
         self.player.xp          = self.save.save_data['player']['xp']
         self.player.location    = [self.save.save_data['player']['x'], self.save.save_data['player']['y']]
 
-        self.day_count: int = self.save.save_data['day_count']
 
         self.particle_displays: list[ParticleDisplay] = []
 
@@ -205,8 +210,13 @@ class GameView(Viewport):
                             color = (255, 0, 0) if Util.distance(self.player.selected_tile, self.player.location) > 5 else (255, 255, 255)
                             pygame.draw.rect(self.enviorment['window'], color, (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
+        for enemy in self.enemies:
+            if Util.distance(enemy.location, self.player.location) < 100:
+                ex = (enemy.location[0] - left_plane) * TILE_SIZE
+                ey = (enemy.location[1] - bottom_plane) * TILE_SIZE
+                enemy.draw(enviorment['window'], enviorment, (ex, ey))
 
-        # draw the player as a red rect
+        # # draw the player as a red rect
         pygame.draw.rect(self.enviorment['window'], (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
         text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
         self.enviorment['window'].blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
@@ -243,6 +253,12 @@ class GameView(Viewport):
                 self.paused_overlay = PauseMenu(self.size, self.enviorment)
                 self.enviorment['overlays'].append(self.paused_overlay)
                 return
+            
+            elif event.key == pygame.K_j:
+                self.enemies.append(TestPathfinderEnemy((
+                    self.player.selected_tile[0],
+                    self.player.selected_tile[1]
+                ), self))
 
         if event.type == pygame.KEYUP:
             self.keys_pressed[event.key] = False
