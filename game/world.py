@@ -94,7 +94,7 @@ class World:
                 self.map['map_data'][point[1]][point[0]] = TileIDS.WATER
         
         # pick random empty spots to place trees
-        for _ in range(1500):
+        for _ in range(5500):
             location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
             # while self.map['map_data'][location[1]][location[0]] != TileIDS.EMPTY:
                 # location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
