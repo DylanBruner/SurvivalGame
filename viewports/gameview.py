@@ -27,8 +27,8 @@ class GameView(Viewport):
         self.paused: bool = False
         self.paused_overlay: Viewport = None
 
-        self.player_pos: tuple[int, int] = (0, 0)
-        self.move_pos: tuple[int, int] = (0, 0)
+        self.move_pos: tuple[int, int]   = (self.save.save_data['player']['x'], self.save.save_data['player']['y'])
+        self.player_pos: tuple[int, int] = (int(self.move_pos[0]), int(self.move_pos[1]))
         self.keys_pressed: dict[int, bool] = {}
 
         self.game_time: float = self.save.save_data['game_time']
@@ -80,7 +80,7 @@ class GameView(Viewport):
         if projected_pos[1] < 0 or projected_pos[1] >= len(self.save.save_data['world']['map_data']):
             return False
 
-        tileAt = self.save.save_data['world']['map_data'][projected_pos[1]][projected_pos[0]]        
+        tileAt = self.save.save_data['world']['map_data'][projected_pos[1]][projected_pos[0]]
 
         return not Tiles.getTile(tileAt).collidable
     
@@ -95,6 +95,9 @@ class GameView(Viewport):
             self.move_pos = (self.move_pos[0], self.move_pos[1] - speed)
         if self.keys_pressed.get(pygame.K_s, False) and self.canMove(1, speed):
             self.move_pos = (self.move_pos[0], self.move_pos[1] + speed)
+        
+        self.save.save_data['player']['x'] = self.move_pos[0]
+        self.save.save_data['player']['y'] = self.move_pos[1]
         
         # limit the player to the map
         self.player_pos = (max(0, min(int(self.move_pos[0]), len(self.save.save_data['world']['map_data'][0]) - 1)),
@@ -127,6 +130,7 @@ class GameView(Viewport):
             self.last_time_update = time.time()
             
             if self.game_time > 1501: self.game_time = 60
+            self.save.save_data['game_time'] = self.game_time
 
         self.enviorment['window'].fill((0, 0, 0))
 

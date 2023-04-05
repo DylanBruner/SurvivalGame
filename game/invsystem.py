@@ -3,9 +3,8 @@ from game.tiles import Tiles
 
 from componentsystem import Component
 from game.keybinding import Bindings
-from game.world import TILE_SIZE, TileIDS
+from game.world import TILE_SIZE, TileIDS, TEXTURE_MAPPINGS
 from utils import Util
-
 
 class Config:
     # Visual
@@ -28,7 +27,10 @@ class HotbarComponent(Component):
         super().__init__(location=location, size=(Config.SLOT_SIZE * 9, Config.SLOT_SIZE)) # the size shouldn't really matter
         self.EVENT_SYSTEM_HOOKED = True
 
-        self._items = [None, None, None, None, None, None, None, None, None] # 9 slots
+        self._items = []
+        for item_id, item_count in self.parent.save.save_data['player']['inventory']:
+            self._items.append(Item(item_id, item_count, TEXTURE_MAPPINGS[item_id]))
+
         self._keybind_map = [f"SLOT_{i + 1}" for i in range(len(self._items))]
         self._selected_slot = 0
         self._breaking_power = 9
@@ -52,7 +54,7 @@ class HotbarComponent(Component):
 
         # if not, find an empty slot
         for i in range(len(self._items)):
-            if not self._items[i]:
+            if not self._items[i] or self._items[i].item_id == 0:
                 self._items[i] = item
                 return
         
@@ -62,7 +64,7 @@ class HotbarComponent(Component):
         for i in range(len(self._items)):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
             # draw item
-            if self._items[i]:
+            if self._items[i] and self._items[i].item_id != 0:
                 surface.blit(self._items[i].texture, (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 4, self.location[1] + 4))
                 # draw count
                 if self._items[i].count > 1:
@@ -92,6 +94,13 @@ class HotbarComponent(Component):
                 self.parent.save.setTile(self.real_tile[0], self.real_tile[1], TileIDS.GRASS)
                 self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
                 self.breaking_tile = None
+                self.save()
+    
+    def save(self):
+        self.parent.save.save_data['player']['inventory'] = []
+        for item in self._items:
+            if item:
+                self.parent.save.save_data['player']['inventory'].append((item.item_id, item.count))
             
     def onEvent(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -118,6 +127,7 @@ class HotbarComponent(Component):
                     self._items[self._selected_slot].count -= 1
                     if self._items[self._selected_slot].count <= 0:
                         self._items[self._selected_slot] = None
+                    self.save()
                 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:

@@ -1,4 +1,4 @@
-import pygame, importlib, inspect
+import pygame, importlib, inspect, sys
 from componentsystem import Viewport
 from myenvironment import Environment
 
@@ -56,9 +56,10 @@ class Util:
 
         @staticmethod
         def reloadModules(globs: dict):
-            for key, value in globs.items():
-                if type(value) == type(importlib) and key not in Util.MonkeyUtils.RELOAD_BLACKLIST:
-                    importlib.reload(value)
+            for module in list(sys.modules.keys()):
+                if module not in Util.MonkeyUtils.RELOAD_BLACKLIST and module.startswith("viewports"):
+                    importlib.reload(sys.modules[module])
+                    globs[module.split(".")[-1]] = sys.modules[module]
 
         @staticmethod
         def getViewportFromName(name: str):
@@ -74,7 +75,12 @@ class Util:
             # reload the current viewport, all other should be reloaded when the modules are reloaded (hopefully)
             environment.window = pygame.display.set_mode(environment.window.get_size())
             module = inspect.getmodule(environment.viewport).__name__.split(".")[-1]
-            environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment)
+
+            if module == "gameview":
+                environment.viewport.save.save()
+                environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment, environment.viewport.save)                
+            else:
+                environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment)
 
 if __name__ == "__main__":
     Util.MonkeyUtils.getViewportFromName("mainmenu")

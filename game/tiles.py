@@ -33,3 +33,12 @@ class Tiles:
         base = 100 / durability
         if breaking_power >= req_power:
             return base * breaking_power
+    
+    @staticmethod
+    def getTexture(id_name: int or str) -> str:
+        if isinstance(id_name, int):
+            for tile in TILE_DATA.values():
+                if tile["id"] == id_name:
+                    return tile["texture"]
+        elif isinstance(id_name, str):
+            return TILE_DATA[id_name]["texture"]

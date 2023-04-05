@@ -25,7 +25,10 @@ class PauseMenu(Viewport):
         self.enviorment['overlays'].remove(self)
     
     def exit(self):
-        ...
+        self.enviorment.viewport.save.save() # save the game
+        self.enviorment.viewport = Util.MonkeyUtils.getViewportFromName("mainmenu")(self.enviorment.viewport.size, self.enviorment)
+        self.enviorment.last_viewports = [] # we don't want to go 'back' into the game
+        self.closed = True
     
     def draw(self, enviorment: dict):
         super().draw(enviorment)
