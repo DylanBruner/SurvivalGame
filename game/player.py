@@ -8,3 +8,5 @@ class Player:
         self.xp          = 0
         self.location    = [0, 0]
         self.alive       = True
+
+        self.selected_tile = [None, None]

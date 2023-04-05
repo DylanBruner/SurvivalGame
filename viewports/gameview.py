@@ -80,7 +80,7 @@ class GameView(Viewport):
         return True
     
     def doGameLogic(self, environment: dict):
-        speed = 0.01 * environment['time_delta']
+        speed = 0.008 * environment['time_delta']
         self.player_velocity = [0, 0]
         if self.keys_pressed.get(Bindings.get("FORWARD"), False):
             self.player_velocity[1] = -speed
@@ -157,49 +157,45 @@ class GameView(Viewport):
         # draw the map
         map_data: list[list[int]] = self.save.save_data['world']['map_data']
 
-        # it should be centered on the player
-        VIEW_WIDTH = self.size[0]
-        VIEW_HEIGHT = self.size[1]
+        # Define the size of the visible area around the player
+        visible_width = self.size[0] // TILE_SIZE + 32
+        visible_height = self.size[1] // TILE_SIZE + 32
 
-        startX = int(self.player.location[0]) - (VIEW_WIDTH // TILE_SIZE) // 2
-        startY = int(self.player.location[1]) - (VIEW_HEIGHT // TILE_SIZE) // 2
+        # Get the player's position
+        player_x, player_y = self.player.location[0] + 16, self.player.location[1] + 16
 
-        # calculate the visible tile range
-        minX = max(startX, 0)
-        maxX = min(startX + (VIEW_WIDTH // TILE_SIZE) + 1, len(map_data[0]))
-        minY = max(startY, 0)
-        maxY = min(startY + (VIEW_HEIGHT // TILE_SIZE) + 1, len(map_data))
+        # Calculate the bounds of the visible area
+        left_plane = player_x - visible_width // 2
+        right_plane = left_plane + visible_width
+        bottom_plane = player_y - visible_height // 2
+        top_plane = bottom_plane + visible_height
 
-        # draw only the visible tiles
-        for y in range(minY, maxY):
-            for x in range(minX, maxX):
-                tile = map_data[y][x]
-                if not tile:
-                    tile = 1
+        # Iterate only over the tiles that are visible
+        for x in range(int(left_plane), int(right_plane)):
+            for y in range(int(bottom_plane), int(top_plane)):
+                # Check if the tile is within the bounds of the map
+                if x >= 0 and x < len(map_data) and y >= 0 and y < len(map_data[x]):
+                    texture = TEXTURE_MAPPINGS[map_data[x][y]]
+                    if texture is not None:
+                        # Calculate the position of the tile on the screen
+                        screen_x = (x - left_plane) * TILE_SIZE
+                        screen_y = (y - bottom_plane) * TILE_SIZE
+                        self.enviorment['window'].blit(texture, (screen_x, screen_y))
+                        # draw black border around the tile
+                        pygame.draw.rect(self.enviorment['window'], (0, 0, 0), (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
-                tile_texture = TEXTURE_MAPPINGS[tile]
-                tile_pos = (x * TILE_SIZE - startX * TILE_SIZE, y * TILE_SIZE - startY * TILE_SIZE)
+                        # check if the mouse is hovering over the tile
+                        if pygame.mouse.get_pos()[0] >= screen_x and pygame.mouse.get_pos()[0] <= screen_x + TILE_SIZE and pygame.mouse.get_pos()[1] >= screen_y and pygame.mouse.get_pos()[1] <= screen_y + TILE_SIZE:
+                            self.player.selected_tile = (x, y)
 
-                if Tiles.getTile(tile).background_id:
-                    background_texture = TEXTURE_MAPPINGS[Tiles.getTile(tile).background_id]
-                    self.enviorment['window'].blit(background_texture, tile_pos)
+                            color = (255, 0, 0) if Util.distance(self.player.selected_tile, self.player.location) > 5 else (255, 255, 255)
+                            pygame.draw.rect(self.enviorment['window'], color, (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
-                self.enviorment['window'].blit(tile_texture, tile_pos)
 
-        # draw the player in the middle of the screen
-        pygame.draw.rect(enviorment['window'], (255, 0, 0), (VIEW_WIDTH // 2 - TILE_SIZE // 2, VIEW_HEIGHT // 2 - TILE_SIZE // 2, TILE_SIZE, TILE_SIZE))
-
-        # draw the selected tile, along with if it's reachable/valid
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_pos = (mouse_pos[0] + startX * TILE_SIZE, mouse_pos[1] + startY * TILE_SIZE)
-        mouse_pos = (mouse_pos[0] // TILE_SIZE, mouse_pos[1] // TILE_SIZE)
-        # red if not reachable, white if reachable (5 from player and in the map)
-        if mouse_pos[0] < 0 or mouse_pos[0] >= len(map_data[0]) or mouse_pos[1] < 0 or mouse_pos[1] >= len(map_data) or Util.distance(self.player.location, mouse_pos) > 5:
-            color = (255, 0, 0)
-        else:
-            color = (255, 255, 255)
-
-        pygame.draw.rect(enviorment['window'], color, (mouse_pos[0] * TILE_SIZE - startX * TILE_SIZE, mouse_pos[1] * TILE_SIZE - startY * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
+        # draw the player as a red rect
+        pygame.draw.rect(self.enviorment['window'], (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
+        # text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
+        # self.enviorment['window'].blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
             particle_disp.draw(enviorment['window'], delta_time = enviorment['time_delta'])
