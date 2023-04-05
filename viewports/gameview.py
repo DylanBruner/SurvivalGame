@@ -22,6 +22,7 @@ class GameView(Viewport):
         self.paused_overlay: Viewport = None
 
         self.player_pos: tuple[int, int] = (0, 0)
+        self.move_pos: tuple[int, int] = (0, 0)
         self.keys_pressed: dict[int, bool] = {}
 
         self.setup()
@@ -35,19 +36,20 @@ class GameView(Viewport):
         self.hotbar = HotbarComponent(parent=self)
         self.registerComponent(self.hotbar)
     
-    def canMove(self, dir: int) -> bool:
+    def canMove(self, dir: int, speed: int) -> bool:
         # forward, backward, left, right
         projected_pos = None
         if dir == 0:
-            projected_pos = (self.player_pos[0], self.player_pos[1] - 1)
+            projected_pos = (self.move_pos[0], self.move_pos[1] - speed)
         elif dir == 1:
-            projected_pos = (self.player_pos[0], self.player_pos[1] + 1)
+            projected_pos = (self.move_pos[0], self.move_pos[1] + speed)
         elif dir == 2:
-            projected_pos = (self.player_pos[0] - 1, self.player_pos[1])
+            projected_pos = (self.move_pos[0] - speed, self.move_pos[1])
         elif dir == 3:
-            projected_pos = (self.player_pos[0] + 1, self.player_pos[1])
+            projected_pos = (self.move_pos[0] + speed, self.move_pos[1])
         else:
             raise Exception(f"Invalid direction: {dir}")
+        projected_pos = (int(projected_pos[0]), int(projected_pos[1]))
 
         # if projected_pos is out of bounds, return False
         if projected_pos[0] < 0 or projected_pos[0] >= len(self.save.save_data['world']['map_data'][0]):
@@ -61,18 +63,19 @@ class GameView(Viewport):
     
     def doGameLogic(self, enviorment: dict):
         # handle key presses
-        if self.keys_pressed.get(pygame.K_a, False) and self.canMove(2):
-            self.player_pos = (self.player_pos[0] - 1, self.player_pos[1])
-        if self.keys_pressed.get(pygame.K_d, False) and self.canMove(3):
-            self.player_pos = (self.player_pos[0] + 1, self.player_pos[1])
-        if self.keys_pressed.get(pygame.K_w, False) and self.canMove(0):
-            self.player_pos = (self.player_pos[0], self.player_pos[1] - 1)
-        if self.keys_pressed.get(pygame.K_s, False) and self.canMove(1):
-            self.player_pos = (self.player_pos[0], self.player_pos[1] + 1)
+        speed = 0.05 * enviorment['time_delta']
+        if self.keys_pressed.get(pygame.K_a, False) and self.canMove(2, speed):
+            self.move_pos = (self.move_pos[0] - speed, self.move_pos[1])
+        if self.keys_pressed.get(pygame.K_d, False) and self.canMove(3, speed):
+            self.move_pos = (self.move_pos[0] + speed, self.move_pos[1])
+        if self.keys_pressed.get(pygame.K_w, False) and self.canMove(0, speed):
+            self.move_pos = (self.move_pos[0], self.move_pos[1] - speed)
+        if self.keys_pressed.get(pygame.K_s, False) and self.canMove(1, speed):
+            self.move_pos = (self.move_pos[0], self.move_pos[1] + speed)
         
         # limit the player to the map
-        self.player_pos = (max(0, min(self.player_pos[0], len(self.save.save_data['world']['map_data'][0]) - 1)),
-                           max(0, min(self.player_pos[1], len(self.save.save_data['world']['map_data']) - 1)))
+        self.player_pos = (max(0, min(int(self.move_pos[0]), len(self.save.save_data['world']['map_data'][0]) - 1)),
+                           max(0, min(int(self.move_pos[1]), len(self.save.save_data['world']['map_data']) - 1)))
             
     def draw(self, enviorment: dict):
         if self.paused:

@@ -16,7 +16,7 @@ TEXTURE_MAPPINGS = {
 }
 
 class World:
-    def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (100, 100)):
+    def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (800, 800)):
         self.MAP_SIZE = MAP_SIZE
         self.map = {
             'seed': None,
