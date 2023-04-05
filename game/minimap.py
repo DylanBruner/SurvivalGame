@@ -12,10 +12,18 @@ class MiniMap(Component):
     
     def draw(self, surface: pygame.Surface, enviorment: dict):
         pygame.draw.rect(surface, (255, 255, 255), (self.location[0], self.location[1], self.size[0], self.size[1]))
-        mapSurface = pygame.Surface(self.parent.size)
+        mapSurface = pygame.Surface(self.size)
         mapSurface.fill((255, 255, 255))
 
         #TODO: Figure out how to do this without lagging the game
         map: list[list[int]] = self.parent.save.save_data['world']['map_data']
+        for x in range(self.SCALE_SIZE[0]):
+            for y in range(self.SCALE_SIZE[1]):
+                if map[x][y] in TEXTURE_MAPPINGS:
+                    mapSurface.blit(TEXTURE_MAPPINGS[map[x][y]], (x * TILE_SIZE, y * TILE_SIZE))
+                else:
+                    mapSurface.blit(TEXTURE_MAPPINGS[0], (x * TILE_SIZE, y * TILE_SIZE))
 
-        surface.blit(mapSurface, (self.location[0], self.location[1]))
+        mapSurface = pygame.transform.scale(mapSurface, self.size)
+        surface.blit(mapSurface, self.location)
+        
