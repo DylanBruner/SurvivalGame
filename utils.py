@@ -73,7 +73,7 @@ class Util:
             Util.MonkeyUtils.reloadModules(globs)
             
             # reload the current viewport, all other should be reloaded when the modules are reloaded (hopefully)
-            environment.window = pygame.display.set_mode(environment.window.get_size())
+            environment.window = pygame.display.set_mode(environment.window.get_size(), pygame.RESIZABLE)
             module = inspect.getmodule(environment.viewport).__name__.split(".")[-1]
 
             if module == "gameview":

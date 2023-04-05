@@ -32,6 +32,7 @@ class SaveGame:
                 "money": 0,
                 "health": 100,
                 "max_health": 100,
+                "max_stamina": 100,
                 "level": 1,
                 "xp": 0,
                 "x": 0,

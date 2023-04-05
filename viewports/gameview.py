@@ -35,6 +35,11 @@ class GameView(Viewport):
         self.game_time: float = self.save.save_data['game_time']
         self.last_time_update: float = time.time()
 
+        self.player_health: int = self.save.save_data['player']['health']
+        self.player_max_health: int = self.save.save_data['player']['max_health']
+        self.player_max_stamina: int = self.save.save_data['player']['max_stamina']
+        self.player_stamina = self.player_max_stamina // 4 # spawn with 1/4 stamina
+
         self.particle_displays: list[ParticleDisplay] = []
 
         self.setup()
@@ -58,6 +63,13 @@ class GameView(Viewport):
         # Game stuff
         self.hotbar = HotbarComponent(parent=self)
         self.registerComponent(self.hotbar)
+
+        # Health display
+        self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player_max_health, border_color = (0, 0, 0), border_radius=4)
+        self.registerComponent(self.HEALTH_DISPLAY)
+
+        self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player_max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
+        self.registerComponent(self.STAMINA_DISPLAY)
 
         self.minimap = MiniMap(parent=self)
         self.registerComponent(self.minimap)
@@ -105,6 +117,11 @@ class GameView(Viewport):
         # limit the player to the map
         self.player_pos = (max(0, min(int(self.move_pos[0]), len(self.save.save_data['world']['map_data'][0]) - 1)),
                            max(0, min(int(self.move_pos[1]), len(self.save.save_data['world']['map_data']) - 1)))
+    
+        # stamina regen
+        if self.player_stamina < self.player_max_stamina:
+            self.player_stamina += 0.01 * enviorment['time_delta']
+            self.player_stamina = min(self.player_max_stamina, self.player_stamina)
             
     def draw(self, enviorment: dict):
         if self.paused:
@@ -134,6 +151,9 @@ class GameView(Viewport):
             
             if self.game_time > 1501: self.game_time = 60
             self.save.save_data['game_time'] = self.game_time
+        
+        self.HEALTH_DISPLAY.value = self.player_health
+        self.STAMINA_DISPLAY.value = self.player_stamina
 
         self.enviorment['window'].fill((0, 0, 0))
 

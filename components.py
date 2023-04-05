@@ -6,7 +6,7 @@ DEFAULT_FONT = pygame.font.SysFont("Arial", 20)
 
 class ProgressBar(Component):
     def __init__(self, location: tuple[int, int], 
-                 size: tuple[int, int], value: int, maxValue: int = 100,
+                 size: tuple[int, int], value: int = 0, max_value: int = 100,
                  bar_color: tuple[int, int, int] = (0, 255, 0),
                  background_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
@@ -14,7 +14,7 @@ class ProgressBar(Component):
         
         super().__init__(location, size)
         self.value = value
-        self.max   = maxValue
+        self.max   = max_value
         self.bar_color = bar_color
         self.background_color = background_color
         self.border_color = border_color
