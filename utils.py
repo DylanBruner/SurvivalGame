@@ -50,6 +50,19 @@ class Util:
         hours = str(hours).zfill(2)
         minutes = str(minutes).zfill(2)
         return f"{hours}:{minutes} {ampm}"
+    
+    @staticmethod
+    def calculateStaminaCost(breaking_power: int) -> int:
+        # higher breaking power = more stamina cost
+        return max(1, breaking_power * 2 - 1)
+
+    @staticmethod
+    def shiftUnicode(chr: int) -> int:
+        return chr + 0xE000
+
+    @staticmethod
+    def unshiftUnicode(chr: int) -> int:
+        return chr - 0xE000
 
     class MonkeyUtils:
         RELOAD_BLACKLIST = ["pygame"]
@@ -70,6 +83,10 @@ class Util:
         
         @staticmethod
         def reload(environment: Environment, globs: dict):
+            # attempt to save the game
+            if hasattr(environment, "viewport") and hasattr(environment.viewport, "save"):
+                environment.viewport.save.save()
+                
             Util.MonkeyUtils.reloadModules(globs)
             
             # reload the current viewport, all other should be reloaded when the modules are reloaded (hopefully)

@@ -13,6 +13,7 @@ BLANK_SAVE = {
         "xp": 0,
         "x": 0,
         "y": 0,
+        "xp_multiplier": 1,
     },
     "day_count": 0,
     "game_time": 0,

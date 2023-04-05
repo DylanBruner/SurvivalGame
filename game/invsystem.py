@@ -15,7 +15,7 @@ class Config:
     BREAK_COLOR: pSys.Color = pSys.Color((70, 66, 38), mod_r=40)
 
     # Gameplay
-    STACK_SIZE: int = 99
+    STACK_SIZE: int = 250
 
 class Item:
     def __init__(self, item_id: int, count: int, texture: pygame.Surface):
@@ -90,7 +90,10 @@ class HotbarComponent(Component):
 
             self.breaking_percent += Tiles.calculateHitPercent(self._breaking_power, tile.breaking_power, tile.durability)
 
-            if self.breaking_percent >= 100:
+            if self.breaking_percent >= 100 and self.parent.player_stamina - Util.calculateStaminaCost(self._breaking_power) >= 0:
+                self.parent.player_stamina -= Util.calculateStaminaCost(self._breaking_power)
+                self.parent.player_xp += 5 * self.parent.save.save_data['player']['xp_multiplier']
+                self.parent.save.save_data['player']['xp'] = self.parent.player_xp
                 self.breaking = False
                 self.breaking_percent = 0
 
@@ -106,28 +109,55 @@ class HotbarComponent(Component):
                 self.parent.particle_displays.append(p)
     
     def save(self):
-        self.parent.save.save_data['player']['inventory'] = []
+        self.parent.save.save_data['player']['inventory'] = [[0, 0] for i in range(9)]
         for item in self._items:
             if item:
-                self.parent.save.save_data['player']['inventory'].append((item.item_id, item.count))
+                self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [item.item_id, item.count]
+            else:
+                self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [0, 0]
             
     def onEvent(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             for i in range(len(self._keybind_map)):
-                if Bindings.check(event, self._keybind_map[i]):
-                    self._selected_slot = i
+                if pygame.key.get_pressed()[pygame.K_LSHIFT] and Bindings.check(event, self._keybind_map[i]):
+                    if self._selected_slot == i: continue
+                    item1 = self._items[self._selected_slot]
+                    item2 = self._items[i]
+
+                    # if possible merge the items
+                    if item1 and item2 and item1.item_id == item2.item_id:
+                        if item1.count + item2.count <= Config.STACK_SIZE:
+                            item1.count += item2.count
+                            self._items[i] = None
+                            self.save()
+                            return
+                    
+                    # swap the items
+                    self._items[self._selected_slot] = item2
+                    self._items[i] = item1
+                    self.save()
+                elif Bindings.check(event, self._keybind_map[i]):
+                    self._selected_slot = i            
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
             if Util.distance(selected_tile, self.parent.player_pos) > 5:
                 return
             if event.button == 1:
-                self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
-                tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
-                if tile.breakable:
-                    self.breaking = True
-                    self.breaking_percent = 0
-                    self.breaking_tile = (event.pos[0] // TILE_SIZE, event.pos[1] // TILE_SIZE)
+                if Util.calculateStaminaCost(self._breaking_power) > self.parent.player_stamina:
+                    p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
+                                         shape=pSys.Shape.RANDOM_POLYGON, count=200,
+                                         speed=10, lifetime=200, size=1)
+                    self.parent.particle_displays.append(p)
+
+                else:
+                    self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+                    tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
+                    if tile.breakable:
+                        self.breaking = True
+                        self.breaking_percent = 0
+                        self.breaking_tile = (event.pos[0] // TILE_SIZE, event.pos[1] // TILE_SIZE)
+
             # place block
             elif event.button == 3:
                 selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
@@ -137,9 +167,21 @@ class HotbarComponent(Component):
                     if self._items[self._selected_slot].count <= 0:
                         self._items[self._selected_slot] = None
                     self.save()
+            
+            # scroll
+            elif event.button == 4:
+                self._selected_slot -= 1
+                if self._selected_slot < 0:
+                    self._selected_slot = len(self._items) - 1
                 
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 if self.breaking:
                     self.breaking = False
                     self.breaking_percent = 0
+            
+            # scroll
+            elif event.button == 5:
+                self._selected_slot += 1
+                if self._selected_slot >= len(self._items):
+                    self._selected_slot = 0

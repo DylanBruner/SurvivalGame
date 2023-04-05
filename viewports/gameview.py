@@ -39,6 +39,8 @@ class GameView(Viewport):
         self.player_max_stamina: int = self.save.save_data['player']['max_stamina']
         self.player_stamina = self.player_max_stamina // 4 # spawn with 1/4 stamina
 
+        self.player_xp = self.save.save_data['player']['xp']
+
         self.day_count: int = self.save.save_data['day_count']
 
         self.particle_displays: list[ParticleDisplay] = []
@@ -69,8 +71,17 @@ class GameView(Viewport):
         self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player_max_health, border_color = (0, 0, 0), border_radius=4)
         self.registerComponent(self.HEALTH_DISPLAY)
 
+        # Stamina display
         self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player_max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
         self.registerComponent(self.STAMINA_DISPLAY)
+
+        # XP display, thin and above the hotbar
+        self.XP_DISPLAY = ProgressBar(location=(self.hotbar.location[0], self.hotbar.location[1] - 14), size=(self.hotbar.size[0] + 33, 10), max_value=100, border_color = (0, 0, 0), bar_color=(154, 66, 205), border_radius=4)
+        self.registerComponent(self.XP_DISPLAY)
+
+        # XP level display, above the XP display in the middle
+        self.XP_LEVEL_DISPLAY = TextDisplay(location=(self.size[0] // 2 - (DEFAULT_FONT.size("???")[0] // 2), self.XP_DISPLAY.location[1] - 24), text="???", color=(255, 255, 255))
+        self.registerComponent(self.XP_LEVEL_DISPLAY)
 
         self.minimap = MiniMap(parent=self)
         self.registerComponent(self.minimap)
@@ -93,6 +104,12 @@ class GameView(Viewport):
             self.player_velocity[0] = -speed
         if self.keys_pressed.get(Bindings.get("RIGHT"), False):
             self.player_velocity[0] = speed
+
+        if self.keys_pressed.get(Bindings.get("SPRINT"), False) and (self.player_velocity[0] != 0 or self.player_velocity[1] != 0):
+            if self.player_stamina - 0.02 * environment['time_delta'] > 0:
+                self.player_velocity[0] *= 2
+                self.player_velocity[1] *= 2
+                self.player_stamina -= 0.03 * environment['time_delta']
 
         # make diagonal movement look less like teleporting
         if self.player_velocity[0] != 0 and self.player_velocity[1] != 0:
@@ -143,8 +160,11 @@ class GameView(Viewport):
                 self.save.save_data['day_count'] = self.day_count
             self.save.save_data['game_time'] = self.game_time
         
-        self.HEALTH_DISPLAY.value = self.player_health
+        self.HEALTH_DISPLAY.value  = self.player_health
         self.STAMINA_DISPLAY.value = self.player_stamina
+        self.XP_DISPLAY.value      = self.player_xp % 100
+        self.XP_LEVEL_DISPLAY.setText(str(self.player_xp // 100))
+        self.XP_LEVEL_DISPLAY.location = (self.size[0] // 2 - (DEFAULT_FONT.size(str(self.player_xp // 100))[0] // 2), self.XP_DISPLAY.location[1] - 24)
 
         self.enviorment['window'].fill((0, 0, 0))
 
@@ -168,6 +188,9 @@ class GameView(Viewport):
         for y in range(minY, maxY):
             for x in range(minX, maxX):
                 tile = map_data[y][x]
+                if not tile:
+                    tile = 1
+
                 tile_texture = TEXTURE_MAPPINGS[tile]
                 tile_pos = (x * TILE_SIZE - startX * TILE_SIZE, y * TILE_SIZE - startY * TILE_SIZE)
                 self.enviorment['window'].blit(tile_texture, tile_pos)

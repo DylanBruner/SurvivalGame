@@ -21,6 +21,7 @@ class ProgressBar(Component):
         self.border_radius = border_radius
 
     def draw(self, surface: pygame.Surface, enviorment: dict):
+        self.value = max(0, min(self.value, self.max))
         pygame.draw.rect(surface, self.border_color, (self.location[0], self.location[1], self.size[0], self.size[1]), border_radius=self.border_radius)
         pygame.draw.rect(surface, self.background_color, (self.location[0] + 1, self.location[1] + 1, self.size[0] - 2, self.size[1] - 2), border_radius=self.border_radius)
         pygame.draw.rect(surface, self.bar_color, (self.location[0] + 1, self.location[1] + 1, (self.size[0] - 2) * (self.value / self.max), self.size[1] - 2), border_radius=self.border_radius)
