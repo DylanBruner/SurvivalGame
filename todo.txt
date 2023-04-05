@@ -20,3 +20,4 @@
 
 Things that would be cool to have but are not a priority:
 - biomes
+- multiplayer (probably not going to happen)

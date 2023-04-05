@@ -63,6 +63,18 @@ class SaveGame:
         
         with open(f"data/saves/{save_file}", 'w') as f:
             json.dump(save_data, f)
+    
+    @staticmethod
+    def regenMap(save_file: str):
+        with open(f"data/saves/{save_file}", 'r') as f:
+            save_data = json.load(f)
+        
+        save_data['world'] = World().save()
+        save_data['player']['x'] = 0
+        save_data['player']['y'] = 0
+        
+        with open(f"data/saves/{save_file}", 'w') as f:
+            json.dump(save_data, f)
         
     @staticmethod
     def createNewSave(save_file: str) -> 'SaveGame':
