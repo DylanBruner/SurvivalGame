@@ -49,43 +49,28 @@ class GameView(Viewport):
         self.setup()
     
     def setup(self):
-        # FPS display
         self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
-        self.registerComponent(self.FPS_DISPLAY)
 
-        # Location display
         self.LOC_DISPLAY = TextDisplay(location=(90, 210), text="Location: ???", color=(255, 255, 255))
         self.LOC_DISPLAY._LAST_UPDATE_FRAME = 0
-        self.registerComponent(self.LOC_DISPLAY)
 
-        # Time display
         self.TIME_DISPLAY = TextDisplay(location=(10, 230), text="Time: ???", color=(255, 255, 255))
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
-        self.registerComponent(self.TIME_DISPLAY)
 
-        # Game stuff
         self.hotbar = HotbarComponent(parent=self)
-        self.registerComponent(self.hotbar)
-
-        # Health display
         self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player.max_health, border_color = (0, 0, 0), border_radius=4)
-        self.registerComponent(self.HEALTH_DISPLAY)
-
-        # Stamina display
         self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player.max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
-        self.registerComponent(self.STAMINA_DISPLAY)
-
-        # XP display, thin and above the hotbar
         self.XP_DISPLAY = ProgressBar(location=(self.hotbar.location[0], self.hotbar.location[1] - 14), size=(self.hotbar.size[0] + 33, 10), max_value=100, border_color = (0, 0, 0), bar_color=(154, 66, 205), border_radius=4)
-        self.registerComponent(self.XP_DISPLAY)
-
-        # XP level display, above the XP display in the middle
         self.XP_LEVEL_DISPLAY = TextDisplay(location=(self.size[0] // 2 - (DEFAULT_FONT.size("???")[0] // 2), self.XP_DISPLAY.location[1] - 24), text="???", color=(255, 255, 255))
-        self.registerComponent(self.XP_LEVEL_DISPLAY)
 
         self.minimap = MiniMap(parent=self)
-        self.registerComponent(self.minimap)
+
+        self.registerComponents([
+            self.FPS_DISPLAY, self.LOC_DISPLAY, self.TIME_DISPLAY,
+            self.hotbar, self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
+            self.XP_DISPLAY, self.XP_LEVEL_DISPLAY, self.minimap
+        ])
 
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)

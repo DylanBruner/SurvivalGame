@@ -48,6 +48,11 @@ while True:
             
             # DEV/RELOADING Warning: this is a very bad thing to use!
             if event.key == pygame.K_F5 and DEV_MODE:
+                # draw the text 'reloading' in the middle of the screen in red
+                font = pygame.font.SysFont("Arial", 32)
+                text = font.render("Reloading!", True, (255, 0, 0))
+                environment.window.blit(text, (environment.current_size[0] // 2 - text.get_width() // 2, (environment.current_size[1] // 2 - text.get_height() // 2) - 100))
+                pygame.display.update()
                 startTime = time.time()
                 utils.Util.MonkeyUtils.reload(environment, globals())
                 print(f"[DEV] Reloaded in {time.time() - startTime:.4f} seconds!")
@@ -73,5 +78,4 @@ while True:
             overlay.draw(environment)
 
     pygame.display.update()
-    environment.time_delta = min(environment.clock.tick(60), 500) # if we exceed 500ms, something is probably wrong so this'll help avoid
-                                                                        # really bad lag spikes and weird behavior
+    environment.time_delta = min(environment.clock.tick(60), 500) if not STEPPING_MODE else 10
