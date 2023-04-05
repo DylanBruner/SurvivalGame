@@ -100,6 +100,9 @@ class HotbarComponent(Component):
                     self._selected_slot = i
         
         if event.type == pygame.MOUSEBUTTONDOWN:
+            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+            if Util.distance(selected_tile, self.parent.player_pos) > 5:
+                return
             if event.button == 1:
                 self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
                 tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
