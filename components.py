@@ -10,7 +10,8 @@ class ProgressBar(Component):
                  bar_color: tuple[int, int, int] = (0, 255, 0),
                  background_color: tuple[int, int, int] = (255, 255, 255),
                  border_color: tuple[int, int, int] = (0, 0, 0),
-                 border_radius: int = 0):
+                 border_radius: int = 0, text_display: bool = False, text_color: tuple[int, int, int] = (0, 0, 0),
+                 text_font: pygame.font.Font = DEFAULT_FONT):
         
         super().__init__(location, size)
         self.value = value
@@ -19,12 +20,20 @@ class ProgressBar(Component):
         self.background_color = background_color
         self.border_color = border_color
         self.border_radius = border_radius
+        self.text_display = text_display
+        self.text_color = text_color
+        self.text_font = text_font
 
     def draw(self, surface: pygame.Surface, enviorment: dict):
         self.value = max(0, min(self.value, self.max))
         pygame.draw.rect(surface, self.border_color, (self.location[0], self.location[1], self.size[0], self.size[1]), border_radius=self.border_radius)
         pygame.draw.rect(surface, self.background_color, (self.location[0] + 1, self.location[1] + 1, self.size[0] - 2, self.size[1] - 2), border_radius=self.border_radius)
         pygame.draw.rect(surface, self.bar_color, (self.location[0] + 1, self.location[1] + 1, (self.size[0] - 2) * (self.value / self.max), self.size[1] - 2), border_radius=self.border_radius)
+
+        if self.text_display:
+            # draw the text in the center of the bar
+            text = self.text_font.render(f"{int(self.value)}/{int(self.max)}", True, self.text_color)
+            surface.blit(text, (self.location[0] + (self.size[0] / 2) - (text.get_width() / 2), self.location[1] + (self.size[1] / 2) - (text.get_height() / 2)))
 
 class TextDisplay(Component):
     def __init__(self, location: tuple[int, int], text: str,

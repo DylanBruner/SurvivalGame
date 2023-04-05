@@ -59,10 +59,20 @@ class GameView(Viewport):
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
 
         self.hotbar = HotbarComponent(parent=self)
-        self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), size=(175, 20), max_value=self.player.max_health, border_color = (0, 0, 0), border_radius=4)
-        self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), size=(175, 20), max_value=self.player.max_stamina, border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4)
-        self.XP_DISPLAY = ProgressBar(location=(self.hotbar.location[0], self.hotbar.location[1] - 14), size=(self.hotbar.size[0] + 33, 10), max_value=100, border_color = (0, 0, 0), bar_color=(154, 66, 205), border_radius=4)
-        self.XP_LEVEL_DISPLAY = TextDisplay(location=(self.size[0] // 2 - (DEFAULT_FONT.size("???")[0] // 2), self.XP_DISPLAY.location[1] - 24), text="???", color=(255, 255, 255))
+        self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), 
+                                          size=(175, 20), max_value=self.player.max_health, border_color = (0, 0, 0), 
+                                          border_radius=4, text_display=True)
+        
+        self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), 
+                                           size=(175, 20), max_value=self.player.max_stamina, 
+                                           border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4, text_display=True)
+        
+        self.XP_DISPLAY = ProgressBar(location=(self.hotbar.location[0], self.hotbar.location[1] - 14), 
+                                      size=(self.hotbar.size[0] + 33, 10), max_value=100, border_color = (0, 0, 0), 
+                                      bar_color=(154, 66, 205), border_radius=4)
+        
+        self.XP_LEVEL_DISPLAY = TextDisplay(location=(self.size[0] // 2 - (DEFAULT_FONT.size("???")[0] // 2), 
+                                                      self.XP_DISPLAY.location[1] - 24), text="???", color=(255, 255, 255))
 
         self.minimap = MiniMap(parent=self)
 
