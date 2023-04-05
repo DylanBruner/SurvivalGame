@@ -1,4 +1,5 @@
 import pygame, random
+from utils import Util
 
 TILE_SIZE = 32
 
@@ -7,13 +8,33 @@ class TileIDS:
     GRASS = 1
     WATER = 2
     STONE = 3
+    TREE_V1 = 4 # Variation 1-4
+    TREE_V2 = 5
+    TREE_V3 = 6
+    TREE_V4 = 7
+    WOOD = 8
+
 
 TEXTURE_MAPPINGS = {
     TileIDS.EMPTY: pygame.Surface((32, 32)),
     TileIDS.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (32, 32)),
     TileIDS.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (32, 32)),
-    TileIDS.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (32, 32))
+    TileIDS.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (32, 32)),
+
+    TileIDS.TREE_V1: None,
+    TileIDS.TREE_V2: None,
+    TileIDS.TREE_V3: None,
+    TileIDS.TREE_V4: None,
+
+    TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (32, 32))
 }
+
+def postLoad():
+    _TREE_SPRITES = Util.loadSpritesheetAdvanced('data/assets/world/tree-variations.png', (64, 64), 8, 8)[4:]
+    TEXTURE_MAPPINGS[TileIDS.TREE_V1] = pygame.transform.scale(_TREE_SPRITES[0], (32, 32))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V2] = pygame.transform.scale(_TREE_SPRITES[1], (32, 32))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V3] = pygame.transform.scale(_TREE_SPRITES[2], (32, 32))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V4] = pygame.transform.scale(_TREE_SPRITES[3], (32, 32))
 
 class World:
     def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (1600, 1600)):
@@ -71,3 +92,11 @@ class World:
             points = self.getCirclePoints(water_start, random.randint(5, 10), True)
             for point in points:
                 self.map['map_data'][point[1]][point[0]] = TileIDS.WATER
+        
+        # pick random empty spots to place trees
+        for _ in range(1500):
+            location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
+            # while self.map['map_data'][location[1]][location[0]] != TileIDS.EMPTY:
+                # location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
+            
+            self.map['map_data'][location[1]][location[0]] = random.choice([TileIDS.TREE_V1, TileIDS.TREE_V2, TileIDS.TREE_V3, TileIDS.TREE_V4])

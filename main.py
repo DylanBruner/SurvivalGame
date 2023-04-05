@@ -1,5 +1,6 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
 import pygame, myenvironment, utils, time
+import game.world as world
 import viewports.mainmenu as mainmenu
 
 #https://opengameart.org/content/iron-plague-pointercursor
@@ -21,6 +22,8 @@ environment = myenvironment.Environment(**{
     "fullscreen": False,
 })
 environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
+
+world.postLoad() # some more asset processing that needs to be done after pygame is fully initialized
 
 while True:
     for event in pygame.event.get():

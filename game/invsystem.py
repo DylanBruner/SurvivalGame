@@ -97,8 +97,13 @@ class HotbarComponent(Component):
                 self.breaking = False
                 self.breaking_percent = 0
 
+                if tile.drops:
+                    for drop in tile.drops:
+                        self.addToInventory(Item(drop[0], drop[1], TEXTURE_MAPPINGS[drop[0]]))
+                else:
+                    self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
+
                 self.parent.save.setTile(self.real_tile[0], self.real_tile[1], TileIDS.GRASS)
-                self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
                 self.breaking_tile = None
                 self.save()
 

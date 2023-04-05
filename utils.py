@@ -14,6 +14,16 @@ class Util:
         return sprites
 
     @staticmethod
+    def loadSpritesheetAdvanced(path: str, spriteSize: tuple, spriteCount: int, spritesPerRow: int, transparentColor: tuple[int, int, int] = None) -> list[pygame.Surface]:
+        spritesheet = pygame.image.load(path).convert_alpha()
+        if transparentColor:
+            spritesheet.set_colorkey(transparentColor)
+        sprites = []
+        for i in range(spriteCount):
+            sprites.append(spritesheet.subsurface((i % spritesPerRow * spriteSize[0], i // spritesPerRow * spriteSize[1], spriteSize[0], spriteSize[1])))
+        return sprites
+
+    @staticmethod
     def launchViewport(old: Viewport, new: Viewport, enviorment: Environment) -> None:
         # old.setCustomCursorEnabled(False)
         enviorment.viewport = new

@@ -6,7 +6,9 @@ with open(TILE_CFG_FILE, "r") as f:
     TILE_DATA: dict = json.load(f)
 
 class Tile:
-    def __init__(self, name: str, id: int, texture: str, durability: int, breaking_power: int, collidable: bool, breakable: bool):
+    def __init__(self, name: str, id: int, texture: str, durability: int, 
+                 breaking_power: int, collidable: bool, breakable: bool,
+                 background_id: int = None, drops: list[list[int, int]] = None):
         self.name = name
         self.id = id
         self.texture = texture
@@ -14,9 +16,11 @@ class Tile:
         self.breaking_power = breaking_power
         self.collidable = collidable
         self.breakable = breakable
+        self.background_id = background_id
+        self.drops = drops
     
     def __repr__(self):
-        return f"Tile(name={self.name}, id={self.id}, texture={self.texture}, durability={self.durability}, breaking_power={self.breaking_power}, collidable={self.collidable}, breakable={self.breakable})"
+        return f"Tile(name={self.name}, id={self.id}, texture={self.texture}, durability={self.durability}, breaking_power={self.breaking_power}, collidable={self.collidable}, breakable={self.breakable}, background_id={self.background_id}, drops={self.drops})"
 
 class Tiles:
     @staticmethod

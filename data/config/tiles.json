@@ -25,5 +25,58 @@
         "breaking_power": 1,
         "collidable": false,
         "breakable": false
+    },
+    "TREE_V1": {
+        "id": 4,
+        "name": "Tree",
+        "texture": null,
+        "durability": 1000,
+        "breaking_power": 1,
+        "collidable": true,
+        "breakable": true,
+        "background_id": 1,
+        "drops": [[8, 1]]
+    },
+    "TREE_V2": {
+        "id": 5,
+        "name": "Tree",
+        "texture": null,
+        "durability": 1000,
+        "breaking_power": 1,
+        "collidable": true,
+        "breakable": true,
+        "background_id": 1,
+        "drops": [[8, 1]]
+    },
+    "TREE_V3": {
+        "id": 6,
+        "name": "Tree",
+        "texture": null,
+        "durability": 1000,
+        "breaking_power": 1,
+        "collidable": true,
+        "breakable": true,
+        "background_id": 1,
+        "drops": [[8, 1]]
+    },
+    "TREE_V4": {
+        "id": 7,
+        "name": "Tree",
+        "texture": null,
+        "durability": 1000,
+        "breaking_power": 1,
+        "collidable": true,
+        "breakable": true,
+        "background_id": 1,
+        "drops": [[8, 1]]
+    },
+    "WOOD": {
+        "id": 8,
+        "name": "Wood",
+        "texture": "data/assets/world/light_wood.png",
+        "durability": 1000,
+        "breaking_power": 1,
+        "collidable": true,
+        "breakable": true
     }
 }

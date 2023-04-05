@@ -193,6 +193,11 @@ class GameView(Viewport):
 
                 tile_texture = TEXTURE_MAPPINGS[tile]
                 tile_pos = (x * TILE_SIZE - startX * TILE_SIZE, y * TILE_SIZE - startY * TILE_SIZE)
+
+                if Tiles.getTile(tile).background_id:
+                    background_texture = TEXTURE_MAPPINGS[Tiles.getTile(tile).background_id]
+                    self.enviorment['window'].blit(background_texture, tile_pos)
+
                 self.enviorment['window'].blit(tile_texture, tile_pos)
 
         # draw the player in the middle of the screen
