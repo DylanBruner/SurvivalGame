@@ -42,7 +42,6 @@ class PlayGame(Viewport):
         self.registerComponent(self.back_button, {'border_radius': 4})
     
     def launchSave(self, save_file: str):
-        print(f"Launching save: {save_file}")
         save_game = SaveGame(save_file=save_file)
         game_view = GameView(self.size, self.enviorment, save_game)
         Util.launchViewport(self, game_view, self.enviorment)

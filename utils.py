@@ -70,9 +70,9 @@ class Util:
         @staticmethod
         def reload(environment: Environment, globs: dict):
             Util.MonkeyUtils.reloadModules(globs)
+            
+            # reload the current viewport, all other should be reloaded when the modules are reloaded (hopefully)
             environment.window = pygame.display.set_mode(environment.window.get_size())
-            # print(environment.viewport.__class__.__name__)
-            # get the parent module of the viewport
             module = inspect.getmodule(environment.viewport).__name__.split(".")[-1]
             environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment)
 

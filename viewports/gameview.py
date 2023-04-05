@@ -14,7 +14,7 @@ from utils import Util
 from viewports.pausemenu import PauseMenu
 
 # 1 one day in game is 20 minutes irl
-REAL2GAME = (1 / 60 * 20) * 200 # 1 real second is 20 game seconds
+REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
 
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
