@@ -16,7 +16,7 @@ TEXTURE_MAPPINGS = {
 }
 
 class World:
-    def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (800, 800)):
+    def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (1600, 1600)):
         self.MAP_SIZE = MAP_SIZE
         self.map = {
             'seed': None,
@@ -59,7 +59,7 @@ class World:
         # fill map with grass
         self.map['map_data'] = [[TileIDS.GRASS for _ in range(self.MAP_SIZE[0])] for _ in range(self.MAP_SIZE[1])]
         # add some stone
-        for _ in range(200):
+        for _ in range(1500):
             stone_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
             points = self.getCirclePoints(stone_start, random.randint(2, 5), True)
             for point in points:
