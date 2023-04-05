@@ -175,11 +175,15 @@ class GameView(Viewport):
             for y in range(int(bottom_plane), int(top_plane)):
                 # Check if the tile is within the bounds of the map
                 if x >= 0 and x < len(map_data) and y >= 0 and y < len(map_data[x]):
-                    texture = TEXTURE_MAPPINGS[map_data[x][y]]
+                    tile_id = map_data[x][y]
+                    texture = TEXTURE_MAPPINGS[tile_id]
                     if texture is not None:
                         # Calculate the position of the tile on the screen
                         screen_x = (x - left_plane) * TILE_SIZE
                         screen_y = (y - bottom_plane) * TILE_SIZE
+                        if Tiles.getTile(tile_id).background_id:
+                            self.enviorment['window'].blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
+
                         self.enviorment['window'].blit(texture, (screen_x, screen_y))
                         # draw black border around the tile
                         pygame.draw.rect(self.enviorment['window'], (0, 0, 0), (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
