@@ -24,6 +24,8 @@ environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            if hasattr(environment.viewport, "save"):
+                environment.viewport.save.save()
             pygame.quit()
             quit()
 

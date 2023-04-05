@@ -40,6 +40,8 @@ class GameView(Viewport):
         self.player_max_stamina: int = self.save.save_data['player']['max_stamina']
         self.player_stamina = self.player_max_stamina // 4 # spawn with 1/4 stamina
 
+        self.day_count: int = self.save.save_data['day_count']
+
         self.particle_displays: list[ParticleDisplay] = []
 
         self.setup()
@@ -73,6 +75,9 @@ class GameView(Viewport):
 
         self.minimap = MiniMap(parent=self)
         self.registerComponent(self.minimap)
+
+        self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
+        self.setCustomCursorEnabled(True)
             
     def canMove(self, dir: int, speed: int) -> bool:
         # forward, backward, left, right
@@ -142,14 +147,17 @@ class GameView(Viewport):
             self.LOC_DISPLAY.setText(f"({self.player_pos[0]}, {self.player_pos[1]})")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)}")
+            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} - Day {self.day_count}")
 
             # update the game time
             timeChange = time.time() - self.last_time_update
             self.game_time += REAL2GAME * timeChange
             self.last_time_update = time.time()
             
-            if self.game_time > 1501: self.game_time = 60
+            if self.game_time > 1501: 
+                self.game_time = 60
+                self.day_count += 1
+                self.save.save_data['day_count'] = self.day_count
             self.save.save_data['game_time'] = self.game_time
         
         self.HEALTH_DISPLAY.value = self.player_health

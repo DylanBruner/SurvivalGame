@@ -1,6 +1,4 @@
-import os
-
-import pygame
+import os, shutil, pygame
 
 from components import *
 from componentsystem import Viewport
@@ -42,6 +40,15 @@ class PlayGame(Viewport):
         self.registerComponent(self.back_button, {'border_radius': 4})
     
     def launchSave(self, save_file: str):
+        # check if the 'r' key is pressed
+        if pygame.key.get_pressed()[pygame.K_r]:
+            print("[INFO] Backing up save file...")
+            shutil.copyfile(f"data/saves/{save_file}", f"data/saves/backup_{save_file}")
+            print("[INFO] Backup complete!")
+            print("[INFO] Attempting to repair/update save file...")
+            SaveGame.repairSave(save_file)
+            print("[INFO] Repair/update complete! attempting to load save file...")
+
         save_game = SaveGame(save_file=save_file)
         game_view = GameView(self.size, self.enviorment, save_game)
         Util.launchViewport(self, game_view, self.enviorment)

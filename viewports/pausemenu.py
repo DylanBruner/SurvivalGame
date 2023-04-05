@@ -19,6 +19,9 @@ class PauseMenu(Viewport):
         self.exit_button = Button(location=(10, 70), size=(100, 30), text="Exit")
         self.exit_button.on_click = self.exit
         self.registerComponent(self.exit_button)
+
+        self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
+        self.setCustomCursorEnabled(True)
     
     def resume(self):
         self.closed = True
