@@ -66,7 +66,8 @@ class World:
                 self.map['map_data'][point[1]][point[0]] = TileIDS.STONE
 
         # pick a random spot to start the water
-        water_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
-        points = self.getCirclePoints(water_start, random.randint(5, 10), True)
-        for point in points:
-            self.map['map_data'][point[1]][point[0]] = TileIDS.WATER
+        for _ in range(1200):
+            water_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
+            points = self.getCirclePoints(water_start, random.randint(5, 10), True)
+            for point in points:
+                self.map['map_data'][point[1]][point[0]] = TileIDS.WATER

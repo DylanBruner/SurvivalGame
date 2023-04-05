@@ -43,14 +43,14 @@ class PlayGame(Viewport):
         # check if the 'r' key is pressed
         if pygame.key.get_pressed()[pygame.K_r]:
             print("[INFO] Backing up save file...")
-            shutil.copyfile(f"data/saves/{save_file}", f"data/saves/backup_{save_file}")
+            shutil.copyfile(f"data/saves/{save_file}", f"data/saves/{save_file}.bak")
             print("[INFO] Backup complete!")
             print("[INFO] Attempting to repair/update save file...")
             SaveGame.repairSave(save_file)
             print("[INFO] Repair/update complete! attempting to load save file...")
         elif pygame.key.get_pressed()[pygame.K_l]:
             print("[INFO] Backing up save file...")
-            shutil.copyfile(f"data/saves/{save_file}", f"data/saves/backup_{save_file}")
+            shutil.copyfile(f"data/saves/{save_file}", f"data/saves/{save_file}.bak")
             print("[INFO] Backup complete!")
             print("[INFO] Regnerating map...")
             SaveGame.regenMap(save_file)
