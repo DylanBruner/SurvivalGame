@@ -1,15 +1,18 @@
 import pygame
-from game.tiles import Tiles
 
+import game.particlesystem as pSys
 from componentsystem import Component
 from game.keybinding import Bindings
-from game.world import TILE_SIZE, TileIDS, TEXTURE_MAPPINGS
+from game.tiles import Tiles
+from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
 from utils import Util
+
 
 class Config:
     # Visual
     SLOT_SIZE: int = 48
     ITEM_SIZE: int = 48 - 8 # 4px padding on each side
+    BREAK_COLOR: pSys.Color = pSys.Color((70, 66, 38), mod_r=40)
 
     # Gameplay
     STACK_SIZE: int = 99
@@ -95,6 +98,12 @@ class HotbarComponent(Component):
                 self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
                 self.breaking_tile = None
                 self.save()
+
+                # Particles
+                p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
+                                         shape=pSys.Shape.RANDOM_POLYGON, count=200,
+                                         speed=10, lifetime=200, size=1)
+                self.parent.particle_displays.append(p)
     
     def save(self):
         self.parent.save.save_data['player']['inventory'] = []

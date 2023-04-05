@@ -6,6 +6,7 @@ from components import *
 from componentsystem import Viewport
 from game.invsystem import HotbarComponent
 from game.minimap import MiniMap
+from game.particlesystem import ParticleDisplay
 from game.savemanager import SaveGame
 from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
@@ -33,6 +34,8 @@ class GameView(Viewport):
 
         self.game_time: float = self.save.save_data['game_time']
         self.last_time_update: float = time.time()
+
+        self.particle_displays: list[ParticleDisplay] = []
 
         self.setup()
     
@@ -169,6 +172,9 @@ class GameView(Viewport):
 
         pygame.draw.rect(enviorment['window'], color, (mouse_pos[0] * TILE_SIZE - startX * TILE_SIZE, mouse_pos[1] * TILE_SIZE - startY * TILE_SIZE, TILE_SIZE, TILE_SIZE), 1)
         
+        for particle_disp in self.particle_displays:
+            particle_disp.draw(enviorment['window'], delta_time = enviorment['time_delta'])
+
         super().draw(enviorment) # so components can draw themselves on top of the map
 
     def onEvent(self, event: pygame.event.Event):
