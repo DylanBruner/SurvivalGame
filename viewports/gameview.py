@@ -1,14 +1,18 @@
-import pygame, time
+import time
 
-from game.world import TILE_SIZE, TEXTURE_MAPPINGS, TileIDS
-from game.invsystem import HotbarComponent
+import pygame
+
 from components import *
 from componentsystem import Viewport
+from game.invsystem import HotbarComponent
+from game.minimap import MiniMap
+from game.savemanager import SaveGame
+from game.tiles import Tiles
+from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
 from myenviorment import Environment
 from utils import Util
-from game.savemanager import SaveGame
 from viewports.pausemenu import PauseMenu
-from game.tiles import Tiles
+
 
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
@@ -28,14 +32,17 @@ class GameView(Viewport):
         self.setup()
     
     def setup(self):
-        self.FPS_DISPLAY = TextDisplay(location=(10, 10), text="FPS: ???", color=(255, 255, 255))
+        self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
         self.registerComponent(self.FPS_DISPLAY)
 
         # Game stuff
         self.hotbar = HotbarComponent(parent=self)
         self.registerComponent(self.hotbar)
-    
+
+        self.minimap = MiniMap(parent=self)
+        self.registerComponent(self.minimap)
+            
     def canMove(self, dir: int, speed: int) -> bool:
         # forward, backward, left, right
         projected_pos = None
