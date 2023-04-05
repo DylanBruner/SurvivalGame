@@ -29,3 +29,9 @@ class Util:
     @staticmethod
     def distance(p1: tuple, p2: tuple) -> float:
         return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
+
+    @staticmethod
+    def getTileLocation(mouse_pos: tuple, player_pos: tuple, window_size: tuple, tile_size: int) -> tuple:
+        startX = player_pos[0] - (window_size[0] // tile_size) // 2
+        startY = player_pos[1] - (window_size[1] // tile_size) // 2
+        return ((mouse_pos[0] // tile_size) + startX, (mouse_pos[1] // tile_size) + startY)

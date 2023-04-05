@@ -12,6 +12,12 @@ class SaveGame:
     def loadSave(self, save_file: str):
         with open(f"data/saves/{save_file}", 'r') as f:
             self.save_data = json.load(f)
+    
+    def getTile(self, x: int, y: int) -> int:
+        return self.save_data['world']['map_data'][y][x]
+
+    def setTile(self, x: int, y: int, tile: int):
+        self.save_data['world']['map_data'][y][x] = tile
 
     @staticmethod
     def createNewSave(save_file: str) -> 'SaveGame':

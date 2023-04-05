@@ -1,6 +1,6 @@
 import pygame, time
 
-from game.world import TILE_SIZE, TEXTURE_MAPPINGS, Tiles
+from game.world import TILE_SIZE, TEXTURE_MAPPINGS, TileIDS
 from game.invsystem import HotbarComponent
 from components import *
 from componentsystem import Viewport
@@ -8,6 +8,7 @@ from myenviorment import Environment
 from utils import Util
 from game.savemanager import SaveGame
 from viewports.pausemenu import PauseMenu
+from game.tiles import Tiles
 
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
@@ -34,15 +35,39 @@ class GameView(Viewport):
         self.hotbar = HotbarComponent(parent=self)
         self.registerComponent(self.hotbar)
     
+    def canMove(self, dir: int) -> bool:
+        # forward, backward, left, right
+        projected_pos = None
+        if dir == 0:
+            projected_pos = (self.player_pos[0], self.player_pos[1] - 1)
+        elif dir == 1:
+            projected_pos = (self.player_pos[0], self.player_pos[1] + 1)
+        elif dir == 2:
+            projected_pos = (self.player_pos[0] - 1, self.player_pos[1])
+        elif dir == 3:
+            projected_pos = (self.player_pos[0] + 1, self.player_pos[1])
+        else:
+            raise Exception(f"Invalid direction: {dir}")
+
+        # if projected_pos is out of bounds, return False
+        if projected_pos[0] < 0 or projected_pos[0] >= len(self.save.save_data['world']['map_data'][0]):
+            return False
+        if projected_pos[1] < 0 or projected_pos[1] >= len(self.save.save_data['world']['map_data']):
+            return False
+
+        tileAt = self.save.save_data['world']['map_data'][projected_pos[1]][projected_pos[0]]        
+
+        return not Tiles.getTile(tileAt).collidable
+    
     def doGameLogic(self, enviorment: dict):
         # handle key presses
-        if self.keys_pressed.get(pygame.K_a, False):
+        if self.keys_pressed.get(pygame.K_a, False) and self.canMove(2):
             self.player_pos = (self.player_pos[0] - 1, self.player_pos[1])
-        if self.keys_pressed.get(pygame.K_d, False):
+        if self.keys_pressed.get(pygame.K_d, False) and self.canMove(3):
             self.player_pos = (self.player_pos[0] + 1, self.player_pos[1])
-        if self.keys_pressed.get(pygame.K_w, False):
+        if self.keys_pressed.get(pygame.K_w, False) and self.canMove(0):
             self.player_pos = (self.player_pos[0], self.player_pos[1] - 1)
-        if self.keys_pressed.get(pygame.K_s, False):
+        if self.keys_pressed.get(pygame.K_s, False) and self.canMove(1):
             self.player_pos = (self.player_pos[0], self.player_pos[1] + 1)
         
         # limit the player to the map

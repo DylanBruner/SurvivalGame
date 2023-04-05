@@ -2,17 +2,17 @@ import pygame, random
 
 TILE_SIZE = 32
 
-class Tiles:
+class TileIDS:
     EMPTY = 0 # Really shouldn't be used
     GRASS = 1
     WATER = 2
     STONE = 3
 
 TEXTURE_MAPPINGS = {
-    Tiles.EMPTY: pygame.Surface((32, 32)),
-    Tiles.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (32, 32)),
-    Tiles.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (32, 32)),
-    Tiles.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (32, 32))
+    TileIDS.EMPTY: pygame.Surface((32, 32)),
+    TileIDS.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (32, 32)),
+    TileIDS.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (32, 32)),
+    TileIDS.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (32, 32))
 }
 
 class World:
@@ -57,16 +57,16 @@ class World:
         random.seed((random.randint(0, 100000) if seed == None else seed))
         self.map['seed'] = seed
         # fill map with grass
-        self.map['map_data'] = [[Tiles.GRASS for _ in range(self.MAP_SIZE[0])] for _ in range(self.MAP_SIZE[1])]
+        self.map['map_data'] = [[TileIDS.GRASS for _ in range(self.MAP_SIZE[0])] for _ in range(self.MAP_SIZE[1])]
         # add some stone
         for _ in range(100):
             stone_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
             points = self.getCirclePoints(stone_start, random.randint(2, 5), True)
             for point in points:
-                self.map['map_data'][point[1]][point[0]] = Tiles.STONE
+                self.map['map_data'][point[1]][point[0]] = TileIDS.STONE
 
         # pick a random spot to start the water
         water_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
         points = self.getCirclePoints(water_start, random.randint(5, 10), True)
         for point in points:
-            self.map['map_data'][point[1]][point[0]] = Tiles.WATER
+            self.map['map_data'][point[1]][point[0]] = TileIDS.WATER

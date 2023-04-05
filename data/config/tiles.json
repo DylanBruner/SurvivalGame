@@ -1,0 +1,29 @@
+{
+    "GRASS": {
+        "id": 1,
+        "name": "Grass",
+        "texture": "data/assets/world/grass/1.jpg",
+        "durability": 100,
+        "breaking_power": 1,
+        "collidable": false,
+        "breakable": false
+    },
+    "STONE": {
+        "id": 3,
+        "name": "Stone",
+        "texture": "data/assets/world/stones/Tileable1k.png",
+        "durability": 1000,
+        "breaking_power": 2,
+        "collidable": true,
+        "breakable": true
+    },
+    "WATER": {
+        "id": 2,
+        "name": "Water",
+        "texture": "data/assets/world/water.jpg",
+        "durability": 100,
+        "breaking_power": 1,
+        "collidable": false,
+        "breakable": false
+    }
+}
