@@ -17,7 +17,8 @@ environment = myenvironment.Environment(**{
     "current_size": (800, 600),
     "overlays": [],
     "clock": pygame.time.Clock(),
-    "time_delta": 0
+    "time_delta": 0,
+    "fullscreen": False,
 })
 environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
 
@@ -47,6 +48,10 @@ while True:
                 startTime = time.time()
                 utils.Util.MonkeyUtils.reload(environment, globals())
                 print(f"[DEV] Reloaded in {time.time() - startTime:.4f} seconds!")
+            
+            if event.key == pygame.K_F11:
+                environment.window = pygame.display.set_mode(environment.window.get_size(), pygame.FULLSCREEN)
+                environment.current_size = environment.window.get_size()
 
         environment.viewport.onEvent(event)
         for overlay in environment.overlays:

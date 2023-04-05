@@ -16,6 +16,7 @@
 - a difficulty setting
 - particles :D [DONE]
 - fix movement so that it's not forced to snap to the grid
+- foliage so we can actually see ourself moving
 
 Things that would be cool to have but are not a priority:
 - biomes
