@@ -194,13 +194,28 @@ class GameView(Viewport):
 
         # draw the player as a red rect
         pygame.draw.rect(self.enviorment['window'], (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
-        # text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
-        # self.enviorment['window'].blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
+        text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
+        self.enviorment['window'].blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
             particle_disp.draw(enviorment['window'], delta_time = enviorment['time_delta'])
 
         super().draw(enviorment) # so components can draw themselves on top of the map
+    
+    def getTileLocation(self, loc: tuple[int, int]) -> tuple[int, int]:
+        """
+        Take a position in the world and return the top left corner of the tile it is in on the screen
+        """
+        visible_width = self.size[0] // TILE_SIZE + 32
+        visible_height = self.size[1] // TILE_SIZE + 32
+
+        # Get the player's position
+        player_x, player_y = self.player.location[0] + 16, self.player.location[1] + 16
+
+        left_plane = player_x - visible_width // 2
+        bottom_plane = player_y - visible_height // 2
+
+        return (loc[0] - left_plane) * TILE_SIZE, (loc[1] - bottom_plane) * TILE_SIZE
 
     def onEvent(self, event: pygame.event.Event):
         super().onEvent(event) # so components can still handle events

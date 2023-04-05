@@ -40,10 +40,10 @@ class HotbarComponent(Component):
 
         self.SLOT_SPACING = 4 # distance between slots
 
-        self.breaking_percent = 0
-        self.breaking = False
-        self.breaking_tile = None
-        self.real_tile = None
+        self.breaking_percent: int = 0
+        self.breaking_id: int = None
+        self.breaking: bool = False
+        self.breaking_tile: list[int, int] = None
 
         self.count_font = pygame.font.SysFont("Arial", 16)
 
@@ -53,12 +53,14 @@ class HotbarComponent(Component):
             if self._items[i] and self._items[i].item_id == item.item_id:
                 if self._items[i].count + item.count <= Config.STACK_SIZE:
                     self._items[i].count += item.count
+                    self.save()
                     return
 
         # if not, find an empty slot
         for i in range(len(self._items)):
             if not self._items[i] or self._items[i].item_id == 0:
                 self._items[i] = item
+                self.save()
                 return
         
         # TODO: Drop the item on the ground when we have support for dropped items
@@ -78,41 +80,41 @@ class HotbarComponent(Component):
                 pygame.draw.rect(surface, (0, 0, 0), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), 2, border_radius=4)
 
         if self.breaking:
-            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
-            if selected_tile != self.real_tile:
+            if self.breaking_tile != self.parent.player.selected_tile or self.parent.player.stamina < Util.calculateStaminaCost(self._breaking_power):
                 self.breaking = False
                 self.breaking_percent = 0
-
-            pygame.draw.rect(surface, (255, 0, 0), (self.breaking_tile[0] * TILE_SIZE, self.breaking_tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE), 2)
-            pygame.draw.rect(surface, (255, 0, 0), (self.breaking_tile[0] * TILE_SIZE, self.breaking_tile[1] * TILE_SIZE, TILE_SIZE * self.breaking_percent / 100, TILE_SIZE ))
-            
-            tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
-
-            self.breaking_percent += Tiles.calculateHitPercent(self._breaking_power, tile.breaking_power, tile.durability)
-
-            if self.breaking_percent >= 100 and self.parent.player.stamina - Util.calculateStaminaCost(self._breaking_power) >= 0:
-                self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
-                self.parent.player.xp += 5 * self.parent.save.save_data['player']['xp_multiplier']
-                self.parent.save.save_data['player']['xp'] = self.parent.player.xp
-                self.breaking = False
-                self.breaking_percent = 0
-
-                if tile.drops:
-                    for drop in tile.drops:
-                        self.addToInventory(Item(drop[0], drop[1], TEXTURE_MAPPINGS[drop[0]]))
-                else:
-                    self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
-
-                self.parent.save.setTile(self.real_tile[0], self.real_tile[1], TileIDS.GRASS)
                 self.breaking_tile = None
-                self.save()
+                self.breaking_id = None
+                return
+            self.breaking_percent += ((self._breaking_power * 10) / Tiles.getTile(self.breaking_id).durability) * enviorment['time_delta']
 
-                # Particles
+            if self.breaking_percent >= 100:
+                self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
+                tile = Tiles.getTile(self.breaking_id)
+                if tile:
+                    if tile.drops:
+                        for drop in tile.drops:
+                            self.addToInventory(Item(drop[0], drop[1], TEXTURE_MAPPINGS[drop[0]]))
+                    else:
+                        self.addToInventory(Item(self.breaking_id, 1, TEXTURE_MAPPINGS[self.breaking_id]))
+
+                self.breaking_percent = 0
+                self.breaking = False
+                self.breaking_tile = None
+                self.breaking_id = None
+                self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]] = TileIDS.GRASS
+                
                 p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
-                                         shape=pSys.Shape.RANDOM_POLYGON, count=200,
-                                         speed=10, lifetime=200, size=1)
+                            shape=pSys.Shape.RANDOM_POLYGON, count=125,
+                            speed=10, lifetime=200, size=1)
                 self.parent.particle_displays.append(p)
-    
+                                            
+                return
+
+            tile_loc = self.parent.getTileLocation(self.breaking_tile)
+            # draw a progress bar that shows how much the player has broken the block
+            pygame.draw.rect(surface, (255, 0, 0), (tile_loc[0], tile_loc[1] - 10, Config.SLOT_SIZE * (self.breaking_percent / 150), 5))
+            
     def save(self):
         self.parent.save.save_data['player']['inventory'] = [[0, 0] for i in range(9)]
         for item in self._items:
@@ -145,33 +147,26 @@ class HotbarComponent(Component):
                     self._selected_slot = i            
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-            selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
-            if Util.distance(selected_tile, self.parent.player.location) > 5:
-                return
-            if event.button == 1:
-                if Util.calculateStaminaCost(self._breaking_power) > self.parent.player.stamina:
-                    p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
-                                         shape=pSys.Shape.RANDOM_POLYGON, count=200,
-                                         speed=10, lifetime=200, size=1)
-                    self.parent.particle_displays.append(p)
+            if event.button == 1 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:
+                if not self.breaking:
+                    tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
+                    if Tiles.getTile(tile_id).breakable and self.parent.player.stamina > Util.calculateStaminaCost(self._breaking_power):
+                        self.breaking_tile = self.parent.player.selected_tile
 
-                else:
-                    self.real_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
-                    tile = Tiles.getTile(self.parent.save.getTile(self.real_tile[0], self.real_tile[1]))
-                    if tile.breakable:
-                        self.breaking = True
                         self.breaking_percent = 0
-                        self.breaking_tile = (event.pos[0] // TILE_SIZE, event.pos[1] // TILE_SIZE)
+                        self.breaking         = True
+                        self.breaking_id      = tile_id
 
             # place block
-            elif event.button == 3:
-                selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player.location, self.parent.size, TILE_SIZE)
-                if self._items[self._selected_slot] and self.parent.save.getTile(selected_tile[0], selected_tile[1]) == TileIDS.GRASS:
-                    self.parent.save.setTile(selected_tile[0], selected_tile[1], self._items[self._selected_slot].item_id)
-                    self._items[self._selected_slot].count -= 1
-                    if self._items[self._selected_slot].count <= 0:
-                        self._items[self._selected_slot] = None
-                    self.save()
+            elif event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:
+                tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
+                if tile_id == TileIDS.GRASS or tile_id == TileIDS.EMPTY:
+                    if self._items[self._selected_slot]:
+                        self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]] = self._items[self._selected_slot].item_id
+                        self._items[self._selected_slot].count -= 1
+                        if self._items[self._selected_slot].count <= 0:
+                            self._items[self._selected_slot] = None
+                        self.save()
             
             # scroll
             elif event.button == 4:
