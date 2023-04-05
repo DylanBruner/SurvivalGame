@@ -9,6 +9,9 @@ from viewports.mainmenu import MainMenu
 
 pygame.init()
 
+STEPPING_MODE = False # if true, the game will only update when you press enter, only works for game logic and some rendering
+STEPS         = 0 # how many steps we have that haven't been processed yet
+
 # keeping most of the important stuff in a dict lets me pass it around easily, probably not the best way to do it but it works
 environment = Environment(**{
     "GAME_NAME": "A Game",
@@ -31,11 +34,22 @@ while True:
             environment.window = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
             environment.current_size = (event.w, event.h)
         
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F3:
+                STEPPING_MODE = not STEPPING_MODE
+                print("Stepping mode:", STEPPING_MODE)
+            if STEPPING_MODE and event.key == pygame.K_RETURN:
+                STEPS += 1
+        
         environment.viewport.onEvent(event)
         for overlay in environment.overlays:
             if not overlay.closed:
                 overlay.onEvent(event)
 
+    if STEPPING_MODE and STEPS == 0:
+        continue
+    elif STEPPING_MODE: STEPS -= 1
+    
     environment.window.fill((255, 255, 255))
     
     environment.viewport.draw(environment)

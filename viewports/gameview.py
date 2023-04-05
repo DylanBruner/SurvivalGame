@@ -13,6 +13,8 @@ from myenviorment import Environment
 from utils import Util
 from viewports.pausemenu import PauseMenu
 
+# 1 one day in game is 20 minutes irl
+REAL2GAME = (1 / 60 * 20) * 200 # 1 real second is 20 game seconds
 
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
@@ -29,12 +31,26 @@ class GameView(Viewport):
         self.move_pos: tuple[int, int] = (0, 0)
         self.keys_pressed: dict[int, bool] = {}
 
+        self.game_time: float = self.save.save_data['game_time']
+        self.last_time_update: float = time.time()
+
         self.setup()
     
     def setup(self):
+        # FPS display
         self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
         self.registerComponent(self.FPS_DISPLAY)
+
+        # Location display
+        self.LOC_DISPLAY = TextDisplay(location=(80, 210), text="Location: ???", color=(255, 255, 255))
+        self.LOC_DISPLAY._LAST_UPDATE_FRAME = 0
+        self.registerComponent(self.LOC_DISPLAY)
+
+        # Time display
+        self.TIME_DISPLAY = TextDisplay(location=(10, 230), text="Time: ???", color=(255, 255, 255))
+        self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
+        self.registerComponent(self.TIME_DISPLAY)
 
         # Game stuff
         self.hotbar = HotbarComponent(parent=self)
@@ -98,6 +114,19 @@ class GameView(Viewport):
         if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.FPS_DISPLAY.setText(f"FPS: {enviorment['clock'].get_fps():.0f}")
+        if time.time() - self.LOC_DISPLAY._LAST_UPDATE_FRAME > 0.05:
+            self.LOC_DISPLAY._LAST_UPDATE_FRAME = time.time()
+            self.LOC_DISPLAY.setText(f"({self.player_pos[0]}, {self.player_pos[1]})")
+        if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
+            self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
+            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)}")
+
+            # update the game time
+            timeChange = time.time() - self.last_time_update
+            self.game_time += REAL2GAME * timeChange
+            self.last_time_update = time.time()
+            
+            if self.game_time > 1501: self.game_time = 60
 
         self.enviorment['window'].fill((0, 0, 0))
 

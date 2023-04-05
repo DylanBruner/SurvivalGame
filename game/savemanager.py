@@ -31,6 +31,7 @@ class SaveGame:
                 "level": 1,
                 "xp": 0,
             },
+            "game_time": 0,
             "world": World().save()
         }
 

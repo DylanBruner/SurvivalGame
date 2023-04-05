@@ -35,3 +35,18 @@ class Util:
         startX = player_pos[0] - (window_size[0] // tile_size) // 2
         startY = player_pos[1] - (window_size[1] // tile_size) // 2
         return ((mouse_pos[0] // tile_size) + startX, (mouse_pos[1] // tile_size) + startY)
+
+    @staticmethod
+    def gameTimeToNice(gameTime: int) -> str: #00:00 AM/PM
+        gameTime = int(gameTime)
+        hours = gameTime // 60
+        minutes = gameTime % 60
+        if hours > 12:
+            hours -= 12
+            ampm = "PM"
+        else:
+            ampm = "AM"
+        # round hours and minutes to 2 digits
+        hours = str(hours).zfill(2)
+        minutes = str(minutes).zfill(2)
+        return f"{hours}:{minutes} {ampm}"
