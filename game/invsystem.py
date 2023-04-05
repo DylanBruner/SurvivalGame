@@ -40,12 +40,34 @@ class HotbarComponent(Component):
         self.breaking_tile = None
         self.real_tile = None
 
+        self.count_font = pygame.font.SysFont("Arial", 16)
+
+    def addToInventory(self, item: Item):
+        # check if the item is already in the inventory
+        for i in range(len(self._items)):
+            if self._items[i] and self._items[i].item_id == item.item_id:
+                if self._items[i].count + item.count <= Config.STACK_SIZE:
+                    self._items[i].count += item.count
+                    return
+
+        # if not, find an empty slot
+        for i in range(len(self._items)):
+            if not self._items[i]:
+                self._items[i] = item
+                return
+        
+        # TODO: Drop the item on the ground when we have support for dropped items
+
     def draw(self, surface: pygame.Surface, enviorment: dict):
         for i in range(len(self._items)):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
             # draw item
             if self._items[i]:
                 surface.blit(self._items[i].texture, (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 4, self.location[1] + 4))
+                # draw count
+                if self._items[i].count > 1:
+                    count_surface = self.count_font.render(str(self._items[i].count), True, (255, 255, 255))
+                    surface.blit(count_surface, (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 8, self.location[1] + 8))
             
             if self._selected_slot == i:
                 pygame.draw.rect(surface, (0, 0, 0), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), 2, border_radius=4)
@@ -68,6 +90,7 @@ class HotbarComponent(Component):
                 self.breaking_percent = 0
 
                 self.parent.save.setTile(self.real_tile[0], self.real_tile[1], TileIDS.GRASS)
+                self.addToInventory(Item(tile.id, 1, pygame.image.load(tile.texture)))
                 self.breaking_tile = None
             
     def onEvent(self, event: pygame.event.Event):
@@ -84,7 +107,15 @@ class HotbarComponent(Component):
                     self.breaking = True
                     self.breaking_percent = 0
                     self.breaking_tile = (event.pos[0] // TILE_SIZE, event.pos[1] // TILE_SIZE)
-                    
+            # place block
+            elif event.button == 3:
+                selected_tile = Util.getTileLocation(pygame.mouse.get_pos(), self.parent.player_pos, self.parent.size, TILE_SIZE)
+                if self._items[self._selected_slot] and self.parent.save.getTile(selected_tile[0], selected_tile[1]) == TileIDS.GRASS:
+                    self.parent.save.setTile(selected_tile[0], selected_tile[1], self._items[self._selected_slot].item_id)
+                    self._items[self._selected_slot].count -= 1
+                    if self._items[self._selected_slot].count <= 0:
+                        self._items[self._selected_slot] = None
+                
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 if self.breaking:
