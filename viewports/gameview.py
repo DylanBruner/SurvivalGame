@@ -19,6 +19,18 @@ from enemies.testpathfinder import TestPathfinderEnemy
 # 1 one day in game is 20 minutes irl
 REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
 
+def circle_surf(radius: int, color: tuple[int, int, int]) -> pygame.Surface:
+    surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+    pygame.draw.circle(surf, color, (radius, radius), radius)
+    surf.set_colorkey((0, 0, 0))
+    return surf
+
+def rect_surf(size: tuple[int, int], color: tuple[int, int, int]) -> pygame.Surface:
+    surf = pygame.Surface(size, pygame.SRCALPHA)
+    pygame.draw.rect(surf, color, (0, 0, *size))
+    surf.set_colorkey((0, 0, 0))
+    return surf
+
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
                  save: SaveGame = None):
@@ -35,6 +47,7 @@ class GameView(Viewport):
         self.game_time: float = self.save.save_data['game_time']
         self.last_time_update: float = time.time()
         self.day_count: int = self.save.save_data['day_count']
+        self.blood_moon: bool = (self.day_count % 7) == 0
 
         self.enemies: list[Enemy] = []
 
@@ -50,10 +63,15 @@ class GameView(Viewport):
 
 
         self.particle_displays: list[ParticleDisplay] = []
+        self.ui_layer: pygame.Surface   = None
+        self.game_layer: pygame.Surface = None
 
         self.setup()
     
     def setup(self):
+        self.ui_layer   = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
+
         self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
@@ -128,6 +146,26 @@ class GameView(Viewport):
         if self.player.stamina < self.player.max_stamina:
             self.player.stamina += 0.01 * environment['time_delta']
             self.player.stamina = min(self.player.max_stamina, self.player.stamina)
+    
+    def drawLighting(self):
+        # night color
+        color = [0, 0, 0]
+        if self.game_time < 400:
+            color = self.game_time * 0.8, self.game_time * 0.8, self.game_time * 0.8
+        elif self.game_time > 1000:
+            if self.blood_moon:
+                color = [1550 - (self.game_time), (1300 - (self.game_time)), 1300 - (self.game_time)]
+            else:
+                color = (1450 - (self.game_time)), (1450 - (self.game_time)), (1450 - (self.game_time))
+        else:
+            color = [255, 255, 255]
+
+        color = [int(max(70, min(255, c))) for c in color]
+        text = DEFAULT_FONT.render(f"{color}", True, (255, 255, 255))
+        self.game_layer.blit(text, (500, 500))
+
+        surf = rect_surf(self.size, color)
+        self.game_layer.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 
     def draw(self, enviorment: dict):
         if self.paused:
@@ -152,13 +190,21 @@ class GameView(Viewport):
 
             # update the game time
             timeChange = time.time() - self.last_time_update
-            self.game_time += REAL2GAME * timeChange
+            self.game_time += (REAL2GAME * timeChange)
             self.last_time_update = time.time()
             
             if self.game_time > 1501: 
                 self.game_time = 60
                 self.day_count += 1
                 self.save.save_data['day_count'] = self.day_count
+
+                if (self.day_count % 7) == 0:
+                    self.blood_moon = True
+                    self.TIME_DISPLAY.color = (255, 0, 0)
+                else: 
+                    self.blood_moon = False
+                    self.TIME_DISPLAY.color = (255, 255, 255)
+
             self.save.save_data['game_time'] = self.game_time
         
         self.HEALTH_DISPLAY.value  = self.player.health
@@ -167,7 +213,8 @@ class GameView(Viewport):
         self.XP_LEVEL_DISPLAY.setText(str(self.player.xp // 100))
         self.XP_LEVEL_DISPLAY.location = (self.size[0] // 2 - (DEFAULT_FONT.size(str(self.player.xp // 100))[0] // 2), self.XP_DISPLAY.location[1] - 24)
 
-        self.enviorment['window'].fill((0, 0, 0))
+        self.game_layer.fill((0, 0, 0))
+        self.ui_layer.fill((0, 0, 0, 0))
 
         # draw the map
         map_data: list[list[int]] = self.save.save_data['world']['map_data']
@@ -197,34 +244,44 @@ class GameView(Viewport):
                         screen_x = (x - left_plane) * TILE_SIZE
                         screen_y = (y - bottom_plane) * TILE_SIZE
                         if Tiles.getTile(tile_id).background_id:
-                            self.enviorment['window'].blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
+                            self.game_layer.blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
 
-                        self.enviorment['window'].blit(texture, (screen_x, screen_y))
+                        self.game_layer.blit(texture, (screen_x, screen_y))
                         # draw black border around the tile
-                        pygame.draw.rect(self.enviorment['window'], (0, 0, 0), (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
+                        # pygame.draw.rect(self.game_layer, (0, 0, 0), (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
                         # check if the mouse is hovering over the tile
                         if pygame.mouse.get_pos()[0] >= screen_x and pygame.mouse.get_pos()[0] <= screen_x + TILE_SIZE and pygame.mouse.get_pos()[1] >= screen_y and pygame.mouse.get_pos()[1] <= screen_y + TILE_SIZE:
                             self.player.selected_tile = (x, y)
 
                             color = (255, 0, 0) if Util.distance(self.player.selected_tile, self.player.location) > 5 else (255, 255, 255)
-                            pygame.draw.rect(self.enviorment['window'], color, (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
+                            pygame.draw.rect(self.ui_layer, color, (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
         for enemy in self.enemies:
             if Util.distance(enemy.location, self.player.location) < 100:
                 ex = (enemy.location[0] - left_plane) * TILE_SIZE
                 ey = (enemy.location[1] - bottom_plane) * TILE_SIZE
-                enemy.draw(enviorment['window'], enviorment, (ex, ey))
+                enemy.draw(self.game_layer, enviorment, (ex, ey))
 
         # # draw the player as a red rect
-        pygame.draw.rect(self.enviorment['window'], (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
+        pygame.draw.rect(self.game_layer, (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
         text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
-        self.enviorment['window'].blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
+        self.ui_layer.blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
-            particle_disp.draw(enviorment['window'], delta_time = enviorment['time_delta'])
+            particle_disp.draw(self.game_layer, delta_time = enviorment['time_delta'])
 
-        super().draw(enviorment) # so components can draw themselves on top of the map
+        # super().draw(enviorment) # so components can draw themselves on top of the map
+        for component in self.components['components']:
+            component.draw(self.ui_layer, enviorment)
+        
+        if self._customCursorEnabled:
+            self.ui_layer.blit(self.customCursor, pygame.mouse.get_pos())
+
+        self.drawLighting()
+        
+        self.enviorment['window'].blit(self.game_layer, (0, 0))
+        self.enviorment['window'].blit(self.ui_layer, (0, 0))
     
     def getTileLocation(self, loc: tuple[int, int]) -> tuple[int, int]:
         """
