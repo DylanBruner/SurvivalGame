@@ -7,6 +7,7 @@
 - health bar & health system [KINDA] [no way to regen atm]
 
 [TODO LIST] (somewhat in order of priority)
+- move code out of gameview.py to other files
 - collisions
 - add ennemies
 - money
