@@ -17,6 +17,9 @@ BLANK_SAVE = {
     },
     "day_count": 0,
     "game_time": 0,
+    "difficulty": {
+        "blood_moon": True
+    },
     "world": []
 }
 

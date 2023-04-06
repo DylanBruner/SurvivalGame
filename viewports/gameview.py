@@ -186,7 +186,7 @@ class GameView(Viewport):
             self.LOC_DISPLAY.setText(f"({self.player.location[0]:.0f}, {self.player.location[1]:.0f})")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} - Day {self.day_count}")
+            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} (Day {self.day_count})")
 
             # update the game time
             timeChange = time.time() - self.last_time_update
@@ -198,7 +198,7 @@ class GameView(Viewport):
                 self.day_count += 1
                 self.save.save_data['day_count'] = self.day_count
 
-                if (self.day_count % 7) == 0:
+                if (self.day_count % 7) == 0 and self.save.save_data['difficulty']['blood_moon']:
                     self.blood_moon = True
                     self.TIME_DISPLAY.color = (255, 0, 0)
                 else: 

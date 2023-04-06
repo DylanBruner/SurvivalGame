@@ -1,26 +1,46 @@
-- manage saves from in game: delete, upgrade/repair*, rename, copy
-  * upgrade/repair will repair the save if it is corrupted, or upgrade it to the latest version if it is an older version and is missing some data
-- add ennemies
-- add more things to build with
-- crafting system
-- add items (weapons, armor, tools, consumables, etc)
-- better UI
-- better random generation
-- random gen structures & maybe structure groups (like a village in Minecraft)
-- possibly more inventory slots, not just the hotbar
-- health bar & health system [DONEish] [no way to regen atm]
 - stamina bar & stamina system [DONE]
+- fix movement so that it's not forced to snap to the grid [DONE]
+- particles :D [DONE]
+- make movement not SUCK [DONE]
+- lighting... this will be hard [DONE] (wasn't that hard)
+- borderless full screen support [KINDA] (doesn't support borderless fullscreen)
+- health bar & health system [KINDA] [no way to regen atm]
+
+[TODO LIST] (somewhat in order of priority)
+- collisions
+- add ennemies
+- money
+- surviors that randomly spawn in the world
+  - they can be hostile or friendly
+  - if they're friendly they can give you quests, buy items and sell items to you
+- add more resources to mine, loot, craft, build with, etc.
+- add items (weapons, armor, tools, consumables, etc)
+- possibly more inventory slots, not just the hotbar
+- random gen structures & maybe structure groups (like a village in Minecraft)
+  - loot chests / chests in general
+- better random generation
+- manage saves from in game: delete, upgrade/repair*, rename, copy
+  - upgrade / repair is supported, just needs a nice way to do it as it's currently just a hotkey
+- crafting system (i don't want a Minecraft-esque crafting system, but it would be really easy to implement)
+- fix the minimap / come up with a design for it
+- better UI (button textures, menu art (stolen ofc), etc)
+- a difficulty setting
+  - blood moons can be disabled by the config but there's no way to do it in game yet
+- foliage so we can actually see ourself moving
+  - trees have been added, but some more things like: flowers and bushes would be nice
 - actual assets
 - title screen art
-- full screen support [KINDA]
-- rebinding of keys in the options menu
-- a difficulty setting
-- particles :D [DONE]
-- fix movement so that it's not forced to snap to the grid [DONE]
-- foliage so we can actually see ourself moving
-- make movement not SUCK [DONE]
+- more sounds
 - better block break sound
-- lighting... this will be hard
+- player character selector along with actually adding characters not just a red box
+- settings menu
+  - rebinding of keys, the game already supports this but there's no interface for it yet
+  - volume sliders
+  - particle quality
+- fix delayed sounds
+- optimize rendering so we can get 60+ fps in fullscreen not just the default window size
+- periodic saving / save the game as a backup if a crash is detected or at least try to
+
 
 Things that would be cool to have but are not a priority:
 - biomes
