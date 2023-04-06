@@ -71,31 +71,14 @@ class SaveGame:
             save_data = json.load(f)
         
         save_data['world'] = World().save()
-        save_data['player']['x'] = 0
-        save_data['player']['y'] = 0
         
         with open(f"data/saves/{save_file}", 'w') as f:
             json.dump(save_data, f)
         
     @staticmethod
     def createNewSave(save_file: str) -> 'SaveGame':
-        save_data = {
-            "save_name": save_file.replace("_", " ").replace(".json", "").title(),
-            "player": {
-                "inventory": [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)],
-                "money": 0,
-                "health": 100,
-                "max_health": 100,
-                "max_stamina": 100,
-                "level": 1,
-                "xp": 0,
-                "x": 0,
-                "y": 0,
-                "day_counter": 0
-            },
-            "game_time": 0,
-            "world": World().save()
-        }
+        save_data = BLANK_SAVE.copy()
+        save_data['world'] = World().save()
 
         with open(f"data/saves/{save_file}", 'w') as f:
             json.dump(save_data, f)
