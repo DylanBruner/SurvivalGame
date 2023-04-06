@@ -6,7 +6,7 @@ from game.keybinding import Bindings
 from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
 from utils import Util
-
+from game.sounds import Sounds
 
 class Config:
     # Visual
@@ -89,6 +89,7 @@ class HotbarComponent(Component):
             self.breaking_percent += ((self._breaking_power * 10) / Tiles.getTile(self.breaking_id).durability) * enviorment['time_delta']
 
             if self.breaking_percent >= 100:
+                Sounds.playSound(Sounds.BLOCK_BREAK)
                 self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
                 tile = Tiles.getTile(self.breaking_id)
                 if tile:

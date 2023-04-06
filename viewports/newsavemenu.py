@@ -5,6 +5,7 @@ from componentsystem import Viewport
 from myenvironment import Environment
 from utils import Util
 from game.savemanager import SaveGame
+from game.sounds import Sounds
 
 class NewSaveMenu(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment):
@@ -26,10 +27,11 @@ class NewSaveMenu(Viewport):
         self.registerComponent(self.create_button)
 
         self.back_button = Button((self.size[0] / 2 - 100, 300), (200, 40), "Back")
-        self.back_button.on_click = lambda: Util.backViewport(self.enviorment)
+        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
         self.registerComponent(self.back_button)
     
     def createSave(self):
+        Sounds.playSound(Sounds.MENU_CLICK)
         save_file = self.save_name.text.replace(" ", "_").lower().strip() + ".json"
         if save_file == ".json":
             return

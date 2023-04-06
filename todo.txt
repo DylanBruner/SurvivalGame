@@ -6,18 +6,21 @@
 - add items (weapons, armor, tools, consumables, etc)
 - better UI
 - better random generation
+- random gen structures & maybe structure groups (like a village in Minecraft)
 - possibly more inventory slots, not just the hotbar
-- health bar & health system
-- stamina bar & stamina system
+- health bar & health system [DONEish] [no way to regen atm]
+- stamina bar & stamina system [DONE]
 - actual assets
 - title screen art
-- full screen support
+- full screen support [KINDA]
 - rebinding of keys in the options menu
 - a difficulty setting
 - particles :D [DONE]
-- fix movement so that it's not forced to snap to the grid
+- fix movement so that it's not forced to snap to the grid [DONE]
 - foliage so we can actually see ourself moving
-- make movement not SUCK
+- make movement not SUCK [DONE]
+- better block break sound
+- lighting... this will be hard
 
 Things that would be cool to have but are not a priority:
 - biomes

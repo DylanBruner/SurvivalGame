@@ -7,6 +7,7 @@ from utils import Util
 from viewports.newsavemenu import NewSaveMenu
 from viewports.gameview import GameView
 from game.savemanager import SaveGame
+from game.sounds import Sounds
 
 class PlayGame(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment):
@@ -27,16 +28,16 @@ class PlayGame(Viewport):
         self.save_buttons = []
         for i in range(len(save_names)):
             self.save_buttons.append(Button((self.size[0] / 2 - 100, 150 + i * 50), (200, 40), nice_names[i]))
-            self.save_buttons[i].on_click = lambda save_file=save_names[i]: self.launchSave(save_file)
+            self.save_buttons[i].on_click = lambda save_file=save_names[i]: (Sounds.playSound(Sounds.MENU_CLICK), self.launchSave(save_file))
             self.registerComponent(self.save_buttons[i])
         
         if len(save_names) < 3:
             self.new_game_button = Button((self.size[0] / 2 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
-            self.new_game_button.on_click = lambda: Util.launchViewport(self, NewSaveMenu(self.size, self.enviorment), self.enviorment)
+            self.new_game_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, NewSaveMenu(self.size, self.enviorment), self.enviorment))
             self.registerComponent(self.new_game_button, {'border_radius': 4})
 
         self.back_button = Button((self.size[0] / 2 - 100, 250 + len(save_names) * 50), (200, 40), "Back")
-        self.back_button.on_click = lambda: Util.backViewport(self.enviorment)
+        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
         self.registerComponent(self.back_button, {'border_radius': 4})
     
     def launchSave(self, save_file: str):
