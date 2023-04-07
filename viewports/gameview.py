@@ -34,9 +34,9 @@ class Lighting:
         return surf
 
 class GameView(Viewport):
-    def __init__(self, size: tuple[int, int], enviorment: Environment,
+    def __init__(self, size: tuple[int, int], environment: Environment,
                  save: SaveGame = None):
-        super().__init__(size, enviorment)
+        super().__init__(size, environment)
         self.save: SaveGame = save
         if self.save == None: raise Exception("No save file specified")
         self.theme = None # disable automatic themeing
@@ -124,20 +124,20 @@ class GameView(Viewport):
         self.game_layer.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, enviorment: dict):
+    def draw(self, environment: dict):
         if self.paused:
             if self.paused_overlay.closed:
                 self.paused = False
                 self.paused_overlay = None
                 return
-            self.paused_overlay.draw(enviorment)
+            self.paused_overlay.draw(environment)
             return
         
-        self.doGameLogic(enviorment)
+        self.doGameLogic(environment)
 
         if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.FPS_DISPLAY.setText(f"FPS: {enviorment['clock'].get_fps():.0f}")
+            self.FPS_DISPLAY.setText(f"FPS: {environment['clock'].get_fps():.0f}")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} (Day {self.day_count})")
@@ -215,7 +215,7 @@ class GameView(Viewport):
             if Util.distance(enemy.location, self.player.location) < 100:
                 ex = (enemy.location[0] - left_plane) * TILE_SIZE
                 ey = (enemy.location[1] - bottom_plane) * TILE_SIZE
-                enemy.draw(self.game_layer, enviorment, (ex, ey))
+                enemy.draw(self.game_layer, environment, (ex, ey))
 
         # # draw the player as a red rect
         pygame.draw.rect(self.game_layer, (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
@@ -223,19 +223,19 @@ class GameView(Viewport):
         self.ui_layer.blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
-            particle_disp.draw(self.game_layer, delta_time = enviorment['time_delta'])
+            particle_disp.draw(self.game_layer, delta_time = environment['time_delta'])
 
-        # super().draw(enviorment) # so components can draw themselves on top of the map
+        # super().draw(environment) # so components can draw themselves on top of the map
         for component in self.components['components']:
-            component.draw(self.ui_layer, enviorment)
+            component.draw(self.ui_layer, environment)
         
         if self._customCursorEnabled:
             self.ui_layer.blit(self.customCursor, pygame.mouse.get_pos())
 
         self.drawLighting()
         
-        self.enviorment['window'].blit(self.game_layer, (0, 0))
-        self.enviorment['window'].blit(self.ui_layer, (0, 0))
+        self.environment['window'].blit(self.game_layer, (0, 0))
+        self.environment['window'].blit(self.ui_layer, (0, 0))
     
     @Util.MonkeyUtils.autoErrorHandling
     def getTileLocation(self, loc: tuple[int, int]) -> tuple[int, int]:
@@ -263,8 +263,8 @@ class GameView(Viewport):
             self.keys_pressed[event.key] = True
             if event.key == pygame.K_ESCAPE:
                 self.paused = True
-                self.paused_overlay = PauseMenu(self.size, self.enviorment)
-                self.enviorment['overlays'].append(self.paused_overlay)
+                self.paused_overlay = PauseMenu(self.size, self.environment)
+                self.environment['overlays'].append(self.paused_overlay)
                 return
             
             elif event.key == pygame.K_j:

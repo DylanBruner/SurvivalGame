@@ -67,7 +67,7 @@ class HotbarComponent(Component):
         # TODO: Drop the item on the ground when we have support for dropped items
 
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         for i in range(len(self._items)):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
             # draw item
@@ -88,7 +88,7 @@ class HotbarComponent(Component):
                 self.breaking_tile = None
                 self.breaking_id = None
                 return
-            self.breaking_percent += ((self._breaking_power * 10) / Tiles.getTile(self.breaking_id).durability) * enviorment['time_delta']
+            self.breaking_percent += ((self._breaking_power * 10) / Tiles.getTile(self.breaking_id).durability) * environment['time_delta']
 
             if self.breaking_percent >= 100:
                 Sounds.playSound(Sounds.BLOCK_BREAK)

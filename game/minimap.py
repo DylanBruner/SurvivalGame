@@ -12,7 +12,7 @@ class MiniMap(Component):
         self.SCALED_TEXTURES = {}
     
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         pygame.draw.rect(surface, (255, 255, 255), (self.location[0], self.location[1], self.size[0], self.size[1]))
         mapSurface = pygame.Surface(self.size)
         mapSurface.fill((255, 255, 255))

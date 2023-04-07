@@ -8,8 +8,8 @@ from viewports.playgame import PlayGame
 from game.sounds import Sounds
 
 class MainMenu(Viewport):
-    def __init__(self, size: tuple[int, int], enviorment: Environment):
-        super().__init__(size, enviorment)
+    def __init__(self, size: tuple[int, int], environment: Environment):
+        super().__init__(size, environment)
         menutheme = self.theme.__class__()
         menutheme.THEME_TREE['Button']['border_radius'] = 0
         self.theme = menutheme
@@ -18,7 +18,7 @@ class MainMenu(Viewport):
 
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - Main Menu")
+        pygame.display.set_caption(f"{self.environment.GAME_NAME} - Main Menu")
         y_offset = self.size[1] / 4 - 100
         self.menu_text = TextDisplay(location=(self.size[0] / 2 - 100 + DEFAULT_FONT.size("Main Menu")[0] / 4, 50 + y_offset), text="Main Menu", font=pygame.font.SysFont("Arial", 40))
         self.play_button = Button((self.size[0] / 2 - 100, 150 + y_offset), (200, 40), "Play")
@@ -26,7 +26,7 @@ class MainMenu(Viewport):
         self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), "Quit")
 
         self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), quit())
-        self.play_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, PlayGame(self.size, self.enviorment), self.enviorment))
+        self.play_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, PlayGame(self.size, self.environment), self.environment))
 
         self.registerComponents([self.menu_text, self.play_button, self.options_button, self.quit_button])
         
@@ -35,7 +35,7 @@ class MainMenu(Viewport):
         self.setCustomCursorEnabled(True)
 
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, enviorment: dict):
-        super().draw(enviorment)
+    def draw(self, environment: dict):
+        super().draw(environment)
 
 VIEWPORT_CLASS = MainMenu

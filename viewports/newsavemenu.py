@@ -8,13 +8,13 @@ from game.savemanager import SaveGame
 from game.sounds import Sounds
 
 class NewSaveMenu(Viewport):
-    def __init__(self, size: tuple[int, int], enviorment: Environment):
-        super().__init__(size, enviorment)
+    def __init__(self, size: tuple[int, int], environment: Environment):
+        super().__init__(size, environment)
         self.setup()
     
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - New Save")
+        pygame.display.set_caption(f"{self.environment.GAME_NAME} - New Save")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
@@ -28,7 +28,7 @@ class NewSaveMenu(Viewport):
         self.registerComponent(self.create_button)
 
         self.back_button = Button((self.size[0] / 2 - 100, 300), (200, 40), "Back")
-        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
+        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.environment))
         self.registerComponent(self.back_button)
     
     @Util.MonkeyUtils.autoErrorHandling
@@ -39,7 +39,7 @@ class NewSaveMenu(Viewport):
             return
 
         SaveGame.createNewSave(save_file)
-        Util.backViewport(self.enviorment)
-        self.enviorment['viewport'].reload()
+        Util.backViewport(self.environment)
+        self.environment['viewport'].reload()
 
 VIEWPORT_CLASS = NewSaveMenu

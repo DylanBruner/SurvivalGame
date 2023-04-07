@@ -7,8 +7,8 @@ from utils import Util
 from game.sounds import Sounds
 
 class PauseMenu(Viewport):
-    def __init__(self, size: tuple[int, int], enviorment: Environment):
-        super().__init__(size, enviorment)
+    def __init__(self, size: tuple[int, int], environment: Environment):
+        super().__init__(size, environment)
         self.setup()
     
     @Util.MonkeyUtils.autoErrorHandling
@@ -28,18 +28,18 @@ class PauseMenu(Viewport):
     @Util.MonkeyUtils.autoErrorHandling
     def resume(self):
         self.closed = True
-        self.enviorment['overlays'].remove(self)
+        self.environment['overlays'].remove(self)
     
     @Util.MonkeyUtils.autoErrorHandling
     def exit(self):
-        self.enviorment.viewport.player.save()
-        self.enviorment.viewport.save.save() # save the game
-        self.enviorment.viewport = Util.MonkeyUtils.getViewportFromName("mainmenu")(self.enviorment.viewport.size, self.enviorment)
-        self.enviorment.last_viewports = [] # we don't want to go 'back' into the game
+        self.environment.viewport.player.save(self.environment.viewport)
+        self.environment.viewport.save.save() # save the game
+        self.environment.viewport = Util.MonkeyUtils.getViewportFromName("mainmenu")(self.environment.viewport.size, self.environment)
+        self.environment.last_viewports = [] # we don't want to go 'back' into the game
         self.closed = True
     
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, enviorment: dict):
-        super().draw(enviorment)
+    def draw(self, environment: dict):
+        super().draw(environment)
 
 VIEWPORT_CLASS = PauseMenu

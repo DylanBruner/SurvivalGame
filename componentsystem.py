@@ -6,16 +6,16 @@ class Component:
         self.size     = size
         self.EVENT_SYSTEM_HOOKED = False
     
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         pass
 
     def onEvent(self, event: pygame.event.Event):
         pass
 
 class Viewport:
-    def __init__(self, size: tuple[int, int], enviorment):
+    def __init__(self, size: tuple[int, int], environment):
         self.size = size
-        self.enviorment = enviorment
+        self.environment = environment
         self.components: list[Component] = []
         self.customCursor: pygame.Surface = None
         self.components = {
@@ -61,11 +61,11 @@ class Viewport:
         self._customCursorEnabled = enabled
         pygame.mouse.set_visible(not enabled)
     
-    def draw(self, enviorment: dict):
+    def draw(self, environment: dict):
         for component in self.components['components']:
-            component.draw(enviorment["window"], enviorment)
+            component.draw(environment["window"], environment)
         if self._customCursorEnabled:
-            enviorment["window"].blit(self.customCursor, pygame.mouse.get_pos())
+            environment["window"].blit(self.customCursor, pygame.mouse.get_pos())
         
     def setup(self) -> None:
         ... # Should be where the components are registered

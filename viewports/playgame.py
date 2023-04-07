@@ -10,8 +10,8 @@ from game.savemanager import SaveGame
 from game.sounds import Sounds
 
 class PlayGame(Viewport):
-    def __init__(self, size: tuple[int, int], enviorment: Environment):
-        super().__init__(size, enviorment)
+    def __init__(self, size: tuple[int, int], environment: Environment):
+        super().__init__(size, environment)
         menutheme = self.theme.__class__()
         menutheme.THEME_TREE['Button']['border_radius'] = 0
         self.theme = menutheme
@@ -19,7 +19,7 @@ class PlayGame(Viewport):
     
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - Play Game")
+        pygame.display.set_caption(f"{self.environment.GAME_NAME} - Play Game")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
@@ -34,11 +34,11 @@ class PlayGame(Viewport):
         
         if len(save_names) < 3:
             self.new_game_button = Button((self.size[0] / 2 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
-            self.new_game_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, NewSaveMenu(self.size, self.enviorment), self.enviorment))
+            self.new_game_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, NewSaveMenu(self.size, self.environment), self.environment))
             self.registerComponent(self.new_game_button, {'border_radius': 4})
 
         self.back_button = Button((self.size[0] / 2 - 100, 250 + len(save_names) * 50), (200, 40), "Back")
-        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
+        self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.environment))
         self.registerComponent(self.back_button, {'border_radius': 4})
     
     @Util.MonkeyUtils.autoErrorHandling
@@ -60,11 +60,11 @@ class PlayGame(Viewport):
             print("[INFO] Regeneration complete! attempting to load save file...")
 
         save_game = SaveGame(save_file=save_file)
-        game_view = GameView(self.size, self.enviorment, save_game)
-        Util.launchViewport(self, game_view, self.enviorment)
+        game_view = GameView(self.size, self.environment, save_game)
+        Util.launchViewport(self, game_view, self.environment)
     
     @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, enviorment: dict):
-        super().draw(enviorment)
+    def draw(self, environment: dict):
+        super().draw(environment)
 
 VIEWPORT_CLASS = PlayGame

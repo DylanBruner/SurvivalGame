@@ -34,17 +34,17 @@ class Util:
         return sprites
 
     @staticmethod
-    def launchViewport(old: Viewport, new: Viewport, enviorment: Environment) -> None:
+    def launchViewport(old: Viewport, new: Viewport, environment: Environment) -> None:
         # old.setCustomCursorEnabled(False)
-        enviorment.viewport = new
-        enviorment.last_viewports.append(old)
+        environment.viewport = new
+        environment.last_viewports.append(old)
     
     @staticmethod
-    def backViewport(enviorment: Environment) -> None:
-        old = enviorment.viewport
-        new = enviorment.last_viewports.pop()
+    def backViewport(environment: Environment) -> None:
+        old = environment.viewport
+        new = environment.last_viewports.pop()
         # old.setCustomCursorEnabled(False)
-        enviorment.viewport = new
+        environment.viewport = new
     
     @staticmethod
     def distance(p1: tuple, p2: tuple) -> float:
@@ -103,6 +103,7 @@ class Util:
             _data["MonkeyUtils"]["auto_error_handling"]["disabled_functions"] = []
             # attempt to save the game
             if hasattr(environment, "viewport") and hasattr(environment.viewport, "save"):
+                environment.viewport.player.save(environment.viewport)
                 environment.viewport.save.save()
             try:
                 Util.MonkeyUtils.reloadModules(globs)

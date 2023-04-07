@@ -24,7 +24,7 @@ class ProgressBar(Component):
         self.text_color = text_color
         self.text_font = text_font
 
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         self.value = max(0, min(self.value, self.max))
         pygame.draw.rect(surface, self.border_color, (self.location[0], self.location[1], self.size[0], self.size[1]), border_radius=self.border_radius)
         pygame.draw.rect(surface, self.background_color, (self.location[0] + 1, self.location[1] + 1, self.size[0] - 2, self.size[1] - 2), border_radius=self.border_radius)
@@ -46,7 +46,7 @@ class TextDisplay(Component):
     def setText(self, text: str):
         self.text = text
     
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         surface.blit(self.font.render(self.text, True, self.color), self.location)
 
 class TextInput(Component):
@@ -89,14 +89,14 @@ class TextInput(Component):
         self._keys_pressed = []
 
     
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         if self._caret_visible:
-            self._caret_blink_timer -= enviorment["time_delta"]
+            self._caret_blink_timer -= environment["time_delta"]
             if self._caret_blink_timer <= 0:
                 self._caret_blink_timer = self.CARET_BLINK_TIME
                 self._caret_visible = False
         else:
-            self._caret_blink_timer -= enviorment["time_delta"]
+            self._caret_blink_timer -= environment["time_delta"]
             if self._caret_blink_timer <= 0:
                 self._caret_blink_timer = self.CARET_BLINK_TIME
                 self._caret_visible = True
@@ -180,7 +180,7 @@ class Button(Component):
 
         self._hovered = False
 
-    def draw(self, surface: pygame.Surface, enviorment: dict):
+    def draw(self, surface: pygame.Surface, environment: dict):
         pygame.draw.rect(surface, (self.background_color if not self._hovered else self.hover_background_color), (self.location[0], self.location[1], self.size[0], self.size[1]), border_radius=self.border_radius)
 
         # if the padding is 0 on top and bottom, then the text will be centered
