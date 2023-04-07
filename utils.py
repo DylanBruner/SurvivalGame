@@ -95,7 +95,9 @@ class Util:
                 if module not in Util.MonkeyUtils.RELOAD_BLACKLIST and (
                     module.startswith("viewports") or module.startswith("game") or module in Util.MonkeyUtils.OTHER_RELOAD):
 
-                    importlib.reload(sys.modules[module])
+                    mod = importlib.reload(sys.modules[module])
+                    if hasattr(mod, 'postLoad') and callable(mod.postLoad):
+                        mod.postLoad()
                     globs[module.split(".")[-1]] = sys.modules[module]
         
         @staticmethod
@@ -140,4 +142,4 @@ class Util:
             return wrapper
 
 if __name__ == "__main__":
-    Util.MonkeyUtils.getViewportFromName("mainmenu")
+    pass

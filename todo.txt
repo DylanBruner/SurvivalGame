@@ -9,6 +9,9 @@
 - move code out of gameview.py to other files [DONE]
 - money [DONE]
 - player character selector [DONE]
+- fix not being able to interact with some tiles depending on how the mouse is positioned on it [DONE]
+- fix trees rendering or maybe it's the random gen idk [DONE]
+
 
 [TODO LIST] (somewhat in order of priority)
 - collisions
@@ -40,11 +43,9 @@
   - volume sliders
   - particle quality
 - custom world size selectable when creating a new world
-- fix trees rendering or maybe it's the random gen idk
 - fix delayed sounds
 - optimize rendering so we can get 60+ fps in fullscreen not just the default window size
 - periodic saving / save the game as a backup if a crash is detected or at least try to
-- fix not being able to interact with some tiles depending on how the mouse is positioned on it
 
 
 Things that would be cool to have but are not a priority:
