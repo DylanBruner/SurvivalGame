@@ -9,6 +9,7 @@ from viewports.gameview import GameView
 from game.savemanager import SaveGame
 from game.sounds import Sounds
 from game.charselector import CharacterSelector
+from game.images import Images
 
 class PlayGame(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):
@@ -29,18 +30,23 @@ class PlayGame(Viewport):
 
         self.save_buttons = []
         for i in range(len(save_names)):
-            self.save_buttons.append(Button((self.size[0] / 4 - 100, 150 + i * 50), (200, 40), nice_names[i]))
+            # self.save_buttons.append(Button((self.size[0] / 4 - 100, 150 + i * 50), (200, 40), nice_names[i]))
+            self.save_buttons.append(ImageButton((self.size[0] / 4 - 100, 50 + (i * 50)), Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text=nice_names[i], text_color=(0, 0, 0)))
             self.save_buttons[i].on_click = lambda save_file=save_names[i]: (Sounds.playSound(Sounds.MENU_CLICK), self.launchSave(save_file))
             self.registerComponent(self.save_buttons[i])
         
         if len(save_names) < 3:
-            self.new_game_button = Button((self.size[0] / 4 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
+            # self.new_game_button = Button((self.size[0] / 4 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
+            self.new_game_button = ImageButton((self.size[0] / 4 - 100, 230 + (len(save_names) * 50)),
+                                                  Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text="New Game", text_color=(0, 0, 0))
             self.new_game_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, NewSaveMenu(self.size, self.environment), self.environment))
-            self.registerComponent(self.new_game_button, {'border_radius': 4})
+            self.registerComponent(self.new_game_button)
 
-        self.back_button = Button((self.size[0] / 4 - 100, 250 + len(save_names) * 50), (200, 40), "Back")
+        self.back_button = ImageButton((self.size[0] / 4 - 100, 300 + len(save_names) * 50), 
+                                       Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text="Back", text_color=(0, 0, 0))
+        
         self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.environment))
-        self.registerComponent(self.back_button, {'border_radius': 4})
+        self.registerComponent(self.back_button)
 
         self.character_selector = CharacterSelector((self.size[0] / 4 * 3 - 120, 40 + len(save_names) * 50))
         self.registerComponent(self.character_selector)

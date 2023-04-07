@@ -23,8 +23,8 @@ class CharacterSelector(Component):
         self.LEFT_ARROW  = pygame.transform.rotate(self.RIGHT_ARROW.copy(), 180)
 
         # scale the left and right arrows to 2x their size
-        self.RIGHT_ARROW = pygame.transform.scale(self.RIGHT_ARROW, (self.RIGHT_ARROW.get_width() * 2, self.RIGHT_ARROW.get_height() * 2))
-        self.LEFT_ARROW  = pygame.transform.scale(self.LEFT_ARROW, (self.LEFT_ARROW.get_width() * 2, self.LEFT_ARROW.get_height() * 2))
+        self.RIGHT_ARROW = pygame.transform.scale(self.RIGHT_ARROW, (self.RIGHT_ARROW.get_width() * 2.2, self.RIGHT_ARROW.get_height() * 2.2))
+        self.LEFT_ARROW  = pygame.transform.scale(self.LEFT_ARROW, (self.LEFT_ARROW.get_width() * 2.2, self.LEFT_ARROW.get_height() * 2.2))
 
         self.RIGHT_ARROW = pygame.transform.flip(self.RIGHT_ARROW, False, True)
 

@@ -212,3 +212,41 @@ class Button(Component):
         elif event.type == pygame.MOUSEMOTION:
             self._hovered = (self.location[0] <= event.pos[0] <= self.location[0] + self.size[0] 
                              and self.location[1] <= event.pos[1] <= self.location[1] + self.size[1])
+    
+class ImageButton(Component):
+    def __init__(self, location: tuple[int, int], image: pygame.Surface, 
+                 click_image: pygame.Surface = None, 
+                 hover_image: pygame.Surface = None, on_click: callable = lambda: None,
+                 text: str = None, font: pygame.font.Font = DEFAULT_FONT, text_color: tuple[int, int, int] = (255, 255, 255)):
+        super().__init__(location, image.get_size())
+        self.EVENT_SYSTEM_HOOKED = True
+
+        self.image = image
+        self.click_image = click_image
+        self.hover_image = hover_image
+        self.on_click = on_click
+        self.text = text
+        self.font = font
+        self.text_color = text_color
+
+        self._hovered = False
+    
+    def draw(self, surface: pygame.Surface, environment: dict):
+        if self._hovered and self.hover_image:
+            surface.blit(self.hover_image, self.location)
+        else:
+            surface.blit(self.image, self.location)
+        
+        if self.text:
+            surface.blit(self.font.render(self.text, True, self.text_color), (self.location[0] + self.size[0] / 2 - self.font.size(self.text)[0] / 2, 
+                                                                              self.location[1] + self.size[1] / 2 - self.font.size(self.text)[1] / 2))
+
+    def onEvent(self, event: pygame.event.Event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if (self.location[0] <= event.pos[0] <= self.location[0] + self.size[0] 
+                and self.location[1] <= event.pos[1] <= self.location[1] + self.size[1]):
+                self.on_click()
+
+        elif event.type == pygame.MOUSEMOTION:
+            self._hovered = (self.location[0] <= event.pos[0] <= self.location[0] + self.size[0] 
+                             and self.location[1] <= event.pos[1] <= self.location[1] + self.size[1])
