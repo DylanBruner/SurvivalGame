@@ -1,4 +1,4 @@
-import math, pygame, os, time
+import math, pygame, os, time, json
 from game.keybinding import Bindings
 from utils import Util
 
@@ -21,7 +21,8 @@ class Player:
 
         # Visuals ===============================
         self.ANIMATION_DELAY = 200 # how many milliseconds between each frame of animation
-        self.character  = CHARACTERS[0] # you can change this in the future
+        with open('data/config/settings.json', 'r') as f:
+            self.character = CHARACTERS[json.load(f)['player']['selected_character']]
         self.imageSize  = (24, 32)
         self.playerSize = (self.imageSize[0] * 2, self.imageSize[1] * 2)
         
