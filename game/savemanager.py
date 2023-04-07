@@ -2,7 +2,7 @@ import json
 from game.world import World
 
 BLANK_SAVE = {
-    "save_name": "",
+    "save_name": None,
     "player": {
         "inventory": [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)],
         "money": 0,
@@ -14,6 +14,7 @@ BLANK_SAVE = {
         "x": 0,
         "y": 0,
         "xp_multiplier": 1,
+        "coins": 0
     },
     "day_count": 0,
     "game_time": 0,

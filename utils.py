@@ -72,18 +72,20 @@ class Util:
         RELOAD_BLACKLIST = ["pygame"]
 
         @staticmethod
-        def reloadModules(globs: dict):
-            for module in list(sys.modules.keys()):
-                if module not in Util.MonkeyUtils.RELOAD_BLACKLIST and module.startswith("viewports"):
-                    importlib.reload(sys.modules[module])
-                    globs[module.split(".")[-1]] = sys.modules[module]
-
-        @staticmethod
         def getViewportFromName(name: str):
             module = importlib.import_module(f"viewports.{name}")
             if not hasattr(module, "VIEWPORT_CLASS"):
                 raise AttributeError(f"Module {name} does not have a VIEWPORT_CLASS attribute")
             return getattr(module, "VIEWPORT_CLASS")
+
+        @staticmethod
+        def reloadModules(globs: dict):
+            for module in list(sys.modules.keys()):
+                if module not in Util.MonkeyUtils.RELOAD_BLACKLIST and (
+                    module.startswith("viewports") or module.startswith("game")):
+                    
+                    importlib.reload(sys.modules[module])
+                    globs[module.split(".")[-1]] = sys.modules[module]
         
         @staticmethod
         def reload(environment: Environment, globs: dict):

@@ -66,9 +66,6 @@ class GameView(Viewport):
         self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
-        self.LOC_DISPLAY = TextDisplay(location=(90, 210), text="Location: ???", color=(255, 255, 255))
-        self.LOC_DISPLAY._LAST_UPDATE_FRAME = 0
-
         self.TIME_DISPLAY = TextDisplay(location=(10, 230), text="Time: ???", color=(255, 255, 255))
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
 
@@ -91,8 +88,8 @@ class GameView(Viewport):
         self.minimap = MiniMap(parent=self)
 
         self.registerComponents([
-            self.FPS_DISPLAY, self.LOC_DISPLAY, self.TIME_DISPLAY,
-            self.hotbar, self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
+            self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar, 
+            self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
             self.XP_DISPLAY, self.XP_LEVEL_DISPLAY, self.minimap
         ])
 
@@ -137,9 +134,6 @@ class GameView(Viewport):
         if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.FPS_DISPLAY.setText(f"FPS: {enviorment['clock'].get_fps():.0f}")
-        if time.time() - self.LOC_DISPLAY._LAST_UPDATE_FRAME > 0.05:
-            self.LOC_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.LOC_DISPLAY.setText(f"({self.player.location[0]:.0f}, {self.player.location[1]:.0f})")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} (Day {self.day_count})")
