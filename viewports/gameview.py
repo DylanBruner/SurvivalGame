@@ -1,10 +1,9 @@
-import math, time, pygame
+import time, pygame
 
 from components import *
 from componentsystem import Viewport
 from game.enemy import Enemy
 from game.invsystem import HotbarComponent
-from game.keybinding import Bindings
 from game.minimap import MiniMap
 from game.particlesystem import ParticleDisplay
 from game.player import Player
@@ -19,17 +18,20 @@ from enemies.testpathfinder import TestPathfinderEnemy
 # 1 one day in game is 20 minutes irl
 REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
 
-def circle_surf(radius: int, color: tuple[int, int, int]) -> pygame.Surface:
-    surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-    pygame.draw.circle(surf, color, (radius, radius), radius)
-    surf.set_colorkey((0, 0, 0))
-    return surf
+class Lighting:
+    @staticmethod
+    def circle(radius: int, color: tuple[int, int, int]) -> pygame.Surface:
+        surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        pygame.draw.circle(surf, color, (radius, radius), radius)
+        surf.set_colorkey((0, 0, 0))
+        return surf
 
-def rect_surf(size: tuple[int, int], color: tuple[int, int, int]) -> pygame.Surface:
-    surf = pygame.Surface(size, pygame.SRCALPHA)
-    pygame.draw.rect(surf, color, (0, 0, *size))
-    surf.set_colorkey((0, 0, 0))
-    return surf
+    @staticmethod
+    def rect(size: tuple[int, int], color: tuple[int, int, int]) -> pygame.Surface:
+        surf = pygame.Surface(size, pygame.SRCALPHA)
+        pygame.draw.rect(surf, color, (0, 0, *size))
+        surf.set_colorkey((0, 0, 0))
+        return surf
 
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], enviorment: Environment,
@@ -43,24 +45,13 @@ class GameView(Viewport):
         self.paused_overlay: Viewport = None
         self.keys_pressed: dict[int, bool] = {}
 
-
         self.game_time: float = self.save.save_data['game_time']
-        self.last_time_update: float = time.time()
-        self.day_count: int = self.save.save_data['day_count']
+        self.day_count: int   = self.save.save_data['day_count']
         self.blood_moon: bool = (self.day_count % 7) == 0
+        self.last_time_update: float = time.time()
 
         self.enemies: list[Enemy] = []
-
-
-        self.player_velocity: tuple[int, int] = [0, 0]
-        self.player = Player()
-        self.player.max_health  = self.save.save_data['player']['max_health']
-        self.player.health      = self.save.save_data['player']['health']
-        self.player.max_stamina = self.save.save_data['player']['max_stamina']
-        self.player.stamina     = self.save.save_data['player']['max_stamina'] // 4
-        self.player.xp          = self.save.save_data['player']['xp']
-        self.player.location    = [self.save.save_data['player']['x'], self.save.save_data['player']['y']]
-
+        self.player = Player(self.save.save_data)
 
         self.particle_displays: list[ParticleDisplay] = []
         self.ui_layer: pygame.Surface   = None
@@ -108,44 +99,11 @@ class GameView(Viewport):
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
             
-    def canMove(self, dir: int, speed: int) -> bool:
-        # forward, backward, left, right
-        return True
-    
     def doGameLogic(self, environment: dict):
-        speed = 0.008 * environment['time_delta']
-        self.player_velocity = [0, 0]
-        if self.keys_pressed.get(Bindings.get("FORWARD"), False):
-            self.player_velocity[1] = -speed
-        if self.keys_pressed.get(Bindings.get("BACKWARD"), False):
-            self.player_velocity[1] = speed
-        if self.keys_pressed.get(Bindings.get("LEFT"), False):
-            self.player_velocity[0] = -speed
-        if self.keys_pressed.get(Bindings.get("RIGHT"), False):
-            self.player_velocity[0] = speed
+        self.player.tick(self.keys_pressed, environment)
 
-        if self.keys_pressed.get(Bindings.get("SPRINT"), False) and (self.player_velocity[0] != 0 or self.player_velocity[1] != 0):
-            if self.player.stamina - 0.02 * environment['time_delta'] > 0:
-                self.player_velocity[0] *= 2
-                self.player_velocity[1] *= 2
-                self.player.stamina -= 0.03 * environment['time_delta']
-
-        # make diagonal movement look less like teleporting
-        if self.player_velocity[0] != 0 and self.player_velocity[1] != 0:
-            self.player_velocity[0] /= math.sqrt(2)
-            self.player_velocity[1] /= math.sqrt(2)
-
-        # update player position
-        self.player.location = (self.player.location[0] + self.player_velocity[0], self.player.location[1] + self.player_velocity[1])        
-
-        # update save data
         self.save.save_data['player']['x'] = self.player.location[0]
         self.save.save_data['player']['y'] = self.player.location[1]
-
-        # regenerate stamina if below max
-        if self.player.stamina < self.player.max_stamina:
-            self.player.stamina += 0.01 * environment['time_delta']
-            self.player.stamina = min(self.player.max_stamina, self.player.stamina)
     
     def drawLighting(self):
         # night color
@@ -161,10 +119,8 @@ class GameView(Viewport):
             color = [255, 255, 255]
 
         color = [int(max(70, min(255, c))) for c in color]
-        text = DEFAULT_FONT.render(f"{color}", True, (255, 255, 255))
-        self.game_layer.blit(text, (500, 500))
 
-        surf = rect_surf(self.size, color)
+        surf = Lighting.rect(self.size, color)
         self.game_layer.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 
     def draw(self, enviorment: dict):
@@ -285,7 +241,7 @@ class GameView(Viewport):
     
     def getTileLocation(self, loc: tuple[int, int]) -> tuple[int, int]:
         """
-        Take a position in the world and return the top left corner of the tile it is in on the screen
+        Take a position in the world and return the top left corner of the tile relative to the window
         """
         visible_width = self.size[0] // TILE_SIZE + 32
         visible_height = self.size[1] // TILE_SIZE + 32
@@ -320,4 +276,4 @@ class GameView(Viewport):
         if event.type == pygame.KEYUP:
             self.keys_pressed[event.key] = False
 
-VIEWPORT_CLASS = GameView
+VIEWPORT_CLASS = GameView # monkey reloading

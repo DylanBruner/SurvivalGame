@@ -91,6 +91,7 @@ class HotbarComponent(Component):
             if self.breaking_percent >= 100:
                 Sounds.playSound(Sounds.BLOCK_BREAK)
                 self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
+                self.parent.player.xp += 5 # xp system needs to be worked out
                 tile = Tiles.getTile(self.breaking_id)
                 if tile:
                     if tile.drops:

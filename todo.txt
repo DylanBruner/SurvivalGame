@@ -5,9 +5,9 @@
 - lighting... this will be hard [DONE] (wasn't that hard)
 - borderless full screen support [KINDA] (doesn't support borderless fullscreen)
 - health bar & health system [KINDA] [no way to regen atm]
+- move code out of gameview.py to other files [DONE]
 
 [TODO LIST] (somewhat in order of priority)
-- move code out of gameview.py to other files
 - collisions
 - add ennemies
 - money
