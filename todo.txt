@@ -6,11 +6,11 @@
 - borderless full screen support [KINDA] (doesn't support borderless fullscreen)
 - health bar & health system [KINDA] [no way to regen atm]
 - move code out of gameview.py to other files [DONE]
+- money [DONE]
 
 [TODO LIST] (somewhat in order of priority)
 - collisions
 - add ennemies
-- money
 - surviors that randomly spawn in the world
   - they can be hostile or friendly
   - if they're friendly they can give you quests, buy items and sell items to you
@@ -33,7 +33,7 @@
 - title screen art
 - more sounds
 - better block break sound
-- player character selector along with actually adding characters not just a red box
+- player character selector
 - settings menu
   - rebinding of keys, the game already supports this but there's no interface for it yet
   - volume sliders
@@ -41,6 +41,7 @@
 - fix delayed sounds
 - optimize rendering so we can get 60+ fps in fullscreen not just the default window size
 - periodic saving / save the game as a backup if a crash is detected or at least try to
+- fix not being able to interact with some tiles depending on how the mouse is positioned on it
 
 
 Things that would be cool to have but are not a priority:
