@@ -1,3 +1,4 @@
+[TODO LIST (but done!!)]
 - stamina bar & stamina system [DONE]
 - fix movement so that it's not forced to snap to the grid [DONE]
 - particles :D [DONE]
@@ -7,6 +8,7 @@
 - health bar & health system [KINDA] [no way to regen atm]
 - move code out of gameview.py to other files [DONE]
 - money [DONE]
+- player character selector [DONE]
 
 [TODO LIST] (somewhat in order of priority)
 - collisions
@@ -33,7 +35,6 @@
 - title screen art
 - more sounds
 - better block break sound
-- player character selector
 - settings menu
   - rebinding of keys, the game already supports this but there's no interface for it yet
   - volume sliders

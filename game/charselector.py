@@ -49,9 +49,9 @@ class CharacterSelector(Component):
     
     @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surface: pygame.Surface, environment: Environment):
-        surface.blit(self.LEFT_ARROW, (self.location[0] - self.LEFT_ARROW.get_width(), self.location[1] + (self.currentCharacter.get_height() // 1.4) - self.LEFT_ARROW.get_height()))
+        surface.blit(self.LEFT_ARROW, (self.location[0] - self.LEFT_ARROW.get_width(), self.location[1] + (self.currentCharacter.get_height() // 1.24) - self.LEFT_ARROW.get_height()))
         surface.blit(self.currentCharacter, self.location)
-        surface.blit(self.RIGHT_ARROW, (self.location[0] + self.currentCharacter.get_width(), self.location[1] + (self.currentCharacter.get_height() // 1.4) - self.RIGHT_ARROW.get_height()))
+        surface.blit(self.RIGHT_ARROW, (self.location[0] + self.currentCharacter.get_width(), self.location[1] + (self.currentCharacter.get_height() // 1.24) - self.RIGHT_ARROW.get_height()))
 
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
