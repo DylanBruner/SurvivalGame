@@ -1,5 +1,6 @@
 import math
 from game.keybinding import Bindings
+from utils import Util
 
 class Player:
     def __init__(self, save_data: dict):
@@ -15,6 +16,16 @@ class Player:
         self.velocity      = [0, 0]
         self.selected_tile = [None, None]
     
+    @Util.MonkeyUtils.autoErrorHandling
+    def save(self, parent: object):
+        parent.save.save_data['player']['x'] = self.location[0]
+        parent.save.save_data['player']['y'] = self.location[1]
+        parent.save.save_data['player']['health'] = self.health
+        parent.save.save_data['player']['xp'] = self.xp
+        parent.save.save_data['player']['max_health'] = self.max_health
+        parent.save.save_data['player']['max_stamina'] = self.max_stamina
+    
+    @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:
         speed = 0.008 * environment['time_delta']
         self.velocity = [0, 0]

@@ -47,6 +47,7 @@ class HotbarComponent(Component):
 
         self.count_font = pygame.font.SysFont("Arial", 16)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def addToInventory(self, item: Item):
         # check if the item is already in the inventory
         for i in range(len(self._items)):
@@ -65,6 +66,7 @@ class HotbarComponent(Component):
         
         # TODO: Drop the item on the ground when we have support for dropped items
 
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surface: pygame.Surface, enviorment: dict):
         for i in range(len(self._items)):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
@@ -116,7 +118,8 @@ class HotbarComponent(Component):
             tile_loc = self.parent.getTileLocation(self.breaking_tile)
             # draw a progress bar that shows how much the player has broken the block
             pygame.draw.rect(surface, (255, 0, 0), (tile_loc[0], tile_loc[1] - 10, Config.SLOT_SIZE * (self.breaking_percent / 150), 5))
-            
+    
+    @Util.MonkeyUtils.autoErrorHandling
     def save(self):
         self.parent.save.save_data['player']['inventory'] = [[0, 0] for i in range(9)]
         for item in self._items:
@@ -124,7 +127,8 @@ class HotbarComponent(Component):
                 self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [item.item_id, item.count]
             else:
                 self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [0, 0]
-            
+    
+    @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             for i in range(len(self._keybind_map)):

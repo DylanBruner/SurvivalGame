@@ -17,6 +17,7 @@ class PlayGame(Viewport):
         self.theme = menutheme
         self.setup()
     
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
         pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - Play Game")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
@@ -40,6 +41,7 @@ class PlayGame(Viewport):
         self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
         self.registerComponent(self.back_button, {'border_radius': 4})
     
+    @Util.MonkeyUtils.autoErrorHandling
     def launchSave(self, save_file: str):
         # check if the 'r' key is pressed
         if pygame.key.get_pressed()[pygame.K_r]:
@@ -61,6 +63,7 @@ class PlayGame(Viewport):
         game_view = GameView(self.size, self.enviorment, save_game)
         Util.launchViewport(self, game_view, self.enviorment)
     
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, enviorment: dict):
         super().draw(enviorment)
 

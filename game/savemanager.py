@@ -1,5 +1,6 @@
 import json
 from game.world import World
+from utils import Util
 
 BLANK_SAVE = {
     "save_name": None,
@@ -33,21 +34,26 @@ class SaveGame:
         if save_file != None:
             self.loadSave(save_file)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def save(self) -> None:
         with open(f"data/saves/{self.save_file}", 'w') as f:
             json.dump(self.save_data, f)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def loadSave(self, save_file: str):
         with open(f"data/saves/{save_file}", 'r') as f:
             self.save_data = json.load(f)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def getTile(self, x: int, y: int) -> int:
         return self.save_data['world']['map_data'][y][x]
 
+    @Util.MonkeyUtils.autoErrorHandling
     def setTile(self, x: int, y: int, tile: int):
         self.save_data['world']['map_data'][y][x] = tile
     
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def repairSave(save_file: str):
         with open(f"data/saves/{save_file}", 'r') as f:
             save_data = json.load(f)
@@ -70,6 +76,7 @@ class SaveGame:
             json.dump(save_data, f)
     
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def regenMap(save_file: str):
         with open(f"data/saves/{save_file}", 'r') as f:
             save_data = json.load(f)
@@ -80,6 +87,7 @@ class SaveGame:
             json.dump(save_data, f)
         
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def createNewSave(save_file: str) -> 'SaveGame':
         save_data = BLANK_SAVE.copy()
         save_data['world'] = World().save()

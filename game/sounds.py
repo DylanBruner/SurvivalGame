@@ -1,4 +1,5 @@
 import pygame
+from utils import Util
 
 pygame.mixer.init()
 
@@ -7,5 +8,6 @@ class Sounds:
     BLOCK_BREAK = pygame.mixer.Sound("data/assets/sounds/block_break.wav")
 
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def playSound(sound: pygame.mixer.Sound):
         sound.play()

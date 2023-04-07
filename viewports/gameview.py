@@ -59,6 +59,7 @@ class GameView(Viewport):
 
         self.setup()
     
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
         self.ui_layer   = pygame.Surface(self.size, pygame.SRCALPHA)
         self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
@@ -95,13 +96,15 @@ class GameView(Viewport):
 
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
-            
+
+    @Util.MonkeyUtils.autoErrorHandling
     def doGameLogic(self, environment: dict):
         self.player.tick(self.keys_pressed, environment)
 
         self.save.save_data['player']['x'] = self.player.location[0]
         self.save.save_data['player']['y'] = self.player.location[1]
     
+    @Util.MonkeyUtils.autoErrorHandling
     def drawLighting(self):
         # night color
         color = [0, 0, 0]
@@ -120,6 +123,7 @@ class GameView(Viewport):
         surf = Lighting.rect(self.size, color)
         self.game_layer.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, enviorment: dict):
         if self.paused:
             if self.paused_overlay.closed:
@@ -233,6 +237,7 @@ class GameView(Viewport):
         self.enviorment['window'].blit(self.game_layer, (0, 0))
         self.enviorment['window'].blit(self.ui_layer, (0, 0))
     
+    @Util.MonkeyUtils.autoErrorHandling
     def getTileLocation(self, loc: tuple[int, int]) -> tuple[int, int]:
         """
         Take a position in the world and return the top left corner of the tile relative to the window
@@ -248,6 +253,7 @@ class GameView(Viewport):
 
         return (loc[0] - left_plane) * TILE_SIZE, (loc[1] - bottom_plane) * TILE_SIZE
 
+    @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
         super().onEvent(event) # so components can still handle events
         if self.paused:

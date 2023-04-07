@@ -51,12 +51,15 @@ class World:
             raise Exception('No map file or random generation specified')
     
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def fromFile(path: str) -> 'World':
         return World(map_file = path)
     
+    @Util.MonkeyUtils.autoErrorHandling
     def save(self) -> dict:
         return self.map
     
+    @Util.MonkeyUtils.autoErrorHandling
     def getCirclePoints(self, center: int, radius: int, fill: bool) -> list[tuple[int, int]]:
         points = []
         # use a 2d circle algorithm to get the points that way it has circle-like edges
@@ -74,6 +77,7 @@ class World:
                                 points.append((center[0] + x + 1, center[1] + y))
         return points
     
+    @Util.MonkeyUtils.autoErrorHandling
     def generateMap(self, seed: int = None):
         random.seed((random.randint(0, 100000) if seed == None else seed))
         self.map['seed'] = seed

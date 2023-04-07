@@ -1,6 +1,16 @@
-import pygame, importlib, inspect, sys, math
+import pygame, importlib, inspect, sys, traceback, colorama, os
 from componentsystem import Viewport
 from myenvironment import Environment
+
+_data = {
+    "MonkeyUtils": {
+        "auto_error_handling": {
+            "enabled": True,
+            "prefix": f"{colorama.Fore.RED}[MonkeyUtils/{colorama.Fore.LIGHTRED_EX}AutoErrorHandling{colorama.Fore.RED}]{colorama.Fore.RESET} ",
+            "disabled_functions": []
+        }
+    }
+}
 
 class Util:
     @staticmethod
@@ -70,6 +80,7 @@ class Util:
 
     class MonkeyUtils:
         RELOAD_BLACKLIST = ["pygame"]
+        OTHER_RELOAD     = [file.replace(".py","") for file in os.listdir(".") if file.endswith(".py")]
 
         @staticmethod
         def getViewportFromName(name: str):
@@ -82,18 +93,23 @@ class Util:
         def reloadModules(globs: dict):
             for module in list(sys.modules.keys()):
                 if module not in Util.MonkeyUtils.RELOAD_BLACKLIST and (
-                    module.startswith("viewports") or module.startswith("game")):
-                    
+                    module.startswith("viewports") or module.startswith("game") or module in Util.MonkeyUtils.OTHER_RELOAD):
+
                     importlib.reload(sys.modules[module])
                     globs[module.split(".")[-1]] = sys.modules[module]
         
         @staticmethod
         def reload(environment: Environment, globs: dict):
+            _data["MonkeyUtils"]["auto_error_handling"]["disabled_functions"] = []
             # attempt to save the game
             if hasattr(environment, "viewport") and hasattr(environment.viewport, "save"):
                 environment.viewport.save.save()
-                
-            Util.MonkeyUtils.reloadModules(globs)
+            try:
+                Util.MonkeyUtils.reloadModules(globs)
+            except Exception as e:
+                if _data["MonkeyUtils"]["auto_error_handling"]["enabled"]:
+                    traceback.print_exc()
+                    print(_data["MonkeyUtils"]["auto_error_handling"]["prefix"] + f"Caught a error while reloading modules!")
             
             # reload the current viewport, all other should be reloaded when the modules are reloaded (hopefully)
             environment.window = pygame.display.set_mode(environment.window.get_size(), pygame.RESIZABLE)
@@ -104,6 +120,23 @@ class Util:
                 environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment, environment.viewport.save)                
             else:
                 environment.viewport = Util.MonkeyUtils.getViewportFromName(module)(environment.window.get_size(), environment)
+        
+        @staticmethod
+        def autoErrorHandling(func: callable):
+            def wrapper(*args, **kwargs):
+                if func.__name__ in _data["MonkeyUtils"]["auto_error_handling"]["disabled_functions"]:
+                    return None
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    # print the full error and traceback just like normal
+                    traceback.print_exc()
+                    print(_data["MonkeyUtils"]["auto_error_handling"]["prefix"] + f"Caught a error while calling {func.__name__}! (function will be disabled until next reload)")
+
+                    if _data["MonkeyUtils"]["auto_error_handling"]["enabled"]:
+                        _data["MonkeyUtils"]["auto_error_handling"]["disabled_functions"].append(func.__name__)
+                    return None
+            return wrapper
 
 if __name__ == "__main__":
     Util.MonkeyUtils.getViewportFromName("mainmenu")

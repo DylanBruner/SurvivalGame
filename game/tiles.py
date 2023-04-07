@@ -1,4 +1,5 @@
 import json
+from utils import Util
 
 TILE_CFG_FILE = "data/config/tiles.json"
 
@@ -24,6 +25,7 @@ class Tile:
 
 class Tiles:
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def getTile(id_name: int or str) -> Tile:
         if isinstance(id_name, int):
             for tile in TILE_DATA.values():
@@ -33,12 +35,14 @@ class Tiles:
             return Tile(**TILE_DATA[id_name])
 
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def calculateHitPercent(breaking_power: int, req_power: int, durability: int) -> int:
         base = 100 / durability
         if breaking_power >= req_power:
             return base * breaking_power
     
     @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
     def getTexture(id_name: int or str) -> str:
         if isinstance(id_name, int):
             for tile in TILE_DATA.values():

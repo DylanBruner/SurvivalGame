@@ -16,6 +16,7 @@ class MainMenu(Viewport):
 
         self.setup()
 
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
         pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - Main Menu")
         y_offset = self.size[1] / 4 - 100
@@ -33,6 +34,7 @@ class MainMenu(Viewport):
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, enviorment: dict):
         super().draw(enviorment)
 

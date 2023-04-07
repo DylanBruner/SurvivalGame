@@ -1,4 +1,5 @@
 import pygame, random, math, time
+from utils import Util
 
 class Shape:
     CIRCLE    = 0
@@ -14,6 +15,7 @@ class Color:
         self.base = base
         self.mod_r  = mod_r
     
+    @Util.MonkeyUtils.autoErrorHandling
     def get(self) -> tuple[int, int, int]:
         c = (self.base[0] + random.randint(-self.mod_r, self.mod_r), 
                 self.base[1] + random.randint(-self.mod_r, self.mod_r), 
@@ -35,6 +37,7 @@ class ParticleDisplay:
         self.particles = [(start[0] + random.randint(-10, 10), start[1] + random.randint(-10, 10)) for _ in range(count)]
         self.start_time = time.time()
     
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surface: pygame.Surface, delta_time: int = 1) -> None:
         self.mod_particles = self.particles.copy()
         for particle in self.particles:

@@ -12,6 +12,7 @@ class NewSaveMenu(Viewport):
         super().__init__(size, enviorment)
         self.setup()
     
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
         pygame.display.set_caption(f"{self.enviorment.GAME_NAME} - New Save")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
@@ -30,6 +31,7 @@ class NewSaveMenu(Viewport):
         self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.enviorment))
         self.registerComponent(self.back_button)
     
+    @Util.MonkeyUtils.autoErrorHandling
     def createSave(self):
         Sounds.playSound(Sounds.MENU_CLICK)
         save_file = self.save_name.text.replace(" ", "_").lower().strip() + ".json"

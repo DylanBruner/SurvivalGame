@@ -11,6 +11,7 @@ class PauseMenu(Viewport):
         super().__init__(size, enviorment)
         self.setup()
     
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
         self.pause_text = TextDisplay(location=(10, 10), text="Paused")
         self.registerComponent(self.pause_text)
@@ -24,16 +25,20 @@ class PauseMenu(Viewport):
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
     
+    @Util.MonkeyUtils.autoErrorHandling
     def resume(self):
         self.closed = True
         self.enviorment['overlays'].remove(self)
     
+    @Util.MonkeyUtils.autoErrorHandling
     def exit(self):
+        self.enviorment.viewport.player.save()
         self.enviorment.viewport.save.save() # save the game
         self.enviorment.viewport = Util.MonkeyUtils.getViewportFromName("mainmenu")(self.enviorment.viewport.size, self.enviorment)
         self.enviorment.last_viewports = [] # we don't want to go 'back' into the game
         self.closed = True
     
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, enviorment: dict):
         super().draw(enviorment)
 

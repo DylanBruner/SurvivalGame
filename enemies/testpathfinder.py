@@ -16,6 +16,7 @@ class TestPathfinderEnemy(Enemy):
 
         self.player_location = None
 
+    @Util.MonkeyUtils.autoErrorHandling
     def canSeePlayer(self) -> bool:
         player_location = self.parent.player.location
         for i in range(self.VIEW_DISTANCE):
@@ -24,11 +25,13 @@ class TestPathfinderEnemy(Enemy):
                 return True
         return False
 
+    @Util.MonkeyUtils.autoErrorHandling
     def findingPlayer(self, environment: Environment):
         self.facing += 0.01
         if self.canSeePlayer():
             self.player_location = self.parent.player.location
     
+    @Util.MonkeyUtils.autoErrorHandling
     def moveTowardsPlayer(self, environment: Environment):
         if self.player_location:
             if Util.distance(self.location, self.player_location) < 1:
@@ -37,6 +40,7 @@ class TestPathfinderEnemy(Enemy):
             self.facing = math.atan2(self.player_location[1] - self.location[1], self.player_location[0] - self.location[0])
             self.location = (self.location[0] + math.cos(self.facing) * self.speed, self.location[1] + math.sin(self.facing) * self.speed)
 
+    @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surface: pygame.Surface, environment: Environment, location: tuple[int, int]):
         super().draw(surface, environment, location)
 
