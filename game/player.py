@@ -1,6 +1,8 @@
-import math
+import math, pygame, os
 from game.keybinding import Bindings
 from utils import Util
+
+CHARACTERS = list(os.listdir("data/assets/character/characters_pack_extended/Heroes"))
 
 class Player:
     def __init__(self, save_data: dict):
@@ -58,3 +60,7 @@ class Player:
         if self.stamina < self.max_stamina:
             self.stamina += 0.01 * environment['time_delta']
             self.stamina = min(self.max_stamina, self.stamina)
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def draw(self, surface: pygame.Surface) -> None:
+        pass

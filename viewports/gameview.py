@@ -228,15 +228,13 @@ class GameView(Viewport):
                 ey = (enemy.location[1] - bottom_plane) * TILE_SIZE
                 enemy.draw(self.game_layer, environment, (ex, ey))
 
-        # # draw the player as a red rect
-        pygame.draw.rect(self.game_layer, (255, 0, 0), (self.size[0] // 2 - 16, self.size[1] // 2 - 16, 32, 32), 1)
-        text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
-        self.ui_layer.blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
+        self.player.draw(self.game_layer)
+        # text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
+        # self.ui_layer.blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
             particle_disp.draw(self.game_layer, delta_time = environment['time_delta'])
 
-        # super().draw(environment) # so components can draw themselves on top of the map
         for component in self.components['components']:
             component.draw(self.ui_layer, environment)
         
