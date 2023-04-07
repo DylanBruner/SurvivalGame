@@ -10,6 +10,7 @@ class Player:
         self.health      = save_data['player']['health']
 
         self.xp          = save_data['player']['xp']
+        self.coins       = save_data['player']['coins']
         self.location    = [save_data['player']['x'], save_data['player']['y']]
         self.alive       = True
 
@@ -24,6 +25,7 @@ class Player:
         parent.save.save_data['player']['xp'] = self.xp
         parent.save.save_data['player']['max_health'] = self.max_health
         parent.save.save_data['player']['max_stamina'] = self.max_stamina
+        parent.save.save_data['player']['coins'] = self.coins
     
     @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:

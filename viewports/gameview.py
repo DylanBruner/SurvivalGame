@@ -33,6 +33,9 @@ class Lighting:
         surf.set_colorkey((0, 0, 0))
         return surf
 
+class Images:
+    COIN_IMAGE = pygame.image.load("data/assets/coin.png")
+
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment,
                  save: SaveGame = None):
@@ -64,20 +67,21 @@ class GameView(Viewport):
         self.ui_layer   = pygame.Surface(self.size, pygame.SRCALPHA)
         self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
 
-        self.FPS_DISPLAY = TextDisplay(location=(10, 210), text="FPS: ???", color=(255, 255, 255))
+        self.FPS_DISPLAY = TextDisplay(location=(self.size[0] - 80, 10), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
-        self.TIME_DISPLAY = TextDisplay(location=(10, 230), text="Time: ???", color=(255, 255, 255))
+        self.TIME_DISPLAY = TextDisplay(location=(10, 232), text="Time: ???", color=(255, 255, 255))
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
 
         self.hotbar = HotbarComponent(parent=self)
         self.HEALTH_DISPLAY = ProgressBar(location=(5, self.size[1] - 32), 
                                           size=(175, 20), max_value=self.player.max_health, border_color = (0, 0, 0), 
-                                          border_radius=4, text_display=True)
+                                          border_radius=4, text_display=True, text_color=(0, 0, 0))
         
         self.STAMINA_DISPLAY = ProgressBar(location=(5, self.size[1] - 32 - 24), 
                                            size=(175, 20), max_value=self.player.max_stamina, 
-                                           border_color = (0, 0, 0), bar_color=(0, 0, 255), border_radius=4, text_display=True)
+                                           border_color = (0, 0, 0), bar_color=(20, 220, 220), border_radius=4, text_display=True, 
+                                           text_color=(0, 0, 0))
         
         self.XP_DISPLAY = ProgressBar(location=(self.hotbar.location[0], self.hotbar.location[1] - 14), 
                                       size=(self.hotbar.size[0] + 33, 10), max_value=100, border_color = (0, 0, 0), 
@@ -88,10 +92,15 @@ class GameView(Viewport):
 
         self.minimap = MiniMap(parent=self)
 
+        # Money display
+        self.coin_image = ImageDisplay(location=(8, 210), image=Images.COIN_IMAGE)
+        self.coins_display = TextDisplay(location=(36, 210), text="???", color=(255, 255, 255))
+
         self.registerComponents([
-            self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar, 
+            self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar,
             self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
-            self.XP_DISPLAY, self.XP_LEVEL_DISPLAY, self.minimap
+            self.XP_DISPLAY, self.XP_LEVEL_DISPLAY, self.minimap,
+            self.coins_display, self.coin_image
         ])
 
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
@@ -160,6 +169,8 @@ class GameView(Viewport):
                     self.TIME_DISPLAY.color = (255, 255, 255)
 
             self.save.save_data['game_time'] = self.game_time
+        
+        self.coins_display.setText(f"{self.player.coins:,}")
         
         self.HEALTH_DISPLAY.value  = self.player.health
         self.STAMINA_DISPLAY.value = self.player.stamina

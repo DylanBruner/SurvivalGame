@@ -49,6 +49,14 @@ class TextDisplay(Component):
     def draw(self, surface: pygame.Surface, environment: dict):
         surface.blit(self.font.render(self.text, True, self.color), self.location)
 
+class ImageDisplay(Component):
+    def __init__(self, location: tuple[int, int], image: pygame.Surface):
+        super().__init__(location, (0, 0))
+        self.image = image
+    
+    def draw(self, surface: pygame.Surface, environment: dict):
+        surface.blit(self.image, self.location)
+
 class TextInput(Component):
     def __init__(self, location: tuple[int, int], size: tuple[int, int], text: str = "",
                  font: pygame.font.Font = DEFAULT_FONT, color: tuple[int, int, int] = (0, 0, 0),
