@@ -87,9 +87,9 @@ class Player:
         if keys_pressed.get(Bindings.get("SPRINT"), False) and (self.velocity[0] != 0 or self.velocity[1] != 0):
             if self.stamina - 0.02 * environment['time_delta'] > 0:
                 self.sprinting = True
-                self.velocity[0] *= 2
-                self.velocity[1] *= 2
-                self.stamina -= 0.03 * environment['time_delta']
+                self.velocity[0] *= 2.5
+                self.velocity[1] *= 2.5
+                self.stamina -= 0.007 * environment['time_delta']
             else: self.sprinting = False
         else: self.sprinting = False
 
@@ -102,7 +102,7 @@ class Player:
         self.location = (self.location[0] + self.velocity[0], self.location[1] + self.velocity[1])        
 
                 # regenerate stamina if below max
-        if self.stamina < self.max_stamina:
+        if self.stamina < self.max_stamina and not self.sprinting:
             self.stamina += 0.01 * environment['time_delta']
             self.stamina = min(self.max_stamina, self.stamina)
 
