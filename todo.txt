@@ -51,3 +51,5 @@
 Things that would be cool to have but are not a priority:
 - biomes
 - multiplayer (probably not going to happen)
+  - I could just sync the world data between the games, it seems like it could be a really easy 
+    way to do it.
