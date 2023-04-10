@@ -1,5 +1,6 @@
 import math, pygame, os, time, json
 from game.keybinding import Bindings
+from game.world import TILE_SIZE
 from utils import Util
 
 CHARACTERS = list(os.listdir("data/assets/character/characters_pack_extended/Heroes"))
@@ -67,7 +68,8 @@ class Player:
     
     @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:
-        speed = 0.001 * environment['time_delta']
+        self.parent = environment['viewport']
+        speed = 0.001 * environment['time_delta']# * 40 # temp speedup
         self.velocity = [0, 0]
         if keys_pressed.get(Bindings.get("LEFT"), False):
             self.velocity[0] = -speed
@@ -87,8 +89,8 @@ class Player:
         if keys_pressed.get(Bindings.get("SPRINT"), False) and (self.velocity[0] != 0 or self.velocity[1] != 0):
             if self.stamina - 0.02 * environment['time_delta'] > 0:
                 self.sprinting = True
-                self.velocity[0] *= 2.5
-                self.velocity[1] *= 2.5
+                self.velocity[0] *= 3
+                self.velocity[1] *= 3
                 self.stamina -= 0.007 * environment['time_delta']
             else: self.sprinting = False
         else: self.sprinting = False
@@ -99,9 +101,17 @@ class Player:
             self.velocity[1] /= math.sqrt(2)
 
         # update player position
-        self.location = (self.location[0] + self.velocity[0], self.location[1] + self.velocity[1])        
+        self.location = (self.location[0] + self.velocity[0], self.location[1] + self.velocity[1])
 
-                # regenerate stamina if below max
+        # clamp the location to the map
+        # environment['world']['map_data']
+        # self.parent.save.save_data['world']['map_data'], 2d list
+        # self.location[0], len(self.parent.save.save_data['world']['map_data'][0]) * TILE_SIZE - self.imageSize[0])), max(0, min(self.location[1], len(self.parent.save.save_data['world']['map_data']) * TILE_SIZE - self.imageSize[1]
+        xLimit = len(self.parent.save.save_data['world']['map_data'][0]) - 1
+        yLimit = len(self.parent.save.save_data['world']['map_data']) - 1.4
+        self.location = (max(0, min(self.location[0], xLimit)), max(0.2, min(self.location[1], yLimit)))
+
+        # regenerate stamina if below max
         if self.stamina < self.max_stamina and not self.sprinting:
             self.stamina += 0.01 * environment['time_delta']
             self.stamina = min(self.max_stamina, self.stamina)
