@@ -69,7 +69,7 @@ class Player:
     @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:
         self.parent = environment['viewport']
-        speed = 0.001 * environment['time_delta']# * 40 # temp speedup
+        speed = 0.001 * environment['time_delta'] * 40
         self.velocity = [0, 0]
         if keys_pressed.get(Bindings.get("LEFT"), False):
             self.velocity[0] = -speed
@@ -103,10 +103,6 @@ class Player:
         # update player position
         self.location = (self.location[0] + self.velocity[0], self.location[1] + self.velocity[1])
 
-        # clamp the location to the map
-        # environment['world']['map_data']
-        # self.parent.save.save_data['world']['map_data'], 2d list
-        # self.location[0], len(self.parent.save.save_data['world']['map_data'][0]) * TILE_SIZE - self.imageSize[0])), max(0, min(self.location[1], len(self.parent.save.save_data['world']['map_data']) * TILE_SIZE - self.imageSize[1]
         xLimit = len(self.parent.save.save_data['world']['map_data'][0]) - 1
         yLimit = len(self.parent.save.save_data['world']['map_data']) - 1.4
         self.location = (max(0, min(self.location[0], xLimit)), max(0.2, min(self.location[1], yLimit)))

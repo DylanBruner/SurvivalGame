@@ -93,8 +93,8 @@ class GameView(Viewport):
         self.minimap = MiniMap(parent=self)
 
         # Money display
-        self.coin_image = ImageDisplay(location=(8, 210), image=Images.COIN_IMAGE)
-        self.coins_display = TextDisplay(location=(36, 210), text="???", color=(255, 255, 255))
+        self.coin_image = ImageDisplay(location=(8, 212), image=Images.COIN_IMAGE)
+        self.coins_display = TextDisplay(location=(36, 212), text="???", color=(255, 255, 255))
 
         self.registerComponents([
             self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar,
