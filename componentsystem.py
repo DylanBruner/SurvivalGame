@@ -5,6 +5,7 @@ class Component:
         self.location = location
         self.size     = size
         self.EVENT_SYSTEM_HOOKED = False
+        self.priority = 0 # Doesn't matter
     
     def draw(self, surface: pygame.Surface, environment: dict):
         pass

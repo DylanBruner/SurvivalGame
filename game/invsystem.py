@@ -3,6 +3,7 @@ import pygame
 import game.particlesystem as pSys
 from componentsystem import Component
 from game.keybinding import Bindings
+from game.playerstorage import PlayerStorage
 from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
 from utils import Util
@@ -29,6 +30,7 @@ class HotbarComponent(Component):
         location = (parent.size[0] // 2 - Config.SLOT_SIZE * 9 // 2, parent.size[1] - (Config.SLOT_SIZE + 10)) # 10px from the bottom
         super().__init__(location=location, size=(Config.SLOT_SIZE * 9, Config.SLOT_SIZE)) # the size shouldn't really matter
         self.EVENT_SYSTEM_HOOKED = True
+        self.priority = 1
 
         self._items = []
         for item_id, item_count in self.parent.save.save_data['player']['inventory']:
@@ -46,6 +48,8 @@ class HotbarComponent(Component):
         self.breaking_tile: list[int, int] = None
 
         self.count_font = pygame.font.SysFont("Arial", 16)
+
+        self.STORAGE_MENU = PlayerStorage(self.parent)
 
     @Util.MonkeyUtils.autoErrorHandling
     def addToInventory(self, item: Item):
@@ -80,6 +84,10 @@ class HotbarComponent(Component):
             
             if self._selected_slot == i:
                 pygame.draw.rect(surface, (0, 0, 0), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), 2, border_radius=4)
+
+        if self.STORAGE_MENU.open:
+            self.STORAGE_MENU.draw(surface, environment)
+            return
 
         if self.breaking:
             if self.breaking_tile != self.parent.player.selected_tile or self.parent.player.stamina < Util.calculateStaminaCost(self._breaking_power):
@@ -130,7 +138,14 @@ class HotbarComponent(Component):
     
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
+        if self.STORAGE_MENU.open:
+            self.STORAGE_MENU.onEvent(event)
+            
         if event.type == pygame.KEYDOWN:
+            if Bindings.get("INVENTORY") == event.key:
+                self.STORAGE_MENU.open = not self.STORAGE_MENU.open
+                self.parent.player.freeze = self.STORAGE_MENU.open
+
             for i in range(len(self._keybind_map)):
                 if pygame.key.get_pressed()[pygame.K_LSHIFT] and Bindings.check(event, self._keybind_map[i]):
                     if self._selected_slot == i: continue

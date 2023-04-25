@@ -17,6 +17,8 @@ class Player:
         self.location    = [save_data['player']['x'], save_data['player']['y']]
         self.alive       = True
 
+        self.freeze      = False
+
         self.velocity      = [0, 0]
         self.selected_tile = [None, None]
 
@@ -68,6 +70,7 @@ class Player:
     
     @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:
+        if self.freeze: return
         self.parent = environment['viewport']
         speed = 0.001 * environment['time_delta']
         self.velocity = [0, 0]
@@ -131,8 +134,5 @@ class Player:
     def draw(self, surface: pygame.Surface) -> None:
         self.handleAnimations()
 
-        # surface.blit(self.images[self.selected_image], (self.location[0] - self.images[self.selected_image].get_width() / 2, 
-                                                        # self.location[1] - self.images[self.selected_image].get_height() / 2))
-        # draw the player in the center of the screen
         surface.blit(self.images[self.selected_image], (surface.get_width() / 2 - self.images[self.selected_image].get_width() / 2,
                                                         surface.get_height() / 2 - self.images[self.selected_image].get_height() / 2))

@@ -235,6 +235,7 @@ class GameView(Viewport):
         for particle_disp in self.particle_displays:
             particle_disp.draw(self.game_layer, delta_time = environment['time_delta'])
 
+        self.components['components'].sort(key = lambda component: component.priority, reverse = False)
         for component in self.components['components']:
             component.draw(self.ui_layer, environment)
         

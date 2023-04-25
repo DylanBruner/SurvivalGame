@@ -12,5 +12,6 @@
     "BACKWARD": 115, 
     "LEFT": 97,
     "RIGHT": 100,
-    "SPRINT": 1073742049
+    "SPRINT": 1073742049,
+    "INVENTORY": 101
 }
