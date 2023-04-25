@@ -78,5 +78,16 @@
         "breaking_power": 1,
         "collidable": true,
         "breakable": true
+    },
+
+    "QUICK_MAPPINGS": {
+        "1": "GRASS",
+        "2": "WATER",
+        "3": "STONE",
+        "4": "TREE_V1",
+        "5": "TREE_V2",
+        "6": "TREE_V3",
+        "7": "TREE_V4",
+        "8": "WOOD"
     }
 }

@@ -78,6 +78,11 @@ class Util:
     def unshiftUnicode(chr: int) -> int:
         return chr - 0xE000
 
+    class MathUtils:
+        @staticmethod
+        def pointInRect(point: tuple, rect: tuple[int, int, int, int]) -> bool:
+            return rect[0] <= point[0] <= rect[0] + rect[2] and rect[1] <= point[1] <= rect[1] + rect[3]
+
     class MonkeyUtils:
         RELOAD_BLACKLIST = ["pygame"]
         OTHER_RELOAD     = [file.replace(".py","") for file in os.listdir(".") if file.endswith(".py")]

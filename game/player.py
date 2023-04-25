@@ -69,7 +69,7 @@ class Player:
     @Util.MonkeyUtils.autoErrorHandling
     def tick(self, keys_pressed: dict, environment: dict) -> None:
         self.parent = environment['viewport']
-        speed = 0.001 * environment['time_delta'] * 40
+        speed = 0.001 * environment['time_delta']
         self.velocity = [0, 0]
         if keys_pressed.get(Bindings.get("LEFT"), False):
             self.velocity[0] = -speed

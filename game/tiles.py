@@ -2,6 +2,7 @@ import json
 from utils import Util
 
 TILE_CFG_FILE = "data/config/tiles.json"
+TILE_DATA: dict = None
 
 with open(TILE_CFG_FILE, "r") as f:
     TILE_DATA: dict = json.load(f)

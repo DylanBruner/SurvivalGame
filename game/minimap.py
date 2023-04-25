@@ -28,12 +28,11 @@ class MiniMap(Component):
         cameraY = player_loc[1]
 
         # TODO: stop the black border from showing
-
         for x in range(cameraX - (self.SIZE // 2), player_loc[0] + (self.SIZE // 2)):
             for y in range(cameraY - (self.SIZE // 2), player_loc[1] + (self.SIZE // 2)):
                 if x < 0 or y < 0 or x >= len(map) or y >= len(map[0]):
                     continue
-
+                
                 tile_id: int = map[x][y]
                 tile_color: tuple[int, int, int] = COLORS.get(tile_id, (0, 0, 0))
                 pygame.draw.rect(bitmap, tile_color, (x - (cameraX - (self.SIZE // 2)), y - (cameraY - (self.SIZE // 2)), 1, 1)) 
