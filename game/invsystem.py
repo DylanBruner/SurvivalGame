@@ -147,7 +147,7 @@ class HotbarComponent(Component):
                 self.parent.player.freeze = self.STORAGE_MENU.open
 
             for i in range(len(self._keybind_map)):
-                if pygame.key.get_pressed()[pygame.K_LSHIFT] and Bindings.check(event, self._keybind_map[i]):
+                if pygame.key.get_pressed()[pygame.K_TAB] and Bindings.check(event, self._keybind_map[i]):
                     if self._selected_slot == i: continue
                     item1 = self._items[self._selected_slot]
                     item2 = self._items[i]
@@ -165,7 +165,7 @@ class HotbarComponent(Component):
                     self._items[i] = item1
                     self.save()
                 elif Bindings.check(event, self._keybind_map[i]):
-                    self._selected_slot = i            
+                    self._selected_slot = i     
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:

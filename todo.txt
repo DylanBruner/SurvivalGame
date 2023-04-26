@@ -16,6 +16,7 @@
 [TODO LIST] (somewhat in order of priority)
 - collisions
 - make a debugging system that tracks how long parts of game logic are taking, for debugging bad FPS
+ - done, make the minimap not suck
 - add ennemies
 - surviors that randomly spawn in the world
   - they can be hostile or friendly

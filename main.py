@@ -1,5 +1,6 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
 import pygame, myenvironment, utils, time
+from debug.timer import DebugTimer
 import game.world as world
 import viewports.mainmenu as mainmenu
 
@@ -20,6 +21,7 @@ environment = myenvironment.Environment(**{
     "clock": pygame.time.Clock(),
     "time_delta": 0,
     "fullscreen": False,
+    "debugTimer": DebugTimer()
 })
 environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
 
@@ -60,11 +62,20 @@ while True:
             if event.key == pygame.K_F11:
                 environment.window = pygame.display.set_mode(environment.window.get_size(), pygame.FULLSCREEN)
                 environment.current_size = environment.window.get_size()
+            
+            if event.key == pygame.K_F9:
+                print(environment.debugTimer._timeData)
 
+        start = time.time()
         environment.viewport.onEvent(event)
+        environment.debugTimer.manualTime("Viewport.onEvent", time.time() - start)
+
+        # not exactly sure why this is here
         for overlay in environment.overlays:
             if not overlay.closed:
+                start = time.time()
                 overlay.onEvent(event)
+                environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.onEvent", time.time() - start)
 
     if STEPPING_MODE and STEPS == 0:
         continue
@@ -72,10 +83,15 @@ while True:
     
     environment.window.fill((255, 255, 255))
     
+    start = time.time()
     environment.viewport.draw(environment)
+    environment.debugTimer.manualTime("Viewport.draw", time.time() - start)
+
     for overlay in environment.overlays:
         if not overlay.closed:
+            start = time.time()
             overlay.draw(environment)
+            environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.draw", time.time() - start)
 
     pygame.display.update()
     environment.time_delta = min(environment.clock.tick(60), 500) if not STEPPING_MODE else 10

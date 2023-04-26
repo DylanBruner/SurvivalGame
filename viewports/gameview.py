@@ -99,7 +99,7 @@ class GameView(Viewport):
         self.registerComponents([
             self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar,
             self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
-            self.XP_DISPLAY, self.XP_LEVEL_DISPLAY, self.minimap,
+            self.XP_DISPLAY, self.XP_LEVEL_DISPLAY,
             self.coins_display, self.coin_image
         ])
 
@@ -229,16 +229,16 @@ class GameView(Viewport):
                 enemy.draw(self.game_layer, environment, (ex, ey))
 
         self.player.draw(self.game_layer)
-        # text = DEFAULT_FONT.render(f"({self.player.selected_tile[0]}, {self.player.selected_tile[1]})", True, (255, 255, 255))
-        # self.ui_layer.blit(text, (self.size[0] // 2 - text.get_width() // 2, self.size[1] // 2 - text.get_height() // 2))
         
         for particle_disp in self.particle_displays:
             particle_disp.draw(self.game_layer, delta_time = environment['time_delta'])
 
         self.components['components'].sort(key = lambda component: component.priority, reverse = False)
         for component in self.components['components']:
+            start = time.time()
             component.draw(self.ui_layer, environment)
-        
+            self.environment.debugTimer.manualTime(f"{component.__class__.__name__}.draw", time.time() - start)
+
         if self._customCursorEnabled:
             self.ui_layer.blit(self.customCursor, pygame.mouse.get_pos())
 
