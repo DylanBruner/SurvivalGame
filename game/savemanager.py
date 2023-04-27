@@ -6,6 +6,7 @@ BLANK_SAVE = {
     "save_name": None,
     "player": {
         "inventory": [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)],
+        "storage": [[(0, 0) for _ in range(14)] for _ in range(4)], # 4 rows of 14
         "money": 0,
         "health": 100,
         "max_health": 100,

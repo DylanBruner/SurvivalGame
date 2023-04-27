@@ -30,14 +30,12 @@ class PlayerStorage:
         self.slot.blit(sheet, (0, 0), (353, 329, 40, 40))
 
         # 9x4 2d list filled of 0's
-        self.inventory     = [[(0, 0) for _ in range(14)] for _ in range(4)] # ID, Quantity
+        self.inventory     = self.parent.save.save_data['player']['storage']
         self.slotLocations = [[None for _ in range(14)] for _ in range(4)]
 
-        self.inventory[0][5] = (1, 9)
-
-        self.dragging: bool              = True
+        self.dragging: bool              = False
         self.dragOrigin: tuple[int, int] = None
-        self.dragItem: int               = (1, 5)
+        self.dragItem: int               = (0, 0)
 
         self.QUANTITY_FONT = pygame.font.SysFont("Arial", 16)
 
@@ -55,7 +53,7 @@ class PlayerStorage:
                 self.slotLocations[y][x] = (top_left[0] + 20 + (x * 40), startY + top_left[1] + 20 + (y * 40))
 
                 # draw the item centered in the slot
-                if self.inventory[y][x] != (0, 0):
+                if self.inventory[y][x][0] != 0:
                     surf.blit(pygame.transform.scale(TEXTURE_MAPPINGS[self.inventory[y][x][0]], (32, 32)), (top_left[0] + 20 + (x * 40) + 4, startY + top_left[1] + 20 + (y * 40) + 4))
                     # draw the quantity in the top left
                     if self.inventory[y][x][1] > 1:
@@ -91,12 +89,12 @@ class PlayerStorage:
             if slotX == -1 and slotY == -1: return
 
             # if the slot is empty and the player is holding an item
-            if self.inventory[slotY][slotX] == (0, 0) and self.dragging:
+            if self.inventory[slotY][slotX][0] == 0 and self.dragging:
                 self.inventory[slotY][slotX] = self.dragItem
                 self.dragging = False
 
             # if the slot is not empty and the player is holding an item
-            elif self.inventory[slotY][slotX] != (0, 0) and self.dragging:
+            elif self.inventory[slotY][slotX][0] != 0 and self.dragging:
                 # see if we can stack the items (up to 250)
                 if self.inventory[slotY][slotX][0] == self.dragItem[0] and self.inventory[slotY][slotX][1] < 250:
                     self.inventory[slotY][slotX] = (self.dragItem[0], self.inventory[slotY][slotX][1] + self.dragItem[1])
@@ -107,7 +105,7 @@ class PlayerStorage:
                     self.inventory[slotY][slotX], self.dragItem = self.dragItem, self.inventory[slotY][slotX]
             
             # elif not dragging and shift is pressed and the slot isnt empty
-            elif not self.dragging and pygame.key.get_pressed()[pygame.K_LSHIFT] and self.inventory[slotY][slotX] != (0, 0):
+            elif not self.dragging and pygame.key.get_pressed()[pygame.K_LSHIFT] and self.inventory[slotY][slotX][0] != 0:
                 hotbar = None  
                 for component in self.parent.components['components']:
                     if component.__class__.__name__ == "HotbarComponent":
@@ -118,7 +116,7 @@ class PlayerStorage:
                 hotbar.addToInventory(item)
                 self.inventory[slotY][slotX] = (0, 0)
 
-            elif not self.dragging and self.inventory[slotY][slotX] != (0, 0):
+            elif not self.dragging and self.inventory[slotY][slotX][0] != 0:
                 self.dragging = True
                 self.dragItem = self.inventory[slotY][slotX]
                 self.inventory[slotY][slotX] = (0, 0)
@@ -134,8 +132,9 @@ class PlayerStorage:
                         break
                 
                 # if there is an item in the slot move it into the inventory
-                if hotbar._items[keyPressed - 49] != (0, 0):
+                if hotbar._items[keyPressed - 49] != (0, 0) and hotbar._items[keyPressed - 49] != [0, 0]:
                     item: Item = hotbar._items[keyPressed - 49]
                     if item is not None:
                         hotbar._items[keyPressed - 49] = None
+                        hotbar.save()
                         self.addItem(item)
