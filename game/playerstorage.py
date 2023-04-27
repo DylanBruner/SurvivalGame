@@ -33,6 +33,9 @@ class PlayerStorage:
         self.inventory     = self.parent.save.save_data['player']['storage']
         self.slotLocations = [[None for _ in range(14)] for _ in range(4)]
 
+        self.craftingSlots = [[None for _ in range(3)] for _ in range(3)]
+        self.outputSlot    = (1, 1)
+
         self.dragging: bool              = False
         self.dragOrigin: tuple[int, int] = None
         self.dragItem: int               = (0, 0)
@@ -43,7 +46,7 @@ class PlayerStorage:
         # 400 tall and 450 wide white rect that's centered
         width, height = 600, 400
         top_left      = (env["current_size"][0] // 2 - width // 2, env["current_size"][1] // 2 - (height  * 1.2) // 2)
-        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(top_left, (width, height)))
+        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(top_left, (width, height)), border_radius=12)
 
         # draw the slots
         startY = top_left[1] + 140
@@ -60,7 +63,22 @@ class PlayerStorage:
                         text = self.QUANTITY_FONT.render(str(self.inventory[y][x][1]), True, (255, 255, 255))
                         surf.blit(text, (top_left[0] + 26 + (x * 40), startY + top_left[1] + 26 + (y * 40)))
         
+        # draw the crafting slots
+        topLeft = (100, 60)
+        for y in range(len(self.craftingSlots)):
+            for x in range(len(self.craftingSlots[y])):
+                surf.blit(self.slot, (topLeft[0] + 20 + (x * 40), topLeft[1] + 20 + (y * 40)))
+                if self.craftingSlots[y][x] is not None:
+                    surf.blit(pygame.transform.scale(TEXTURE_MAPPINGS[self.craftingSlots[y][x][0]], (32, 32)), (topLeft[0] + 20 + (x * 40) + 4, topLeft[1] + 20 + (y * 40) + 4)) 
 
+        # draw the output slot
+        slotLocation = (270, 120)
+        surf.blit(self.slot, slotLocation)
+
+        if self.outputSlot is not None:
+            surf.blit(pygame.transform.scale(TEXTURE_MAPPINGS[self.outputSlot[0]], (32, 32)), (slotLocation[0] + 4, slotLocation[1] + 4)) 
+
+        
         if self.dragging:
             surf.blit(TEXTURE_MAPPINGS[self.dragItem[0]], pygame.mouse.get_pos())
 
@@ -86,7 +104,20 @@ class PlayerStorage:
         if event.type == pygame.MOUSEBUTTONDOWN and self.open:
             # calculate the slotX and slotY location
             slotX, slotY = self.getSlotLocation(event.pos)
-            if slotX == -1 and slotY == -1: return
+            if slotX == -1 and slotY == -1:
+                # check if it's one of the crafting slots
+                found = False
+                for y in range(len(self.craftingSlots)):
+                    for x in range(len(self.craftingSlots[y])):
+                        topLeft = (100, 60)
+                        loc     = (topLeft[0] + 20 + (x * 40), topLeft[1] + 20 + (y * 40))
+                        mouse   = pygame.mouse.get_pos()
+
+                        #TODO: Fix this mouse click detection code
+                        if (mouse[0] >= loc[0] and mouse[0] <= loc[1] + 32) and (mouse[1] >= loc[0] and mouse[1] <= loc[1] + 32):
+                            print(x, y)
+
+                return
 
             # if the slot is empty and the player is holding an item
             if self.inventory[slotY][slotX][0] == 0 and self.dragging:
