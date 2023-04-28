@@ -11,32 +11,32 @@
 - player character selector [DONE]
 - fix not being able to interact with some tiles depending on how the mouse is positioned on it [DONE]
 - fix trees rendering or maybe it's the random gen idk [DONE]
+- actual assets [DONE]
+- make a debugging system that tracks how long parts of game logic are taking, for debugging bad FPS [DONE]
+- possibly more inventory slots, not just the hotbar [DONE]
+- crafting system (i don't want a Minecraft-esque crafting system, but it would be really easy to implement) [DONE]
 
 
 [TODO LIST] (somewhat in order of priority)
 - collisions
-- make a debugging system that tracks how long parts of game logic are taking, for debugging bad FPS
- - done, make the minimap not suck
+- make the minimap not suck FPS wise
 - add ennemies
+- more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - surviors that randomly spawn in the world
   - they can be hostile or friendly
   - if they're friendly they can give you quests, buy items and sell items to you
 - add more resources to mine, loot, craft, build with, etc.
 - add items (weapons, armor, tools, consumables, etc)
-- possibly more inventory slots, not just the hotbar
 - random gen structures & maybe structure groups (like a village in Minecraft)
   - loot chests / chests in general
 - better random generation
 - manage saves from in game: delete, upgrade/repair*, rename, copy
   - upgrade / repair is supported, just needs a nice way to do it as it's currently just a hotkey
-- crafting system (i don't want a Minecraft-esque crafting system, but it would be really easy to implement)
-- fix the minimap / come up with a design for it
 - better UI (button textures, menu art (stolen ofc), etc)
 - a difficulty setting
   - blood moons can be disabled by the config but there's no way to do it in game yet
 - foliage so we can actually see ourself moving
   - trees have been added, but some more things like: flowers and bushes would be nice
-- actual assets
 - title screen art
 - more sounds
 - better block break sound
