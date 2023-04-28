@@ -18,17 +18,17 @@
 
 
 [TODO LIST] (somewhat in order of priority)
-- collisions
-- make the minimap not suck FPS wise
-- add ennemies
-- more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
+- random gen structures & maybe structure groups (like a village in Minecraft)
+  - loot chests / chests in general
 - surviors that randomly spawn in the world
   - they can be hostile or friendly
   - if they're friendly they can give you quests, buy items and sell items to you
 - add more resources to mine, loot, craft, build with, etc.
 - add items (weapons, armor, tools, consumables, etc)
-- random gen structures & maybe structure groups (like a village in Minecraft)
-  - loot chests / chests in general
+- collisions
+- make the minimap not suck FPS wise
+- add ennemies
+- more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - better random generation
 - manage saves from in game: delete, upgrade/repair*, rename, copy
   - upgrade / repair is supported, just needs a nice way to do it as it's currently just a hotkey
