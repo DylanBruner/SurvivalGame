@@ -90,7 +90,7 @@ class HotbarComponent(Component):
             return
 
         if self.breaking:
-            if self.breaking_tile != self.parent.player.selected_tile or self.parent.player.stamina < Util.calculateStaminaCost(self._breaking_power):
+            if self.breaking_tile != self.parent.player.selected_tile or self.parent.player.stamina < Util.calculateStaminaCost(self._breaking_power, self.parent.player.xp):
                 self.breaking = False
                 self.breaking_percent = 0
                 self.breaking_tile = None
@@ -100,7 +100,7 @@ class HotbarComponent(Component):
 
             if self.breaking_percent >= 100:
                 Sounds.playSound(Sounds.BLOCK_BREAK)
-                self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power)
+                self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power, self.parent.player.xp)
                 self.parent.player.xp += 5 # xp system needs to be worked out
                 tile = Tiles.getTile(self.breaking_id)
                 if tile:
@@ -171,7 +171,7 @@ class HotbarComponent(Component):
             if event.button == 1 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:
                 if not self.breaking:
                     tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
-                    if Tiles.getTile(tile_id).breakable and self.parent.player.stamina > Util.calculateStaminaCost(self._breaking_power):
+                    if Tiles.getTile(tile_id).breakable and self.parent.player.stamina > Util.calculateStaminaCost(self._breaking_power, self.parent.player.xp):
                         self.breaking_tile = self.parent.player.selected_tile
 
                         self.breaking_percent = 0

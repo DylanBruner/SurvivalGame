@@ -66,9 +66,10 @@ class Util:
         return f"{hours}:{minutes} {ampm}"
     
     @staticmethod
-    def calculateStaminaCost(breaking_power: int) -> int:
+    def calculateStaminaCost(breaking_power: int, player_xp: int) -> int:
         # higher breaking power = more stamina cost
-        return max(1, breaking_power * 2 - 1)
+        levelStaminaDiscount = max(0, player_xp // 1000)
+        return max(0, max(1, breaking_power * 2 - 1) - levelStaminaDiscount)
 
     @staticmethod
     def shiftUnicode(chr: int) -> int:
