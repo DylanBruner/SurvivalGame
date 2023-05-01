@@ -179,8 +179,9 @@ class HotbarComponent(Component):
                         self.breaking_id      = tile_id
 
             # place block
-            elif event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:
-                tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
+            elif (event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5 and
+                  (tile_id := self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]) == TileIDS.GRASS):
+                
                 if tile_id == TileIDS.GRASS or tile_id == TileIDS.EMPTY:
                     if self._items[self._selected_slot]:
                         self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]] = self._items[self._selected_slot].item_id
@@ -189,6 +190,10 @@ class HotbarComponent(Component):
                             self._items[self._selected_slot] = None
                         self.save()
             
+            elif (event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5 and
+                  tile_id == TileIDS.CHEST):
+                print(self.parent.save.save_data['chests'][f'{self.parent.player.selected_tile[1]},{self.parent.player.selected_tile[0]}'])
+
             # scroll
             elif event.button == 4:
                 self._selected_slot -= 1

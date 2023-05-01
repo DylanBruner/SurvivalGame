@@ -1,4 +1,4 @@
-import json
+import json, random
 from game.world import World
 from utils import Util
 
@@ -23,6 +23,7 @@ BLANK_SAVE = {
     "difficulty": {
         "blood_moon": True
     },
+    "chests": {}, #ID: (x, y) = [(item, amount)]
     "world": []
 }
 
@@ -92,6 +93,16 @@ class SaveGame:
     def createNewSave(save_file: str) -> 'SaveGame':
         save_data = BLANK_SAVE.copy()
         save_data['world'] = World().save()
+
+        # loop through all the tiles of the map
+        for y in range(len(save_data['world']['map_data'])):
+            for x in range(len(save_data['world']['map_data'][y])):
+                tile = save_data['world']['map_data'][y][x]
+
+                # if the tile is a chest, add it to the chest list
+                if tile == 9:
+                    save_data['chests'][f"{x},{y}"] = [random.choice(list(range(1, 9))), 9]
+                    print(f"[SAVE::NEW] Added chest at {x},{y}")
 
         with open(f"data/saves/{save_file}", 'w') as f:
             json.dump(save_data, f)

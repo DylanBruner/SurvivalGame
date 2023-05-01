@@ -12,7 +12,8 @@ class TileIDS:
     TREE_V2 = 5
     TREE_V3 = 6
     TREE_V4 = 7
-    WOOD = 8
+    WOOD    = 8
+    CHEST   = 9
 
 
 TEXTURE_MAPPINGS = {
@@ -26,7 +27,8 @@ TEXTURE_MAPPINGS = {
     TileIDS.TREE_V3: None,
     TileIDS.TREE_V4: None,
 
-    TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (32, 32))
+    TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (32, 32)),
+    TileIDS.CHEST: pygame.image.load('data/assets/world/chest.png')
 }
 
 def postLoad():
@@ -35,6 +37,13 @@ def postLoad():
     TEXTURE_MAPPINGS[TileIDS.TREE_V2] = pygame.transform.scale(_TREE_SPRITES[1], (32, 32))
     TEXTURE_MAPPINGS[TileIDS.TREE_V3] = pygame.transform.scale(_TREE_SPRITES[2], (32, 32))
     TEXTURE_MAPPINGS[TileIDS.TREE_V4] = pygame.transform.scale(_TREE_SPRITES[3], (32, 32))
+
+    # (1, 0) -> (30, 31)
+    CHEST = pygame.Surface((32, 32))
+    CHEST.blit(TEXTURE_MAPPINGS[TileIDS.CHEST], (-1, 0), (1, 0, 32, 31))
+    # scale up the x axis by a few pixels
+    TEXTURE_MAPPINGS[TileIDS.CHEST] = pygame.transform.scale(CHEST, (36, 32))
+
 
 class World:
     def __init__(self, map_file: str = None, random_gen: bool = True, MAP_SIZE: tuple[int, int] = (1600, 1600)):
@@ -104,3 +113,8 @@ class World:
                 # location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
             
             self.map['map_data'][location[1]][location[0]] = random.choice([TileIDS.TREE_V1, TileIDS.TREE_V2, TileIDS.TREE_V3, TileIDS.TREE_V4])
+        
+        # randomly place chests
+        for _ in range(10000):
+            location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))            
+            self.map['map_data'][location[1]][location[0]] = TileIDS.CHEST
