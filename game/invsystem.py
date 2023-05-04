@@ -138,14 +138,18 @@ class HotbarComponent(Component):
     
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
-        if self.STORAGE_MENU.open:
-            self.STORAGE_MENU.onEvent(event)
-            
         if event.type == pygame.KEYDOWN:
             if Bindings.get("INVENTORY") == event.key:
                 self.STORAGE_MENU.open = not self.STORAGE_MENU.open
                 self.parent.player.freeze = self.STORAGE_MENU.open
-
+                
+        if self.STORAGE_MENU.open:
+            self.STORAGE_MENU.onEvent(event)
+            if event.type == pygame.WINDOWRESIZED:
+                self.STORAGE_MENU.setup()
+            return
+            
+        if event.type == pygame.KEYDOWN:
             for i in range(len(self._keybind_map)):
                 if pygame.key.get_pressed()[pygame.K_TAB] and Bindings.check(event, self._keybind_map[i]):
                     if self._selected_slot == i: continue
@@ -169,8 +173,8 @@ class HotbarComponent(Component):
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5:
-                if not self.breaking:
-                    tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
+                tile_id = self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]
+                if not self.breaking and Tiles.getTile(tile_id) != None:
                     if Tiles.getTile(tile_id).breakable and self.parent.player.stamina > Util.calculateStaminaCost(self._breaking_power, self.parent.player.xp):
                         self.breaking_tile = self.parent.player.selected_tile
 
@@ -183,6 +187,7 @@ class HotbarComponent(Component):
                   (tile_id := self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]) == TileIDS.GRASS):
                 
                 if tile_id == TileIDS.GRASS or tile_id == TileIDS.EMPTY:
+                    if self._items[self._selected_slot].item_id == 0: return
                     if self._items[self._selected_slot]:
                         self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]] = self._items[self._selected_slot].item_id
                         self._items[self._selected_slot].count -= 1
@@ -190,9 +195,6 @@ class HotbarComponent(Component):
                             self._items[self._selected_slot] = None
                         self.save()
             
-            elif (event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5 and
-                  tile_id == TileIDS.CHEST):
-                print(self.parent.save.save_data['chests'][f'{self.parent.player.selected_tile[1]},{self.parent.player.selected_tile[0]}'])
 
             # scroll
             elif event.button == 4:

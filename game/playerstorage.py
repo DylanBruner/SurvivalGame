@@ -6,6 +6,8 @@ import game.particlesystem as pSys
 
 SLOT_TEXTURE: pygame.Surface = None
 
+FONT = pygame.font.SysFont("Arial", 16)
+
 class Config:
     # Visual
     SLOT_SIZE: int = 42
@@ -21,24 +23,44 @@ class Item:
         self.count   = count
         self.texture = pygame.transform.scale(texture, (Config.ITEM_SIZE, Config.ITEM_SIZE)) # just in case
 
+        # scale the texture down a little
+        self.texture = pygame.transform.scale(self.texture, (Config.ITEM_SIZE - 5, Config.ITEM_SIZE - 5))
+
 class Slot:
-    def __init__(self, pos: tuple[int, int], item: Item = None):
+    def __init__(self, pos: tuple[int, int], item: Item = None, CAN_STORE: bool = True):
         self.item: Item           = item
         self.pos: tuple[int, int] = pos
+        self.CAN_STORE: bool      = CAN_STORE
+        self.customOnClick        = lambda: None
+        self._rect = pygame.Rect(pos, (Config.SLOT_SIZE, Config.SLOT_SIZE))
+
+    def hasItem(self) -> bool:
+        return self.item != None and self.item.item_id != 0 and self.item.count > 0
 
     def draw(self, surf: pygame.Surface) -> None:
         # draw the slot texture
         surf.blit(SLOT_TEXTURE, self.pos)
         
-        # if self.item:
-            # surf.blit(self.item.texture, self.pos)
+        if self.item and (self.item.item_id != 0):
+            surf.blit(self.item.texture, (self.pos[0] + 6, self.pos[1] + 6))
+            q = FONT.render(str(self.item.count), True, (255, 255, 255))
+            surf.blit(q, (self.pos[0] + 5, self.pos[1] + 5))
 
 class PlayerStorage:
     def __init__(self, parent: object):
-        global SLOT_TEXTURE
-
         self.parent = parent
         self.open   = False
+
+        self.currentRecipe: dict = None
+
+        self.setup()
+
+    def setup(self) -> None:
+        global SLOT_TEXTURE
+
+        self.width, self.height = 600, 400
+        self.top_left = (self.parent.environment["current_size"][0] // 2 - self.width // 2, 
+                         self.parent.environment["current_size"][1] // 2 - (self.height  * 1.2) // 2)
 
         # (350, 320), (390, 370)
         sheet = pygame.image.load("data/assets/ui_big_pieces.png")
@@ -48,32 +70,36 @@ class PlayerStorage:
 
         self.inventory: list[Slot]     = []
         self.craftingSlots: list[Slot] = []
-        self.outputSlot: Slot          = Slot((0, 0)) #TODO: Position
+        self.outputSlot: Slot          = Slot((265, 152), CAN_STORE=False) #TODO: Position
+        self.outputSlot.customOnClick = self.itemCrafted
 
-        baseX = 107
-        baseY = 280
-    
+        xMod, yMod = 7, 225
+
         for y, row in enumerate(self.parent.save.save_data['player']['storage']):
             for x, item in enumerate(row):
-                _x, _y = baseX + x * Config.SLOT_SIZE, baseY + y * Config.SLOT_SIZE
+                _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
                 self.inventory.append(Slot(
                     (_x, _y),
                     Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]])
                 ))
+        
+        self.inventory[5].item = Item(1, 15, TEXTURE_MAPPINGS[1])
+        
+        xMod, yMod = 7, 50
+        for y in range(3):
+            for x in range(3):
+                _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
+                self.craftingSlots.append(Slot((_x, _y), Item(0, 0, TEXTURE_MAPPINGS[1])))
 
-        self.dragging: bool = False
-        self.dragItem: int  = (0, 0)
-
-        self.openChest: tuple[int, int] = None
+        self.dragItem: Item = None
+        self.openChest: tuple[int, int] = None #TODO: change this to a container class maybe
 
         self.QUANTITY_FONT = pygame.font.SysFont("Arial", 16)
 
     @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surf: pygame.Surface, env: dict) -> None:
         # 400 tall and 450 wide white rect that's centered
-        width, height = 600, 400
-        top_left      = (env["current_size"][0] // 2 - width // 2, env["current_size"][1] // 2 - (height  * 1.2) // 2)
-        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(top_left, (width, height)), border_radius=12)
+        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(self.top_left, (self.width, self.height)), border_radius=12)
 
         for slot in self.inventory:
             slot.draw(surf)
@@ -83,6 +109,69 @@ class PlayerStorage:
         
         self.outputSlot.draw(surf)
 
+        if self.dragItem:
+            surf.blit(self.dragItem.texture, pygame.mouse.get_pos())
+
+    @Util.MonkeyUtils.autoErrorHandling
+    def itemCrafted(self) -> None:
+        if self.currentRecipe is not None:
+            ...
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def updateCrafting(self) -> None:
+        with open('data/config/recipes.json', 'r') as f:
+            recipes = json.load(f)
+        for recipe in recipes:
+            matches = True
+
+            for y in range(3):
+                for x in range(3):
+                    # make sure the crafting slot isn't none
+                    if self.craftingSlots[y * 3 + x].item is not None:
+                        if self.craftingSlots[y * 3 + x].item.item_id != recipe['recipe'][y][x][0] or self.craftingSlots[y * 3 + x].item.count < recipe['recipe'][y][x][1]:
+                            matches = False
+                    elif recipe['recipe'][y][x][0] != 0:
+                        matches = False
+            
+            if matches:
+                self.outputSlot.item = Item(recipe['result']['id'], recipe['result']['count'], TEXTURE_MAPPINGS[recipe['result']['id']])
+                return
+            else:
+                self.outputSlot.item = None
+
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event) -> None:
-        ...
+        if event.type == pygame.VIDEORESIZE:
+            self.setup()
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for slot in self.inventory + self.craftingSlots + [self.outputSlot]:
+                if slot._rect.collidepoint(pygame.mouse.get_pos()):
+                    if event.button == 1: # left click
+                        if self.dragItem == None and slot.hasItem():
+                            slot.customOnClick()
+                            self.dragItem = slot.item
+                            slot.item = None
+                        
+                        elif self.dragItem != None and not slot.hasItem() and slot.CAN_STORE:
+                            slot.item = self.dragItem
+                            self.dragItem = None
+                        
+                        elif self.dragItem != None and slot.hasItem() and slot.CAN_STORE:
+                            if self.dragItem.item_id == slot.item.item_id:
+                                slot.item.count += self.dragItem.count
+                                self.dragItem = None
+                    
+                    elif event.button == 3: # right click
+                        if self.dragItem != None and slot.CAN_STORE:
+                            # place one item
+                            if slot.hasItem() and slot.item.item_id == self.dragItem.item_id:
+                                slot.item.count += 1
+                                self.dragItem.count -= 1
+                            elif not slot.hasItem():
+                                slot.item = Item(self.dragItem.item_id, 1, self.dragItem.texture)
+                                self.dragItem.count -= 1
+                            
+                            if self.dragItem.count <= 0:
+                                self.dragItem = None
+            self.updateCrafting()

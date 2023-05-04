@@ -203,12 +203,16 @@ class GameView(Viewport):
                 # Check if the tile is within the bounds of the map
                 if x >= 0 and x < len(map_data) and y >= 0 and y < len(map_data[x]):
                     tile_id = map_data[x][y]
+                        
                     texture = TEXTURE_MAPPINGS[tile_id]
                     if texture is not None:
                         # Calculate the position of the tile on the screen
                         screen_x = (x - left_plane) * TILE_SIZE
                         screen_y = (y - bottom_plane) * TILE_SIZE
-                        if Tiles.getTile(tile_id).background_id:
+                        tile = Tiles.getTile(tile_id)
+                        if tile_id == 0 or tile_id == 1:
+                            self.game_layer.blit(TEXTURE_MAPPINGS[1], (screen_x, screen_y))
+                        elif tile is not None and tile.background_id is not None:
                             self.game_layer.blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
 
                         self.game_layer.blit(texture, (screen_x, screen_y))

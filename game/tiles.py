@@ -29,7 +29,8 @@ class Tiles:
     @Util.MonkeyUtils.autoErrorHandling
     def getTile(id_name: int or str) -> Tile:
         if isinstance(id_name, int):
-            for tile in TILE_DATA.values():
+            for key, tile in TILE_DATA.items():
+                if key == 'QUICK_MAPPINGS': continue
                 if tile["id"] == id_name:
                     return Tile(**tile)
         elif isinstance(id_name, str):
