@@ -3,6 +3,7 @@ from game.keybinding import Bindings
 from game.world import TileIDS, TEXTURE_MAPPINGS
 from utils import Util
 import game.particlesystem as pSys
+from _types.item import Item
 
 SLOT_TEXTURE: pygame.Surface = None
 
@@ -17,25 +18,19 @@ class Config:
     # Gameplay
     STACK_SIZE: int = 250
 
-class Item:
-    def __init__(self, item_id: int, count: int, texture: pygame.Surface):
-        self.item_id = item_id
-        self.count   = count
-        self.texture = pygame.transform.scale(texture, (Config.ITEM_SIZE, Config.ITEM_SIZE)) # just in case
-
-        # scale the texture down a little
-        self.texture = pygame.transform.scale(self.texture, (Config.ITEM_SIZE - 5, Config.ITEM_SIZE - 5))
-    
-    def __repr__(self) -> str:
-        return f"Item(id={self.item_id}, count={self.count})"
-
 class Slot:
-    def __init__(self, pos: tuple[int, int], item: Item = None, CAN_STORE: bool = True, HIDDEN: bool = False):
+    def __init__(self, pos: tuple[int, int], item: Item = None, 
+                 sLoc: tuple[int, int] = None, CAN_STORE: bool = True, 
+                 HIDDEN: bool = False, COLLIDER_ONLY: bool = False):
+        
         self.item: Item           = item
+        self.saveLocation: tuple[int, int] = None
         self.pos: tuple[int, int] = pos
-        self.CAN_STORE: bool      = CAN_STORE
-        self.HIDDEN: bool         = HIDDEN
-        self.customOnClick        = lambda: None
+        self.sLoc: tuple[int, int] = sLoc
+        self.CAN_STORE: bool       = CAN_STORE
+        self.COLLIDER_ONLY: bool   = COLLIDER_ONLY
+        self.HIDDEN: bool          = HIDDEN
+        self.customOnClick         = lambda: None
         self._rect = pygame.Rect(pos, (Config.SLOT_SIZE, Config.SLOT_SIZE))
 
     def hasItem(self) -> bool:
@@ -43,6 +38,8 @@ class Slot:
 
     def draw(self, surf: pygame.Surface) -> None:
         if self.HIDDEN and not self.hasItem(): return
+        if self.COLLIDER_ONLY: return # just for visual code purposes
+
         # draw the slot texture
         surf.blit(SLOT_TEXTURE, self.pos)
         
@@ -51,7 +48,6 @@ class Slot:
             q = FONT.render(str(self.item.count), True, (255, 255, 255))
             surf.blit(q, (self.pos[0] + 5, self.pos[1] + 5))
     
-
 class PlayerStorage:
     def __init__(self, parent: object):
         self.parent = parent
@@ -59,8 +55,12 @@ class PlayerStorage:
 
         self.currentRecipe: dict = None
         self.openChestLocation: tuple[int, int] = None
+        self.inventory: list[Slot]     = []
+        self.craftingSlots: list[Slot] = []
+        self.storageSlots: list[Slot]  = []
+        self.hotbarSlots: list[Slot]   = []
 
-        self.setup()
+        self._FIRST_CALL = True
 
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self) -> None:
@@ -79,6 +79,7 @@ class PlayerStorage:
         self.inventory: list[Slot]     = []
         self.craftingSlots: list[Slot] = []
         self.storageSlots: list[Slot]  = []
+        self.hotbarSlots: list[Slot]   = []
         self.outputSlot: Slot          = Slot((265, 152), CAN_STORE=False) #TODO: Position
         self.outputSlot.customOnClick = self.itemCrafted
 
@@ -89,8 +90,10 @@ class PlayerStorage:
                 _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
                 self.inventory.append(Slot(
                     (_x, _y),
-                    Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]])
+                    Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]]),
+                    sLoc=(x, y),
                 ))
+                self.inventory[-1].customOnClick = self.onInventoryModification
         
         # Storage slots
         # 8x4
@@ -100,9 +103,18 @@ class PlayerStorage:
                 _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
                 self.storageSlots.append(Slot((_x, _y), Item(0, 0, TEXTURE_MAPPINGS[1]), CAN_STORE=False, HIDDEN=True))
 
+        # Hotbar slots
+        self.hotbarSlots = []
+        for rect in self.parent.hotbar.slotRects:
+            item: Item = self.parent.hotbar._items[self.parent.hotbar.slotRects.index(rect)]
+            rect: pygame.Rect
+            self.hotbarSlots.append(Slot((rect.x, rect.y), item, COLLIDER_ONLY=True))
+            self.hotbarSlots[-1].customOnClick = self.onHotbarModification
         
-        self.inventory[5].item = Item(1, 15, TEXTURE_MAPPINGS[1])
+        # TEMP give the player some grass
+        # self.inventory[5].item = Item(TileIDS.GRASS, 15, TEXTURE_MAPPINGS[1])
         
+        # Crafting slots
         xMod, yMod = 7, 50
         for y in range(3):
             for x in range(3):
@@ -114,6 +126,20 @@ class PlayerStorage:
 
         self.QUANTITY_FONT = pygame.font.SysFont("Arial", 16)
     
+    @Util.MonkeyUtils.autoErrorHandling
+    def onHotbarModification(self) -> None:
+        for slot in self.hotbarSlots:
+            self.parent.hotbar._items[self.hotbarSlots.index(slot)] = slot.item
+        self.parent.hotbar.save()
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def onInventoryModification(self) -> None:
+        for slot in self.inventory:
+            if slot.hasItem():
+                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = [slot.item.item_id, slot.item.count]
+            else:
+                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = [0, 0]
+        
     @Util.MonkeyUtils.autoErrorHandling
     def clearOpenChest(self) -> None:
         self.openChest = None
@@ -147,30 +173,10 @@ class PlayerStorage:
         self.parent.save.save_data['chests'][f"{self.openChest[1]},{self.openChest[0]}"] = data
         # print(self.parent.save.save_data['chests'][f"{self.openChest[1]},{self.openChest[0]}"])
         
-    @Util.MonkeyUtils.autoErrorHandling
-    def draw(self, surf: pygame.Surface, env: dict) -> None:
-        # 400 tall and 450 wide white rect that's centered
-        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(self.top_left, (self.width, self.height)), border_radius=12)
-
-        for slot in self.inventory:
-            slot.draw(surf)
-        
-        for slot in self.craftingSlots:
-            slot.draw(surf)
-        
-        for slot in self.storageSlots:
-            slot.draw(surf)
-        
-        self.outputSlot.draw(surf)
-
-        if self.dragItem:
-            surf.blit(self.dragItem.texture, pygame.mouse.get_pos())
 
     @Util.MonkeyUtils.autoErrorHandling
     def itemCrafted(self) -> None:
         if self.currentRecipe is not None:
-            print("Item Crafted")
-            # remove the amount of materials used
             for y in range(3):
                 for x in range(3):
                     if self.craftingSlots[y * 3 + x].item is not None:
@@ -201,6 +207,32 @@ class PlayerStorage:
             else:
                 self.outputSlot.item = None
                 self.currentRecipe = None
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def onOpen(self) -> None:
+        # Code that needs to be ran every time the inventory is opened
+        self.hotbarSlots = []
+        for rect in self.parent.hotbar.slotRects:
+            item: Item = self.parent.hotbar._items[self.parent.hotbar.slotRects.index(rect)]
+            rect: pygame.Rect
+            self.hotbarSlots.append(Slot((rect.x, rect.y), item, COLLIDER_ONLY=True))
+            self.hotbarSlots[-1].customOnClick = self.onHotbarModification
+        
+
+    @Util.MonkeyUtils.autoErrorHandling
+    def draw(self, surf: pygame.Surface, env: dict) -> None:
+        if self._FIRST_CALL: 
+            self.setup()
+            self._FIRST_CALL = False
+
+        # 400 tall and 450 wide white rect that's centered
+        pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(self.top_left, (self.width, self.height)), border_radius=12)
+
+        for slot in self.inventory + self.craftingSlots + self.storageSlots + [self.outputSlot]:
+            slot.draw(surf)
+        
+        if self.dragItem:
+            surf.blit(self.dragItem.texture, pygame.mouse.get_pos())
 
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event) -> None:
@@ -208,13 +240,13 @@ class PlayerStorage:
             self.setup()
         
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            for slot in self.inventory + self.craftingSlots + [self.outputSlot] + self.storageSlots:
+            for slot in self.inventory + self.craftingSlots + [self.outputSlot] + self.storageSlots + self.hotbarSlots:
                 if slot._rect.collidepoint(pygame.mouse.get_pos()):
                     if event.button == 1: # left click
                         if self.dragItem == None and slot.hasItem():
-                            slot.customOnClick()
                             self.dragItem = slot.item
                             slot.item = None
+                            slot.customOnClick()
                         
                         elif self.dragItem != None and not slot.hasItem() and slot.CAN_STORE:
                             slot.item = self.dragItem
@@ -241,4 +273,5 @@ class PlayerStorage:
                             
                             if self.dragItem.count <= 0:
                                 self.dragItem = None
+                                slot.customOnClick()
             self.updateCrafting()

@@ -1,4 +1,4 @@
-import pygame, importlib, inspect, sys, traceback, colorama, os
+import pygame, importlib, inspect, sys, traceback, colorama, os, time
 from componentsystem import Viewport
 from myenvironment import Environment
 
@@ -8,6 +8,10 @@ _data = {
             "enabled": True,
             "prefix": f"{colorama.Fore.RED}[MonkeyUtils/{colorama.Fore.LIGHTRED_EX}AutoErrorHandling{colorama.Fore.RED}]{colorama.Fore.RESET} ",
             "disabled_functions": []
+        },
+        "time_warning": {
+            "enabled": True,
+            "prefix": f"{colorama.Fore.RED}[MonkeyUtils/{colorama.Fore.LIGHTRED_EX}Time{colorama.Fore.RED}]{colorama.Fore.RESET} ",
         }
     }
 }
@@ -136,7 +140,11 @@ class Util:
                 if func.__name__ in _data["MonkeyUtils"]["auto_error_handling"]["disabled_functions"]:
                     return None
                 try:
-                    return func(*args, **kwargs)
+                    start = time.time()
+                    r = func(*args, **kwargs)
+                    if time.time() - start > 1:
+                        print(_data["MonkeyUtils"]["time_warning"]["prefix"] + f"Warning: \"{func.__name__}\" took {time.time() - start} seconds to execute!")
+                    return r
                 except Exception as e:
                     # print the full error and traceback just like normal
                     traceback.print_exc()

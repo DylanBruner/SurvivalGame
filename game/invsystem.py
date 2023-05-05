@@ -8,21 +8,16 @@ from game.tiles import Tiles
 from game.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
 from utils import Util
 from game.sounds import Sounds
+from _types.item import Item
 
 class Config:
     # Visual
-    SLOT_SIZE: int = 48
-    ITEM_SIZE: int = 48 - 8 # 4px padding on each side
+    SLOT_SIZE: int = 42
+    ITEM_SIZE: int = 42 - 8 # 4px padding on each side
     BREAK_COLOR: pSys.Color = pSys.Color((70, 66, 38), mod_r=40)
 
     # Gameplay
     STACK_SIZE: int = 250
-
-class Item:
-    def __init__(self, item_id: int, count: int, texture: pygame.Surface):
-        self.item_id = item_id
-        self.count   = count
-        self.texture = pygame.transform.scale(texture, (Config.ITEM_SIZE, Config.ITEM_SIZE)) # just in case
 
 class HotbarComponent(Component):
     def __init__(self, parent):
@@ -34,13 +29,14 @@ class HotbarComponent(Component):
 
         self._items = []
         for item_id, item_count in self.parent.save.save_data['player']['inventory']:
-            self._items.append(Item(item_id, item_count, TEXTURE_MAPPINGS[item_id]))
+            self._items.append(Item(item_id, item_count, TEXTURE_MAPPINGS[item_id], (Config.ITEM_SIZE, Config.ITEM_SIZE)))
 
         self._keybind_map = [f"SLOT_{i + 1}" for i in range(len(self._items))]
         self._selected_slot = 0
         self._breaking_power = 9
 
         self.SLOT_SPACING = 4 # distance between slots
+        self.slotRects: list[pygame.Rect] = [None for _ in range(len(self._items))]
 
         self.breaking_percent: int = 0
         self.breaking_id: int = None
@@ -82,6 +78,9 @@ class HotbarComponent(Component):
                     count_surface = self.count_font.render(str(self._items[i].count), True, (255, 255, 255))
                     surface.blit(count_surface, (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 8, self.location[1] + 8))
             
+            self.slotRects[i] = pygame.Rect(self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), 
+                                            self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE)
+
             if self._selected_slot == i:
                 pygame.draw.rect(surface, (0, 0, 0), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), 2, border_radius=4)
 
@@ -143,6 +142,8 @@ class HotbarComponent(Component):
                 self.STORAGE_MENU.clearOpenChest()
                 self.STORAGE_MENU.open    = not self.STORAGE_MENU.open
                 self.parent.player.freeze = self.STORAGE_MENU.open
+                if self.STORAGE_MENU.open:
+                    self.STORAGE_MENU.onOpen()
                 
         if self.STORAGE_MENU.open:
             self.STORAGE_MENU.onEvent(event)
