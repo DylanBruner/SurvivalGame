@@ -25,12 +25,16 @@ class Item:
 
         # scale the texture down a little
         self.texture = pygame.transform.scale(self.texture, (Config.ITEM_SIZE - 5, Config.ITEM_SIZE - 5))
+    
+    def __repr__(self) -> str:
+        return f"Item(id={self.item_id}, count={self.count})"
 
 class Slot:
-    def __init__(self, pos: tuple[int, int], item: Item = None, CAN_STORE: bool = True):
+    def __init__(self, pos: tuple[int, int], item: Item = None, CAN_STORE: bool = True, HIDDEN: bool = False):
         self.item: Item           = item
         self.pos: tuple[int, int] = pos
         self.CAN_STORE: bool      = CAN_STORE
+        self.HIDDEN: bool         = HIDDEN
         self.customOnClick        = lambda: None
         self._rect = pygame.Rect(pos, (Config.SLOT_SIZE, Config.SLOT_SIZE))
 
@@ -38,6 +42,7 @@ class Slot:
         return self.item != None and self.item.item_id != 0 and self.item.count > 0
 
     def draw(self, surf: pygame.Surface) -> None:
+        if self.HIDDEN and not self.hasItem(): return
         # draw the slot texture
         surf.blit(SLOT_TEXTURE, self.pos)
         
@@ -45,6 +50,7 @@ class Slot:
             surf.blit(self.item.texture, (self.pos[0] + 6, self.pos[1] + 6))
             q = FONT.render(str(self.item.count), True, (255, 255, 255))
             surf.blit(q, (self.pos[0] + 5, self.pos[1] + 5))
+    
 
 class PlayerStorage:
     def __init__(self, parent: object):
@@ -52,9 +58,11 @@ class PlayerStorage:
         self.open   = False
 
         self.currentRecipe: dict = None
+        self.openChestLocation: tuple[int, int] = None
 
         self.setup()
 
+    @Util.MonkeyUtils.autoErrorHandling
     def setup(self) -> None:
         global SLOT_TEXTURE
 
@@ -70,6 +78,7 @@ class PlayerStorage:
 
         self.inventory: list[Slot]     = []
         self.craftingSlots: list[Slot] = []
+        self.storageSlots: list[Slot]  = []
         self.outputSlot: Slot          = Slot((265, 152), CAN_STORE=False) #TODO: Position
         self.outputSlot.customOnClick = self.itemCrafted
 
@@ -83,6 +92,15 @@ class PlayerStorage:
                     Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]])
                 ))
         
+        # Storage slots
+        # 8x4
+        xMod, yMod = 259, 50
+        for y in range(4):
+            for x in range(8):
+                _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
+                self.storageSlots.append(Slot((_x, _y), Item(0, 0, TEXTURE_MAPPINGS[1]), CAN_STORE=False, HIDDEN=True))
+
+        
         self.inventory[5].item = Item(1, 15, TEXTURE_MAPPINGS[1])
         
         xMod, yMod = 7, 50
@@ -95,7 +113,40 @@ class PlayerStorage:
         self.openChest: tuple[int, int] = None #TODO: change this to a container class maybe
 
         self.QUANTITY_FONT = pygame.font.SysFont("Arial", 16)
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def clearOpenChest(self) -> None:
+        self.openChest = None
+        for slot in self.storageSlots:
+            slot.CAN_STORE = False
+            slot.item = None
+            slot.HIDDEN = True
 
+    @Util.MonkeyUtils.autoErrorHandling
+    def loadChestContents(self, location: tuple[int, int]) -> None:
+        # print(self.parent.save.save_data['chests'][f"{location[1]},{location[0]}"])
+        self.open = True
+        self.parent.player.freeze = True
+        self.openChest = location
+        items: list[Item] = []
+        for item in self.parent.save.save_data['chests'][f"{location[1]},{location[0]}"]:
+            items.append(Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]]))
+        
+        for slot in self.storageSlots:
+            slot.CAN_STORE = True
+            slot.item = None
+            slot.HIDDEN = False
+        
+        for slot, item in zip(self.storageSlots, items):
+            slot.item = item
+            slot.customOnClick = self.saveChest
+    
+    @Util.MonkeyUtils.autoErrorHandling
+    def saveChest(self):
+        data = [(slot.item.item_id, slot.item.count) for slot in self.storageSlots if slot.item != None]
+        self.parent.save.save_data['chests'][f"{self.openChest[1]},{self.openChest[0]}"] = data
+        # print(self.parent.save.save_data['chests'][f"{self.openChest[1]},{self.openChest[0]}"])
+        
     @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surf: pygame.Surface, env: dict) -> None:
         # 400 tall and 450 wide white rect that's centered
@@ -107,6 +158,9 @@ class PlayerStorage:
         for slot in self.craftingSlots:
             slot.draw(surf)
         
+        for slot in self.storageSlots:
+            slot.draw(surf)
+        
         self.outputSlot.draw(surf)
 
         if self.dragItem:
@@ -115,7 +169,14 @@ class PlayerStorage:
     @Util.MonkeyUtils.autoErrorHandling
     def itemCrafted(self) -> None:
         if self.currentRecipe is not None:
-            ...
+            print("Item Crafted")
+            # remove the amount of materials used
+            for y in range(3):
+                for x in range(3):
+                    if self.craftingSlots[y * 3 + x].item is not None:
+                        self.craftingSlots[y * 3 + x].item.count -= self.currentRecipe['recipe'][y][x][1]
+                        if self.craftingSlots[y * 3 + x].item.count <= 0:
+                            self.craftingSlots[y * 3 + x].item = None
     
     @Util.MonkeyUtils.autoErrorHandling
     def updateCrafting(self) -> None:
@@ -135,9 +196,11 @@ class PlayerStorage:
             
             if matches:
                 self.outputSlot.item = Item(recipe['result']['id'], recipe['result']['count'], TEXTURE_MAPPINGS[recipe['result']['id']])
+                self.currentRecipe = recipe
                 return
             else:
                 self.outputSlot.item = None
+                self.currentRecipe = None
 
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event) -> None:
@@ -145,7 +208,7 @@ class PlayerStorage:
             self.setup()
         
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            for slot in self.inventory + self.craftingSlots + [self.outputSlot]:
+            for slot in self.inventory + self.craftingSlots + [self.outputSlot] + self.storageSlots:
                 if slot._rect.collidepoint(pygame.mouse.get_pos()):
                     if event.button == 1: # left click
                         if self.dragItem == None and slot.hasItem():
@@ -156,11 +219,13 @@ class PlayerStorage:
                         elif self.dragItem != None and not slot.hasItem() and slot.CAN_STORE:
                             slot.item = self.dragItem
                             self.dragItem = None
+                            slot.customOnClick()
                         
                         elif self.dragItem != None and slot.hasItem() and slot.CAN_STORE:
                             if self.dragItem.item_id == slot.item.item_id:
                                 slot.item.count += self.dragItem.count
                                 self.dragItem = None
+                                slot.customOnClick()
                     
                     elif event.button == 3: # right click
                         if self.dragItem != None and slot.CAN_STORE:
@@ -168,9 +233,11 @@ class PlayerStorage:
                             if slot.hasItem() and slot.item.item_id == self.dragItem.item_id:
                                 slot.item.count += 1
                                 self.dragItem.count -= 1
+                                slot.customOnClick()
                             elif not slot.hasItem():
                                 slot.item = Item(self.dragItem.item_id, 1, self.dragItem.texture)
                                 self.dragItem.count -= 1
+                                slot.customOnClick()
                             
                             if self.dragItem.count <= 0:
                                 self.dragItem = None

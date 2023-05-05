@@ -140,7 +140,8 @@ class HotbarComponent(Component):
     def onEvent(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             if Bindings.get("INVENTORY") == event.key:
-                self.STORAGE_MENU.open = not self.STORAGE_MENU.open
+                self.STORAGE_MENU.clearOpenChest()
+                self.STORAGE_MENU.open    = not self.STORAGE_MENU.open
                 self.parent.player.freeze = self.STORAGE_MENU.open
                 
         if self.STORAGE_MENU.open:
@@ -194,8 +195,22 @@ class HotbarComponent(Component):
                         if self._items[self._selected_slot].count <= 0:
                             self._items[self._selected_slot] = None
                         self.save()
-            
 
+            elif (event.button == 3 and not Util.distance(self.parent.player.selected_tile, self.parent.player.location) > 5 and
+                  (tile_id := self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]]) == TileIDS.CHEST):
+                
+                x, y = self.parent.player.selected_tile
+                for key, value in self.parent.save.save_data['chests'].items():
+                    cx, cy = key.split(',')
+                    if str(cy) == str(x) and str(cx) == str(y): # keys are a bit messed up...
+                        self.STORAGE_MENU.loadChestContents(self.parent.player.selected_tile)
+                        break
+                else:
+                    # TODO: Maybe fix this
+                    # chest wasn't found so create a new one
+                    # self.parent.save.save_data['chests'][f'{y},{x}'] = []
+                    # self.STORAGE_MENU.loadChestContents(self.parent.player.selected_tile)
+                    ...             
             # scroll
             elif event.button == 4:
                 self._selected_slot -= 1

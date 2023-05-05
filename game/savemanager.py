@@ -101,7 +101,10 @@ class SaveGame:
 
                 # if the tile is a chest, add it to the chest list
                 if tile == 9:
-                    save_data['chests'][f"{x},{y}"] = [random.choice(list(range(1, 9))), 9]
+                    save_data['chests'][f"{x},{y}"] = []
+                    for _ in range(random.randint(4, 10)):
+                        save_data['chests'][f"{x},{y}"].append((random.randint(0, 1), random.randint(1, 10)))
+
                     print(f"[SAVE::NEW] Added chest at {x},{y}")
 
         with open(f"data/saves/{save_file}", 'w') as f:
