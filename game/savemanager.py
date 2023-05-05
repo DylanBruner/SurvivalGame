@@ -1,5 +1,6 @@
 import json, random
-from game.world import World
+from game.world import World, TileIDS
+from _types.structure import Structure, LootSpawn
 from utils import Util
 
 BLANK_SAVE = {
@@ -94,18 +95,120 @@ class SaveGame:
         save_data = BLANK_SAVE.copy()
         save_data['world'] = World().save()
 
-        # loop through all the tiles of the map
-        for y in range(len(save_data['world']['map_data'])):
-            for x in range(len(save_data['world']['map_data'][y])):
-                tile = save_data['world']['map_data'][y][x]
+        _map = save_data['world']['map_data']
+        # World generation =====================================================
+        # fill it with grass
+        _map = [[TileIDS.GRASS for _ in range(1500)] for _ in range(1500)]
+        POI_COUNT  = len(_map[0]) * len(_map) // 1000
+        TREE_COUNT = len(_map[0]) * len(_map) // 100
+        LAKE_COUNT = len(_map[0]) * len(_map) // 1000
+        BOULDER_COUNT = len(_map[0]) * len(_map) // 1000
 
-                # if the tile is a chest, add it to the chest list
-                if tile == 9:
-                    save_data['chests'][f"{x},{y}"] = []
-                    for _ in range(random.randint(4, 10)):
-                        save_data['chests'][f"{x},{y}"].append((random.randint(0, 1), random.randint(1, 10)))
+        PLACED_THINGS = []
 
-                    print(f"[SAVE::NEW] Added chest at {x},{y}")
+        # first the structures
+        with open('data/config/structures.json', 'r') as f:
+            structures = list(json.load(f).keys())
+        
+        for l in range(POI_COUNT):
+            structure = Structure.fromID(random.choice(structures))
+            if random.random() > structure.spawn_chance:
+                continue
+
+            x = random.randint(0, len(_map[0]) - 1)
+            y = random.randint(0, len(_map) - 1)
+
+            # if the structure is too close to the edge, try again
+            if x < 10 or x > len(_map[0]) - 10 or y < 10 or y > len(_map) - 10:
+                continue
+            # if the structure is too close to another structure, try again
+            tooClose = False
+            for x2, y2 in PLACED_THINGS:
+                if Util.MathUtils.distance(x, y, x2, y2) < 20:
+                    tooClose = True
+                    break
+            if tooClose:
+                continue
+
+            _map = Util.WorldUtils.placeStructure(_map, structure.structure, x, y)
+
+            ls: LootSpawn = None
+            for ls in structure.lootSpawns:
+                chestContents = ls.table.roll()
+                save_data['chests'][f"{x},{y}"] = chestContents
+
+            PLACED_THINGS.append((x, y))
+
+        print(f"[SAVE::NEW] Placed {len(PLACED_THINGS)} structures")
+
+        # then the trees
+        for l in range(TREE_COUNT):
+            x, y = random.randint(0, len(_map[0]) - 1), random.randint(0, len(_map) - 1)
+            if _map[y][x] != TileIDS.GRASS:
+                continue
+            _map[y][x] = random.choice([TileIDS.TREE_V1, TileIDS.TREE_V2, TileIDS.TREE_V3, TileIDS.TREE_V4])
+        
+        # then boulders
+        for l in range(BOULDER_COUNT):
+            x, y = random.randint(0, len(_map[0]) - 1), random.randint(0, len(_map) - 1)
+            if _map[y][x] != TileIDS.GRASS:
+                continue
+
+            # if we're too close to the edge, try again
+            if x < 10 or x > len(_map[0]) - 10 or y < 10 or y > len(_map) - 10:
+                continue
+            
+            # make a randomish circle from 1 to 5 tiles wide around the point
+            for y2 in range(y - random.randint(1, 5), y + random.randint(1, 5)):
+                for x2 in range(x - random.randint(1, 5), x + random.randint(1, 5)):
+                    if Util.MathUtils.distance(x, y, x2, y2) < 5:
+                        _map[y2][x2] = TileIDS.STONE
+            
+        # then the lakes
+        for l in range(LAKE_COUNT):
+            x, y = random.randint(0, len(_map[0]) - 1), random.randint(0, len(_map) - 1)
+            if _map[y][x] != TileIDS.GRASS:
+                continue
+            # if we're too close to the edge, try again
+            if x < 10 or x > len(_map[0]) - 10 or y < 10 or y > len(_map) - 10:
+                continue
+
+            # if we're too close to another PLACED_THINGS, try again, within 100
+            tooClose = False
+            for x2, y2 in PLACED_THINGS:
+                if Util.MathUtils.distance(x, y, x2, y2) < 25:
+                    tooClose = True
+                    break
+            if tooClose:
+                continue
+
+            for y2 in range(y - 10, y + 10):
+                for x2 in range(x - 10, x + 10):
+                    if x2 < 0 or x2 >= len(_map[0]) or y2 < 0 or y2 >= len(_map):
+                        continue
+                    if Util.MathUtils.distance(x, y, x2, y2) > 10:
+                        continue
+                    _map[y2][x2] = TileIDS.WATER
+
+            # add sand around the edges of the lake
+            for y2 in range(y - 11, y + 11):
+                for x2 in range(x - 11, x + 11):
+                    if x2 < 0 or x2 >= len(_map[0]) or y2 < 0 or y2 >= len(_map):
+                        continue
+                    if Util.MathUtils.distance(x, y, x2, y2) > 10:
+                        continue
+                    if _map[y2][x2] == TileIDS.WATER:
+                        for y3 in range(y2 - 1, y2 + 1):
+                            for x3 in range(x2 - 1, x2 + 1):
+                                if x3 < 0 or x3 >= len(_map[0]) or y3 < 0 or y3 >= len(_map):
+                                    continue
+                                if _map[y3][x3] == TileIDS.GRASS:
+                                    _map[y3][x3] = TileIDS.SAND
+
+            PLACED_THINGS.append((x, y))
+
+        save_data['world']['map_data'] = _map
+        # ======================================================================
 
         with open(f"data/saves/{save_file}", 'w') as f:
             json.dump(save_data, f)

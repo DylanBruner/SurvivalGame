@@ -87,7 +87,19 @@ class Util:
         @staticmethod
         def pointInRect(point: tuple, rect: tuple[int, int, int, int]) -> bool:
             return rect[0] <= point[0] <= rect[0] + rect[2] and rect[1] <= point[1] <= rect[1] + rect[3]
-
+    
+        @staticmethod
+        def distance(x1, y1, x2, y2):
+            return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+        
+    class WorldUtils:
+        @staticmethod
+        def placeStructure(map: list[list[int]], structure: list[list[int]], x: int, y: int) -> None:
+            for i in range(len(structure)):
+                for j in range(len(structure[i])):
+                    map[y + i][x + j] = structure[i][j] if structure[i][j] != 0 else map[y + i][x + j]
+            return map
+    
     class MonkeyUtils:
         RELOAD_BLACKLIST = ["pygame"]
         OTHER_RELOAD     = [file.replace(".py","") for file in os.listdir(".") if file.endswith(".py")]

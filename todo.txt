@@ -4,7 +4,7 @@
 - particles :D [DONE]
 - make movement not SUCK [DONE]
 - lighting... this will be hard [DONE] (wasn't that hard)
-- borderless full screen support [KINDA] (doesn't support borderless fullscreen)
+- full screen support [KINDA] (doesn't support borderless fullscreen)
 - health bar & health system [KINDA] [no way to regen atm]
 - move code out of gameview.py to other files [DONE]
 - money [DONE]
@@ -18,6 +18,8 @@
 
 
 [TODO LIST] (somewhat in order of priority)
+- fix chests not saving their contents
+- fix chests not loading the first time they are clicked, (it works if you re-open the chest)
 - random gen structures & maybe structure groups (like a village in Minecraft)
   - loot chests / chests in general
 - surviors that randomly spawn in the world
@@ -28,6 +30,7 @@
 - collisions
 - make the minimap not suck FPS wise
 - add ennemies
+- item lore
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - better random generation
 - manage saves from in game: delete, upgrade/repair*, rename, copy

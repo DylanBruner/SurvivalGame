@@ -14,6 +14,7 @@ class TileIDS:
     TREE_V4 = 7
     WOOD    = 8
     CHEST   = 9
+    SAND    = 10
 
 
 TEXTURE_MAPPINGS = {
@@ -28,7 +29,8 @@ TEXTURE_MAPPINGS = {
     TileIDS.TREE_V4: None,
 
     TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (32, 32)),
-    TileIDS.CHEST: pygame.image.load('data/assets/world/chest.png')
+    TileIDS.CHEST: pygame.image.load('data/assets/world/chest.png'),
+    TileIDS.SAND: pygame.transform.scale(pygame.image.load('data/assets/world/sand.jpg'), (32, 32)),
 }
 
 def postLoad():
@@ -90,31 +92,3 @@ class World:
     def generateMap(self, seed: int = None):
         random.seed((random.randint(0, 100000) if seed == None else seed))
         self.map['seed'] = seed
-        # fill map with grass
-        self.map['map_data'] = [[TileIDS.GRASS for _ in range(self.MAP_SIZE[0])] for _ in range(self.MAP_SIZE[1])]
-        # add some stone
-        for _ in range(1500):
-            stone_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
-            points = self.getCirclePoints(stone_start, random.randint(2, 5), True)
-            for point in points:
-                self.map['map_data'][point[1]][point[0]] = TileIDS.STONE
-
-        # pick a random spot to start the water
-        for _ in range(1200):
-            water_start = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
-            points = self.getCirclePoints(water_start, random.randint(5, 10), True)
-            for point in points:
-                self.map['map_data'][point[1]][point[0]] = TileIDS.WATER
-        
-        # pick random empty spots to place trees
-        for _ in range(5500):
-            location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
-            # while self.map['map_data'][location[1]][location[0]] != TileIDS.EMPTY:
-                # location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))
-            
-            self.map['map_data'][location[1]][location[0]] = random.choice([TileIDS.TREE_V1, TileIDS.TREE_V2, TileIDS.TREE_V3, TileIDS.TREE_V4])
-        
-        # randomly place chests
-        for _ in range(10000):
-            location = (random.randint(0, self.MAP_SIZE[0] - 1), random.randint(0, self.MAP_SIZE[1] - 1))            
-            self.map['map_data'][location[1]][location[0]] = TileIDS.CHEST
