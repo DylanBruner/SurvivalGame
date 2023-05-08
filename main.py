@@ -1,7 +1,7 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
-import pygame, myenvironment, utils, time
-from debug.timer import DebugTimer
-import game.world as world
+import pygame, util.myenvironment as myenvironment, util.utils as utils, time
+from util.timer import DebugTimer
+import game.save.world as world
 import viewports.mainmenu as mainmenu
 
 #https://opengameart.org/content/iron-plague-pointercursor

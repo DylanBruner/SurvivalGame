@@ -1,11 +1,11 @@
 import pygame
 
-from components import *
-from componentsystem import Viewport
-from myenvironment import Environment
-from utils import Util
-from game.savemanager import SaveGame
-from game.sounds import Sounds
+from components.components import *
+from components.componentsystem import Viewport
+from util.myenvironment import Environment
+from util.utils import Util
+from game.save.savemanager import SaveGame
+from game.misc.sounds import Sounds
 
 class NewSaveMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):

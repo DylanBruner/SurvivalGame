@@ -1,17 +1,17 @@
 import time, pygame
 
-from components import *
-from componentsystem import Viewport
-from game.enemy import Enemy
-from game.invsystem import HotbarComponent
-from game.minimap import MiniMap
-from game.particlesystem import ParticleDisplay
-from game.player import Player
-from game.savemanager import SaveGame
-from game.tiles import Tiles
-from game.world import TEXTURE_MAPPINGS, TILE_SIZE
-from myenvironment import Environment
-from utils import Util
+from components.components import *
+from components.componentsystem import Viewport
+from game.entities.enemy import Enemy
+from game.player.invsystem import HotbarComponent
+from game.display.minimap import MiniMap
+from game.display.particlesystem import ParticleDisplay
+from game.player.player import Player
+from game.save.savemanager import SaveGame
+from game.save.tiles import Tiles
+from game.save.world import TEXTURE_MAPPINGS, TILE_SIZE
+from util.myenvironment import Environment
+from util.utils import Util
 from viewports.pausemenu import PauseMenu
 from enemies.testpathfinder import TestPathfinderEnemy
 

@@ -1,15 +1,15 @@
 import os, shutil, pygame
 
-from components import *
-from componentsystem import Viewport
-from myenvironment import Environment
-from utils import Util
+from components.components import *
+from components.componentsystem import Viewport
+from util.myenvironment import Environment
+from util.utils import Util
 from viewports.newsavemenu import NewSaveMenu
 from viewports.gameview import GameView
-from game.savemanager import SaveGame
-from game.sounds import Sounds
-from game.charselector import CharacterSelector
-from game.images import Images
+from game.save.savemanager import SaveGame
+from game.misc.sounds import Sounds
+from game.display.charselector import CharacterSelector
+from game.display.images import Images
 
 class PlayGame(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):

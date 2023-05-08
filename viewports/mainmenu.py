@@ -1,11 +1,11 @@
 import pygame
 
-from components import *
-from componentsystem import Viewport
-from myenvironment import Environment
-from utils import Util
+from components.components import *
+from components.componentsystem import Viewport
+from util.myenvironment import Environment
+from util.utils import Util
 from viewports.playgame import PlayGame
-from game.sounds import Sounds
+from game.misc.sounds import Sounds
 
 class MainMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):
