@@ -25,8 +25,8 @@ class PlayGame(Viewport):
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
-        save_names = [name for name in list(os.listdir("data/saves")) if name.endswith(".json")][:3]
-        nice_names = [name.replace("_", " ").replace(".json", "").title() for name in save_names][:3]
+        save_names = [name for name in list(os.listdir("data/saves")) if name.endswith(".save")][:3]
+        nice_names = [name.replace("_", " ").replace(".save", "").title() for name in save_names][:3]
 
         self.save_buttons = []
         for i in range(len(save_names)):

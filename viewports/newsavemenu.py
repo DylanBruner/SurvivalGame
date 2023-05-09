@@ -34,8 +34,8 @@ class NewSaveMenu(Viewport):
     @Util.MonkeyUtils.autoErrorHandling
     def createSave(self):
         Sounds.playSound(Sounds.MENU_CLICK)
-        save_file = self.save_name.text.replace(" ", "_").lower().strip() + ".json"
-        if save_file == ".json":
+        save_file = self.save_name.text.replace(" ", "_").lower().strip() + ".save"
+        if save_file == ".save":
             return
 
         SaveGame.createNewSave(save_file)

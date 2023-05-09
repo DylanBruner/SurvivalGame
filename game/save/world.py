@@ -16,35 +16,35 @@ class TileIDS:
     CHEST   = 9
     SAND    = 10
 
-
 TEXTURE_MAPPINGS = {
-    TileIDS.EMPTY: pygame.Surface((32, 32)),
-    TileIDS.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (32, 32)),
-    TileIDS.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (32, 32)),
-    TileIDS.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (32, 32)),
+    TileIDS.EMPTY: pygame.Surface((TILE_SIZE, TILE_SIZE)),
+    TileIDS.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (TILE_SIZE, TILE_SIZE)),
+    TileIDS.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (TILE_SIZE, TILE_SIZE)),
+    TileIDS.WATER: pygame.transform.scale(pygame.image.load('data/assets/world/water.jpg'), (TILE_SIZE, TILE_SIZE)),
 
     TileIDS.TREE_V1: None,
     TileIDS.TREE_V2: None,
     TileIDS.TREE_V3: None,
     TileIDS.TREE_V4: None,
 
-    TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (32, 32)),
-    TileIDS.CHEST: pygame.image.load('data/assets/world/chest.png'),
-    TileIDS.SAND: pygame.transform.scale(pygame.image.load('data/assets/world/sand.jpg'), (32, 32)),
+    TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (TILE_SIZE, TILE_SIZE)),
+    TileIDS.CHEST: pygame.transform.scale(pygame.image.load('data/assets/world/chest.png'), (TILE_SIZE, TILE_SIZE)),
+    TileIDS.SAND: pygame.transform.scale(pygame.image.load('data/assets/world/sand.jpg'), (TILE_SIZE, TILE_SIZE)),
 }
 
 def postLoad():
     _TREE_SPRITES = Util.loadSpritesheetAdvanced('data/assets/world/tree-variations.png', (64, 64), 8, 8)[4:]
-    TEXTURE_MAPPINGS[TileIDS.TREE_V1] = pygame.transform.scale(_TREE_SPRITES[0], (32, 32))
-    TEXTURE_MAPPINGS[TileIDS.TREE_V2] = pygame.transform.scale(_TREE_SPRITES[1], (32, 32))
-    TEXTURE_MAPPINGS[TileIDS.TREE_V3] = pygame.transform.scale(_TREE_SPRITES[2], (32, 32))
-    TEXTURE_MAPPINGS[TileIDS.TREE_V4] = pygame.transform.scale(_TREE_SPRITES[3], (32, 32))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V1] = pygame.transform.scale(_TREE_SPRITES[0], (TILE_SIZE, TILE_SIZE))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V2] = pygame.transform.scale(_TREE_SPRITES[1], (TILE_SIZE, TILE_SIZE))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V3] = pygame.transform.scale(_TREE_SPRITES[2], (TILE_SIZE, TILE_SIZE))
+    TEXTURE_MAPPINGS[TileIDS.TREE_V4] = pygame.transform.scale(_TREE_SPRITES[3], (TILE_SIZE, TILE_SIZE))
 
     # (1, 0) -> (30, 31)
     CHEST = pygame.Surface((32, 32))
     CHEST.blit(TEXTURE_MAPPINGS[TileIDS.CHEST], (-1, 0), (1, 0, 32, 31))
     # scale up the x axis by a few pixels
     TEXTURE_MAPPINGS[TileIDS.CHEST] = pygame.transform.scale(CHEST, (36, 32))
+    TEXTURE_MAPPINGS[TileIDS.CHEST] = pygame.transform.scale(TEXTURE_MAPPINGS[TileIDS.CHEST], (TILE_SIZE, TILE_SIZE))
 
 
 class World:
