@@ -42,6 +42,8 @@
   - trees have been added, but some more things like: flowers and bushes would be nice
 - title screen art
 - more sounds
+- make tiles have the propper size inside the hotbar
+- add a way to resize the world tiles & player character during runtime
 - better block break sound
 - settings menu
   - rebinding of keys, the game already supports this but there's no interface for it yet
