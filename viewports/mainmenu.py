@@ -25,7 +25,7 @@ class MainMenu(Viewport):
         self.options_button = Button((self.size[0] / 2 - 100, 200 + y_offset), (200, 40), "Options")
         self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), "Quit")
 
-        self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), quit())
+        self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), self.environment.taskManager.stop(), quit())
         self.play_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, PlayGame(self.size, self.environment), self.environment))
 
         self.registerComponents([self.menu_text, self.play_button, self.options_button, self.quit_button])

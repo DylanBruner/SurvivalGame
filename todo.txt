@@ -15,13 +15,14 @@
 - make a debugging system that tracks how long parts of game logic are taking, for debugging bad FPS [DONE]
 - possibly more inventory slots, not just the hotbar [DONE]
 - crafting system (i don't want a Minecraft-esque crafting system, but it would be really easy to implement) [DONE]
-
+- random gen structures [DONE]
+  - loot chests / chests in general
+- periodic saving in the background [DONE]
+- better random generation [DONE]
 
 [TODO LIST] (somewhat in order of priority)
 - fix chests not saving their contents
 - fix chests not loading the first time they are clicked, (it works if you re-open the chest)
-- random gen structures & maybe structure groups (like a village in Minecraft)
-  - loot chests / chests in general
 - surviors that randomly spawn in the world
   - they can be hostile or friendly
   - if they're friendly they can give you quests, buy items and sell items to you
@@ -32,7 +33,6 @@
 - add ennemies
 - item lore
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
-- better random generation
 - manage saves from in game: delete, upgrade/repair*, rename, copy
   - upgrade / repair is supported, just needs a nice way to do it as it's currently just a hotkey
 - better UI (button textures, menu art (stolen ofc), etc)
@@ -49,8 +49,7 @@
   - particle quality
 - custom world size selectable when creating a new world
 - fix delayed sounds
-- optimize rendering so we can get 60+ fps in fullscreen not just the default window size
-- periodic saving / save the game as a backup if a crash is detected or at least try to
+- optimize rendering so we can get 60+ fps in fullscreen not just the default window size (just need to scale up the tiles)
 
 
 Things that would be cool to have but are not a priority:

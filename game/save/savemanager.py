@@ -1,4 +1,4 @@
-import json, random
+import json, random, pickle
 from game.save.world import World, TileIDS
 from _types.structure import Structure, LootSpawn
 from util.utils import Util
@@ -39,13 +39,15 @@ class SaveGame:
 
     @Util.MonkeyUtils.autoErrorHandling
     def save(self) -> None:
-        with open(f"data/saves/{self.save_file}", 'w') as f:
-            json.dump(self.save_data, f)
+        # with open(f"data/saves/{self.save_file}", 'w') as f:
+            # json.dump(self.save_data, f)
+        pickle.dump(self.save_data, open(f"data/saves/{self.save_file}", 'wb'))
 
     @Util.MonkeyUtils.autoErrorHandling
     def loadSave(self, save_file: str):
-        with open(f"data/saves/{save_file}", 'r') as f:
-            self.save_data = json.load(f)
+        # with open(f"data/saves/{save_file}", 'r') as f:
+            # self.save_data = json.load(f)
+        self.save_data = pickle.load(open(f"data/saves/{save_file}", 'rb'))
 
     @Util.MonkeyUtils.autoErrorHandling
     def getTile(self, x: int, y: int) -> int:
@@ -81,13 +83,15 @@ class SaveGame:
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
     def regenMap(save_file: str):
-        with open(f"data/saves/{save_file}", 'r') as f:
-            save_data = json.load(f)
+        # with open(f"data/saves/{save_file}", 'r') as f:
+            # save_data = json.load(f)
+        save_data = pickle.load(open(f"data/saves/{save_file}", 'rb'))
         
         save_data['world'] = World().save()
         
-        with open(f"data/saves/{save_file}", 'w') as f:
-            json.dump(save_data, f)
+        # with open(f"data/saves/{save_file}", 'w') as f:
+            # json.dump(save_data, f)
+        pickle.dump(save_data, open(f"data/saves/{save_file}", 'wb'))
         
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
@@ -210,7 +214,8 @@ class SaveGame:
         save_data['world']['map_data'] = _map
         # ======================================================================
 
-        with open(f"data/saves/{save_file}", 'w') as f:
-            json.dump(save_data, f)
+        # with open(f"data/saves/{save_file}", 'w') as f:
+            # json.dump(save_data, f)
+        pickle.dump(save_data, open(f"data/saves/{save_file}", 'wb'))
 
         return SaveGame(save_file)

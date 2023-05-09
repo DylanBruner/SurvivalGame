@@ -1,6 +1,7 @@
 import pygame
 from components.componentsystem import Viewport
 from util.timer import DebugTimer
+from tasks.taskmanager import TaskManager
 
 class Environment:
     def __init__(self, **kwargs):
@@ -14,6 +15,7 @@ class Environment:
         self.last_viewports: list[Viewport] = []
         self.GAME_NAME: str
         self.debugTimer: DebugTimer
+        self.taskManager: TaskManager
 
         self.__dict__.update(kwargs)
     def __getitem__(self, key):

@@ -1,6 +1,8 @@
 import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
 import pygame, util.myenvironment as myenvironment, util.utils as utils, time
 from util.timer import DebugTimer
+import tasks.backgroundsave as backgroundsave
+from tasks.taskmanager import TaskManager
 import game.save.world as world
 import viewports.mainmenu as mainmenu
 
@@ -21,17 +23,22 @@ environment = myenvironment.Environment(**{
     "clock": pygame.time.Clock(),
     "time_delta": 0,
     "fullscreen": False,
-    "debugTimer": DebugTimer()
+    "debugTimer": DebugTimer(),
+    "taskManager": TaskManager().start()
 })
 environment.viewport = mainmenu.MainMenu(environment.current_size, environment)
 
 world.postLoad() # some more asset processing that needs to be done after pygame is fully initialized
+
+# Register background tasks ================================================
+environment.taskManager.register(backgroundsave.task, environment).setInterval(60) # Autosave every 60 seconds
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             if hasattr(environment.viewport, "save"):
                 environment.viewport.save.save()
+            environment.taskManager.stop()
             pygame.quit()
             quit()
 
