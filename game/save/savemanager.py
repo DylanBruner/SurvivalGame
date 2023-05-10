@@ -1,13 +1,14 @@
 import json, random, pickle
 from game.save.world import World, TileIDS
 from _types.structure import Structure, LootSpawn
+from _types.item import Item
 from util.utils import Util
 
 BLANK_SAVE = {
     "save_name": None,
     "player": {
-        "inventory": [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)],
-        "storage": [[(0, 0) for _ in range(14)] for _ in range(4)], # 4 rows of 14
+        "inventory": [Item(0, 0) for _ in range(9)],
+        "storage": [[Item(0, 0) for _ in range(14)] for _ in range(4)], # 4 rows of 14
         "money": 0,
         "health": 100,
         "max_health": 100,

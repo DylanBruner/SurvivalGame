@@ -27,10 +27,10 @@ class HotbarComponent(Component):
         self.EVENT_SYSTEM_HOOKED = True
         self.priority = 1
 
-        self._items = []
-        for item_id, item_count in self.parent.save.save_data['player']['inventory']:
-            self._items.append(Item(item_id, item_count, TEXTURE_MAPPINGS[item_id], (Config.ITEM_SIZE, Config.ITEM_SIZE)))
-
+        self._items = self.parent.save.save_data['player']['inventory']
+        # for item_id, item_count in self.parent.save.save_data['player']['inventory']:
+            # self._items.append(Item(item_id, item_count, (Config.ITEM_SIZE, Config.ITEM_SIZE)))
+   
         self._keybind_map = [f"SLOT_{i + 1}" for i in range(len(self._items))]
         self._selected_slot = 0
         self._breaking_power = 9
@@ -72,7 +72,7 @@ class HotbarComponent(Component):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
             # draw item
             if self._items[i] and self._items[i].item_id != 0:
-                surface.blit(self._items[i].texture, (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 4, self.location[1] + 4))
+                surface.blit(TEXTURE_MAPPINGS[self._items[i].item_id], (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING) + 4, self.location[1] + 4))
                 # draw count
                 if self._items[i].count > 1:
                     count_surface = self.count_font.render(str(self._items[i].count), True, (255, 255, 255))
@@ -105,9 +105,9 @@ class HotbarComponent(Component):
                 if tile:
                     if tile.drops:
                         for drop in tile.drops:
-                            self.addToInventory(Item(drop[0], drop[1], TEXTURE_MAPPINGS[drop[0]]))
+                            self.addToInventory(Item(drop[0], drop[1]))
                     else:
-                        self.addToInventory(Item(self.breaking_id, 1, TEXTURE_MAPPINGS[self.breaking_id]))
+                        self.addToInventory(Item(self.breaking_id, 1))
 
                 self.breaking_percent = 0
                 self.breaking = False
@@ -130,10 +130,10 @@ class HotbarComponent(Component):
     def save(self):
         self.parent.save.save_data['player']['inventory'] = [[0, 0] for i in range(9)]
         for item in self._items:
-            if item:
-                self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [item.item_id, item.count]
-            else:
-                self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [0, 0]
+            self.parent.save.save_data['player']['inventory'][self._items.index(item)] = item#[item.item_id, item.count]
+            # if item:
+            # else:
+                # self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [0, 0]
     
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):

@@ -19,8 +19,10 @@
   - loot chests / chests in general
 - periodic saving in the background [DONE]
 - better random generation [DONE]
+- item lore [DONE]
 
 [TODO LIST] (somewhat in order of priority)
+- make item lore cache so we don't need to re-generate it every time (kills FPS a bit)
 - fix chests not saving their contents
 - fix chests not loading the first time they are clicked, (it works if you re-open the chest)
 - surviors that randomly spawn in the world
@@ -31,7 +33,6 @@
 - collisions
 - make the minimap not suck FPS wise
 - add ennemies
-- item lore
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - manage saves from in game: delete, upgrade/repair*, rename, copy
   - upgrade / repair is supported, just needs a nice way to do it as it's currently just a hotkey

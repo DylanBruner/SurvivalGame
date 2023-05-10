@@ -1,16 +1,10 @@
 import pygame
 
 class Item:
-    def __init__(self, item_id: int, count: int, 
-                 texture: pygame.Surface, size: tuple = (34, 34)):
+    def __init__(self, item_id: int, count: int):
         self.item_id = item_id
         self.count   = count 
         self.lore: list[str] = []
-        self.texture = pygame.transform.scale(texture, size) # just in case
-
-
-        # scale the texture down a little
-        self.texture = pygame.transform.scale(self.texture, (size[0] - 5, size[1] - 5))
 
     def setLore(self, lore: list[str]) -> None:
         self.lore = lore

@@ -4,6 +4,7 @@ from game.save.world import TileIDS, TEXTURE_MAPPINGS
 from util.utils import Util
 import game.display.particlesystem as pSys
 from _types.item import Item
+from game.display.loresys import Lore, BASE_ITEM_LORE
 
 SLOT_TEXTURE: pygame.Surface = None
 
@@ -44,7 +45,7 @@ class Slot:
         surf.blit(SLOT_TEXTURE, self.pos)
         
         if self.item and (self.item.item_id != 0):
-            surf.blit(self.item.texture, (self.pos[0] + 6, self.pos[1] + 6))
+            surf.blit(TEXTURE_MAPPINGS[self.item.item_id], (self.pos[0] + 6, self.pos[1] + 6))
             q = FONT.render(str(self.item.count), True, (255, 255, 255))
             surf.blit(q, (self.pos[0] + 5, self.pos[1] + 5))
     
@@ -90,7 +91,7 @@ class PlayerStorage:
                 _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
                 self.inventory.append(Slot(
                     (_x, _y),
-                    Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]]),
+                    item,
                     sLoc=(x, y),
                 ))
                 self.inventory[-1].customOnClick = self.onInventoryModification
@@ -101,7 +102,7 @@ class PlayerStorage:
         for y in range(4):
             for x in range(8):
                 _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
-                self.storageSlots.append(Slot((_x, _y), Item(0, 0, TEXTURE_MAPPINGS[1]), CAN_STORE=False, HIDDEN=True))
+                self.storageSlots.append(Slot((_x, _y), Item(0, 0), CAN_STORE=False, HIDDEN=True))
 
         # Hotbar slots
         self.hotbarSlots = []
@@ -119,7 +120,7 @@ class PlayerStorage:
         for y in range(3):
             for x in range(3):
                 _x, _y = (self.top_left[0] + xMod) + x * Config.SLOT_SIZE, (self.top_left[1] + yMod) + y * Config.SLOT_SIZE
-                self.craftingSlots.append(Slot((_x, _y), Item(0, 0, TEXTURE_MAPPINGS[1])))
+                self.craftingSlots.append(Slot((_x, _y), Item(0, 0)))
 
         self.dragItem: Item = None
         self.openChest: tuple[int, int] = None #TODO: change this to a container class maybe
@@ -136,9 +137,9 @@ class PlayerStorage:
     def onInventoryModification(self) -> None:
         for slot in self.inventory:
             if slot.hasItem():
-                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = [slot.item.item_id, slot.item.count]
+                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = slot.item
             else:
-                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = [0, 0]
+                self.parent.save.save_data['player']['storage'][slot.sLoc[1]][slot.sLoc[0]] = Item(0, 0)
         
     @Util.MonkeyUtils.autoErrorHandling
     def clearOpenChest(self) -> None:
@@ -156,7 +157,7 @@ class PlayerStorage:
         self.openChest = location
         items: list[Item] = []
         for item in self.parent.save.save_data['chests'][f"{location[1]},{location[0]}"]:
-            items.append(Item(item[0], item[1], TEXTURE_MAPPINGS[item[0]]))
+            items.append(Item(item[0], item[1]))
         
         for slot in self.storageSlots:
             slot.CAN_STORE = True
@@ -201,7 +202,7 @@ class PlayerStorage:
                         matches = False
             
             if matches:
-                self.outputSlot.item = Item(recipe['result']['id'], recipe['result']['count'], TEXTURE_MAPPINGS[recipe['result']['id']])
+                self.outputSlot.item = Item(recipe['result']['id'], recipe['result']['count'])
                 self.currentRecipe = recipe
                 return
             else:
@@ -228,11 +229,24 @@ class PlayerStorage:
         # 400 tall and 450 wide white rect that's centered
         pygame.draw.rect(surf, (255, 255, 255), pygame.Rect(self.top_left, (self.width, self.height)), border_radius=12)
 
-        for slot in self.inventory + self.craftingSlots + self.storageSlots + [self.outputSlot]:
+        loreDraw = None
+
+        for slot in self.inventory + self.craftingSlots + self.storageSlots + [self.outputSlot] + self.hotbarSlots:
             slot.draw(surf)
+            # check if the mouse is hovering over the slot
+            if slot._rect.collidepoint(pygame.mouse.get_pos()):
+                if slot.hasItem():
+                    # lore
+                    if str(slot.item.item_id) in BASE_ITEM_LORE:
+                        loreDraw = BASE_ITEM_LORE[str(slot.item.item_id)]
         
+        if loreDraw is not None:
+            rendered = Lore.renderLore(loreDraw['name'], loreDraw['rarity'], loreDraw['lore'])
+            # draw it to the screen
+            surf.blit(rendered, (pygame.mouse.get_pos()[0] + 10, pygame.mouse.get_pos()[1] + 10))
+
         if self.dragItem:
-            surf.blit(self.dragItem.texture, pygame.mouse.get_pos())
+            surf.blit(TEXTURE_MAPPINGS[self.dragItem.item_id], pygame.mouse.get_pos())
 
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event) -> None:
@@ -267,7 +281,7 @@ class PlayerStorage:
                                 self.dragItem.count -= 1
                                 slot.customOnClick()
                             elif not slot.hasItem():
-                                slot.item = Item(self.dragItem.item_id, 1, self.dragItem.texture)
+                                slot.item = Item(self.dragItem.item_id, 1)
                                 self.dragItem.count -= 1
                                 slot.customOnClick()
                             
