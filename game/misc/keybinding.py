@@ -15,3 +15,12 @@ class Bindings:
     @Util.MonkeyUtils.autoErrorHandling
     def get(action: str) -> int:
         return KEYBINDS.get(action, None)
+
+    @staticmethod
+    @Util.MonkeyUtils.autoErrorHandling
+    def modifyKeybind(action: str, event: pygame.event.Event) -> None:
+        if action not in KEYBINDS:
+            raise ValueError(f"{action} is not a valid keybind")
+        KEYBINDS[action] = event.key
+        with open(KEYBIND_FILE, "w"):
+            json.dump(KEYBINDS, f, indent=4)
