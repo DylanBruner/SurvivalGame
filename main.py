@@ -1,4 +1,4 @@
-import os; os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "True"
+import os
 import pygame, util.myenvironment as myenvironment, util.utils as utils, time
 from util.timer import DebugTimer
 import tasks.backgroundsave as backgroundsave

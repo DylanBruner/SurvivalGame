@@ -1,4 +1,5 @@
 import pygame
+from util.funccache import Cache
 
 rarities = [
     (255, 255, 255),
@@ -49,6 +50,7 @@ class Lore:
         return newLines
     
     @staticmethod
+    @Cache.cache()
     def renderLore(itemName: str, itemRarity: int, lines: list[Text]) -> pygame.Surface:
         lines = Lore._autoWordWrap(lines)
 
@@ -78,12 +80,14 @@ class Lore:
         return surface
 
 BASE_ITEM_LORE = {
-    "3": {
-        "name": "Stone",
-        "rarity": RARITY_COMMON,
-        "lore": [
-            Text(""),
-            Text("It's just stone...", COLOR=(61, 61, 61))           
-        ]
-    }
+    "1": {"name": "Grass", "rarity": RARITY_COMMON, "lore": []},
+    "2": {"name": "Water", "rarity": RARITY_COMMON, "lore": []},
+    "3": {"name": "Stone", "rarity": RARITY_COMMON, "lore": []},
+    "4": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
+    "5": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
+    "6": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
+    "7": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
+    "8": {"name": "Wood", "rarity": RARITY_COMMON, "lore": []},
+    "9": {"name": "Chest", "rarity": RARITY_COMMON, "lore": []},
+    "10": {"name": "Sand", "rarity": RARITY_COMMON, "lore": []},
 }

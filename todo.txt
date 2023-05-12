@@ -20,9 +20,9 @@
 - periodic saving in the background [DONE]
 - better random generation [DONE]
 - item lore [DONE]
+- make item lore cache so we don't need to re-generate it every time (kills FPS a bit) [DONE]
 
 [TODO LIST] (somewhat in order of priority)
-- make item lore cache so we don't need to re-generate it every time (kills FPS a bit)
 - fix chests not saving their contents
 - fix chests not loading the first time they are clicked, (it works if you re-open the chest)
 - surviors that randomly spawn in the world
