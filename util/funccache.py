@@ -1,5 +1,3 @@
-import random
-
 _CACHE = {}
 
 class Cache:

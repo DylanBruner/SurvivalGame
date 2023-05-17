@@ -1,4 +1,5 @@
 import pygame, importlib, inspect, sys, traceback, colorama, os, time
+from numba import njit
 from components.componentsystem import Viewport
 from util.myenvironment import Environment
 
@@ -51,10 +52,12 @@ class Util:
         environment.viewport = new
     
     @staticmethod
+    @njit(fastmath=True)
     def distance(p1: tuple, p2: tuple) -> float:
         return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
     @staticmethod
+    @njit(fastmath=True)
     def gameTimeToNice(gameTime: int) -> str: #00:00 AM/PM
         gameTime = int(gameTime)
         hours = gameTime // 60
@@ -70,25 +73,30 @@ class Util:
         return f"{hours}:{minutes} {ampm}"
     
     @staticmethod
+    @njit(fastmath=True)
     def calculateStaminaCost(breaking_power: int, player_xp: int) -> int:
         # higher breaking power = more stamina cost
         levelStaminaDiscount = max(0, player_xp // 1000)
         return max(0, max(1, breaking_power * 2 - 1) - levelStaminaDiscount)
 
     @staticmethod
+    @njit(fastmath=True)
     def shiftUnicode(chr: int) -> int:
         return chr + 0xE000
 
     @staticmethod
+    @njit(fastmath=True)
     def unshiftUnicode(chr: int) -> int:
         return chr - 0xE000
 
     class MathUtils:
         @staticmethod
+        @njit(fastmath=True)
         def pointInRect(point: tuple, rect: tuple[int, int, int, int]) -> bool:
             return rect[0] <= point[0] <= rect[0] + rect[2] and rect[1] <= point[1] <= rect[1] + rect[3]
     
         @staticmethod
+        @njit(fastmath=True)
         def distance(x1, y1, x2, y2):
             return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
         

@@ -84,14 +84,10 @@ class SaveGame:
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
     def regenMap(save_file: str):
-        # with open(f"data/saves/{save_file}", 'r') as f:
-            # save_data = json.load(f)
         save_data = pickle.load(open(f"data/saves/{save_file}", 'rb'))
         
         save_data['world'] = World().save()
         
-        # with open(f"data/saves/{save_file}", 'w') as f:
-            # json.dump(save_data, f)
         pickle.dump(save_data, open(f"data/saves/{save_file}", 'wb'))
         
     @staticmethod
@@ -215,8 +211,6 @@ class SaveGame:
         save_data['world']['map_data'] = _map
         # ======================================================================
 
-        # with open(f"data/saves/{save_file}", 'w') as f:
-            # json.dump(save_data, f)
         pickle.dump(save_data, open(f"data/saves/{save_file}", 'wb'))
 
         return SaveGame(save_file)

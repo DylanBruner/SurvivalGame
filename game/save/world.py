@@ -69,25 +69,7 @@ class World:
     @Util.MonkeyUtils.autoErrorHandling
     def save(self) -> dict:
         return self.map
-    
-    @Util.MonkeyUtils.autoErrorHandling
-    def getCirclePoints(self, center: int, radius: int, fill: bool) -> list[tuple[int, int]]:
-        points = []
-        # use a 2d circle algorithm to get the points that way it has circle-like edges
-        # but include a little bit of randomness to make it look more natural
-        for x in range(-radius, radius + 1):
-            for y in range(-radius, radius + 1):
-                if x**2 + y**2 <= radius**2:
-                    # check if the point is in the map
-                    if center[0] + x >= 0 and center[0] + x < self.MAP_SIZE[0] and center[1] + y >= 0 and center[1] + y < self.MAP_SIZE[1]:
-                        points.append((center[0] + x, center[1] + y))
 
-                        # add a little bit of randomness to the points
-                        if random.randint(0, 100) < 10:
-                            if center[0] + x + 1 >= 0 and center[0] + x + 1 < self.MAP_SIZE[0] and center[1] + y >= 0 and center[1] + y < self.MAP_SIZE[1]:
-                                points.append((center[0] + x + 1, center[1] + y))
-        return points
-    
     @Util.MonkeyUtils.autoErrorHandling
     def generateMap(self, seed: int = None):
         random.seed((random.randint(0, 100000) if seed == None else seed))
