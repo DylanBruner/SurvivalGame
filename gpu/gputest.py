@@ -2,7 +2,7 @@ import sys, time, numpy
 from PIL import Image as img
 from vispy import scene, app
 from vispy.scene.visuals import Text, Image
-from gpuutils import gpuUTILS, Surface
+from gpucore import gpuUTILS, Surface
 
 canvas = scene.SceneCanvas(keys='interactive', bgcolor='white',
                             size=(800, 600), show=True)
@@ -21,7 +21,7 @@ testImageRender = Image(testImage.getArray(), parent=canvas.scene)
 frames = 0
 lastTime = time.time()
 
-def update(ev):
+def register(ev):
     global frames, lastTime
     canvas.update()
 
@@ -34,7 +34,7 @@ def update(ev):
     # draw a rectangle
 
 timer = app.Timer()
-timer.connect(update)
+timer.connect(register)
 timer.start(0)
 
 if __name__ == '__main__' and sys.flags.interactive == 0:

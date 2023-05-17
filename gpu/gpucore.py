@@ -1,12 +1,16 @@
-import numpy
-from numba import jit
+import numpy, threading, time
 from PIL import Image as img
+from PIL import ImageFont, ImageDraw
+
+from vispy import scene, app
+from vispy.scene.visuals import Text, Image
 
 class Surface:
     def __init__(self, size: tuple[int, int]):
         self._array = numpy.zeros((size[0], size[1], 4), dtype=numpy.uint8)
     
-    def getArray(self) -> numpy.ndarray: return self._array
+    def getArray(self) -> numpy.ndarray:
+        return self._array
     
     def rect(self, topLeft: tuple[int, int], 
              bottomRight: tuple[int, int], color: tuple[int, int, int, int], fill: bool = True):
@@ -91,9 +95,47 @@ class Surface:
             self._array[pos[0]:pos[0] + surface.getArray().shape[0], pos[1]:pos[1] + surface.getArray().shape[1]] = surface.getArray()
         elif isinstance(surface, numpy.ndarray):
             self._array[pos[0]:pos[0] + surface.shape[0], pos[1]:pos[1] + surface.shape[1]] = surface
+        
+    def renderText(self, text: str, pos: tuple[int, int], size: int, color: tuple[int, int, int, int]):
+        if len(color) == 3:
+            color = (color[0], color[1], color[2], 255)
 
+        font = ImageFont.truetype("arial", size)
+        image = img.fromarray(self._array)
+        ImageDraw.Draw(image).text(pos, text, font=font, fill=color)
+        self._array = numpy.array(image)
 
-class gpuUTILS:
+    def getTextSize(self, text: str, fontSize: int) -> tuple[int, int]:
+        font = ImageFont.truetype("arial", fontSize)
+        return font.getsize(text)
+
+class Utils:
     @staticmethod
     def imageFromPath(path: str, convert: str = "RGBA") -> numpy.ndarray:
         return numpy.array(img.open(path).convert(convert))
+
+class App:
+    def __init__(self, _size: tuple[int, int]):
+        self._canvas = scene.SceneCanvas(keys='interactive', bgcolor='white',
+                                         size=_size, show=True)
+        self._actions: list[callable] = []
+    
+    def getScene(self) -> scene.SceneCanvas.scene: return self._canvas.scene
+
+    def eventThread(self) -> None:
+        while True:
+            for action in self._actions:
+                action()
+            time.sleep(0.01)
+    
+    def register(self, func: callable) -> callable:
+        self._actions.append(func)
+        return func
+
+    def connect(self, func: callable) -> callable:
+        self._canvas.connect(func)
+        return func
+
+    def start(self) -> None:
+        threading.Thread(target=self.eventThread).start()
+        app.run()
