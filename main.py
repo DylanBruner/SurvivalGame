@@ -39,10 +39,8 @@ if "--dev" in sys.argv:
 for arg in sys.argv:
     if arg.startswith("--debug-scripts="):
         for script in arg.split("=")[1].split(","):
-            try:
-                importlib.import_module(script)
-            except ModuleNotFoundError:
-                ...
+            with open(script, 'r') as f:
+                exec(f.read(), globals())
 
 while True:
     for event in pygame.event.get():
