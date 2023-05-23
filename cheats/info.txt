@@ -1,0 +1,11 @@
+I'm bored of actually working on the game so I'm just gonna make cheats for it instead
+But I'm going to make them external so it's not stupid simple to write them
+
+TODO
+ - Fast break
+ - Nuker
+ - Increased max mana
+ - Disable mana cost
+ - Ininitate items maybe
+ - Mod menu that shows toggled features
+ - Mod API that makes adding new cheats easier
