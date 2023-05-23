@@ -2,6 +2,7 @@ import pygame, util.myenvironment as myenvironment, util.utils as utils, time
 from util.timer import DebugTimer
 import tasks.backgroundsave as backgroundsave
 from tasks.taskmanager import TaskManager
+from util.pylambda import _if
 import game.save.world as world
 import viewports.mainmenu as mainmenu
 
@@ -81,7 +82,9 @@ while True:
             if not overlay.closed:
                 start = time.time()
                 overlay.onEvent(event)
-                environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.onEvent", time.time() - start)
+                _if(DEV_MODE,
+                    lambda: environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.onEvent", time.time() - start))()
+                    
 
     if STEPPING_MODE and STEPS == 0:
         continue
@@ -97,7 +100,8 @@ while True:
         if not overlay.closed:
             start = time.time()
             overlay.draw(environment)
-            environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.draw", time.time() - start)
-
+            _if(DEV_MODE, 
+                lambda: environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.draw", time.time() - start))()
+                
     pygame.display.update()
     environment.time_delta = min(environment.clock.tick(60), 500) if not STEPPING_MODE else 10
