@@ -5,7 +5,9 @@ from components.componentsystem import Viewport
 from util.myenvironment import Environment
 from util.utils import Util
 from viewports.playgame import PlayGame
+from viewports.settingsmenu import SettingsMenu
 from game.misc.sounds import Sounds
+from game.misc.lang import Lang
 
 class MainMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):
@@ -18,14 +20,17 @@ class MainMenu(Viewport):
 
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
+        self.lang = Lang()
+        
         pygame.display.set_caption(f"{self.environment.GAME_NAME} - Main Menu")
         y_offset = self.size[1] / 4 - 100
         self.menu_text = TextDisplay(location=(self.size[0] / 2 - 100 + DEFAULT_FONT.size("Main Menu")[0] / 4, 50 + y_offset), text="Main Menu", font=pygame.font.SysFont("Arial", 40))
-        self.play_button = Button((self.size[0] / 2 - 100, 150 + y_offset), (200, 40), "Play")
-        self.options_button = Button((self.size[0] / 2 - 100, 200 + y_offset), (200, 40), "Options")
-        self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), "Quit")
+        self.play_button = Button((self.size[0] / 2 - 100, 150 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_PLAY))
+        self.options_button = Button((self.size[0] / 2 - 100, 200 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_OPTIONS))
+        self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_QUIT))
 
         self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), self.environment.taskManager.stop(), quit())
+        self.options_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, SettingsMenu(self.size, self.environment), self.environment))
         self.play_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, PlayGame(self.size, self.environment), self.environment))
 
         self.registerComponents([self.menu_text, self.play_button, self.options_button, self.quit_button])

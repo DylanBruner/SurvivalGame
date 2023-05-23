@@ -1,0 +1,20 @@
+{
+    "_common_name": "Spanish",
+    
+    "menu_action_back": "Atras",
+    "menu_action_options": "Opciones",
+    "menu_action_play": "Jugar",
+    "menu_action_new_game": "Nuevo juego",
+    "menu_action_create": "Crear",
+    "menu_action_quit": "Abandonar",
+    "menu_action_exit": "Salida",
+    "menu_action_resume": "Reanudar",
+    
+    "game_display_time": "Tiempo",
+    "game_display_day": "Día",
+    "game_display_new_save": "Nuevo Guardar",
+    "game_display_play_game": "Jugar un juego",
+    "game_display_state_paused": "en pausa",
+
+    "text_prompt_save_name": "Guardar nombre"
+}

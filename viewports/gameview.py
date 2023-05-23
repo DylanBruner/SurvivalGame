@@ -10,6 +10,7 @@ from game.player.player import Player
 from game.save.savemanager import SaveGame
 from game.save.tiles import Tiles
 from game.save.world import TEXTURE_MAPPINGS, TILE_SIZE
+from game.misc.lang import Lang
 from util.myenvironment import Environment
 from util.utils import Util
 from viewports.pausemenu import PauseMenu
@@ -64,13 +65,14 @@ class GameView(Viewport):
     
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
+        self.lang = Lang()
         self.ui_layer   = pygame.Surface(self.size, pygame.SRCALPHA)
         self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
 
         self.FPS_DISPLAY = TextDisplay(location=(self.size[0] - 80, 10), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
-        self.TIME_DISPLAY = TextDisplay(location=(10, 232), text="Time: ???", color=(255, 255, 255))
+        self.TIME_DISPLAY = TextDisplay(location=(10, 232), text=f"{self.lang.get(Lang.GAME_DISPLAY_TIME)}: ???", color=(255, 255, 255))
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
 
         self.hotbar = HotbarComponent(parent=self)
@@ -149,7 +151,7 @@ class GameView(Viewport):
             self.FPS_DISPLAY.setText(f"FPS: {environment['clock'].get_fps():.0f}")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.TIME_DISPLAY.setText(f"Time: {Util.gameTimeToNice(self.game_time)} (Day {self.day_count})")
+            self.TIME_DISPLAY.setText(f"{self.lang.get(Lang.GAME_DISPLAY_TIME)}: {Util.gameTimeToNice(self.game_time)} ({self.lang.get(Lang.GAME_DISPLAY_DAY)} {self.day_count})")
 
             # update the game time
             timeChange = time.time() - self.last_time_update

@@ -8,6 +8,7 @@ from viewports.newsavemenu import NewSaveMenu
 from viewports.gameview import GameView
 from game.save.savemanager import SaveGame
 from game.misc.sounds import Sounds
+from game.misc.lang import Lang
 from game.display.charselector import CharacterSelector
 from game.display.images import Images
 
@@ -21,7 +22,9 @@ class PlayGame(Viewport):
     
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        pygame.display.set_caption(f"{self.environment.GAME_NAME} - Play Game")
+        self.lang = Lang()
+
+        pygame.display.set_caption(f"{self.environment.GAME_NAME} - {self.lang.get(Lang.GAME_DISPLAY_PLAY_GAME)}")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
@@ -36,14 +39,13 @@ class PlayGame(Viewport):
             self.registerComponent(self.save_buttons[i])
         
         if len(save_names) < 3:
-            # self.new_game_button = Button((self.size[0] / 4 - 100, 200 + len(save_names) * 50), (200, 40), "New Game")
             self.new_game_button = ImageButton((self.size[0] / 4 - 100, 230 + (len(save_names) * 50)),
-                                                  Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text="New Game", text_color=(0, 0, 0))
+                                                  Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text=self.lang.get(Lang.MENU_ACTION_NEW_GAME), text_color=(0, 0, 0))
             self.new_game_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, NewSaveMenu(self.size, self.environment), self.environment))
             self.registerComponent(self.new_game_button)
 
         self.back_button = ImageButton((self.size[0] / 4 - 100, 300 + len(save_names) * 50), 
-                                       Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text="Back", text_color=(0, 0, 0))
+                                       Images().BUTTON_IDLE, Images().BUTTON_CLICK, Images().BUTTON_HOVER, text=self.lang.get(Lang.MENU_ACTION_BACK), text_color=(0, 0, 0))
         
         self.back_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.backViewport(self.environment))
         self.registerComponent(self.back_button)

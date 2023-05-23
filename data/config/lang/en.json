@@ -1,0 +1,20 @@
+{
+    "_common_name": "English",
+    
+    "menu_action_back": "Back",
+    "menu_action_options": "Options",
+    "menu_action_play": "Play",
+    "menu_action_new_game": "New Game",
+    "menu_action_create": "Create",
+    "menu_action_quit": "Quit",
+    "menu_action_exit": "Exit",
+    "menu_action_resume": "Resume",
+    
+    "game_display_time": "Time",
+    "game_display_day": "Day",
+    "game_display_new_save": "New Save",
+    "game_display_play_game": "Play Game",
+    "game_display_state_paused": "Paused",
+
+    "text_prompt_save_name": "Save Name"
+}

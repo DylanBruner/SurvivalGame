@@ -3,6 +3,7 @@ from components.componentsystem import Viewport
 from util.myenvironment import Environment
 from util.utils import Util
 from game.misc.sounds import Sounds
+from game.misc.lang import Lang
 
 class PauseMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):
@@ -11,12 +12,14 @@ class PauseMenu(Viewport):
     
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        self.pause_text = TextDisplay(location=(10, 10), text="Paused")
+        self.lang = Lang()
+
+        self.pause_text = TextDisplay(location=(10, 10), text=self.lang.get(Lang.GAME_DISPLAY_STATE_PAUSED))
         self.registerComponent(self.pause_text)
-        self.resume_button = Button(location=(10, 30), size=(100, 30), text="Resume")
+        self.resume_button = Button(location=(10, 30), size=(100, 30), text=self.lang.get(Lang.MENU_ACTION_RESUME))
         self.resume_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), self.resume())
         self.registerComponent(self.resume_button)
-        self.exit_button = Button(location=(10, 70), size=(100, 30), text="Exit")
+        self.exit_button = Button(location=(10, 70), size=(100, 30), text=self.lang.get(Lang.MENU_ACTION_EXIT))
         self.exit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), self.exit())
         self.registerComponent(self.exit_button)
 
