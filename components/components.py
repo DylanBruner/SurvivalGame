@@ -1,4 +1,4 @@
-import pygame, win32clipboard
+import pygame#, win32clipboard
 from components.componentsystem import Component
 
 pygame.font.init()
@@ -146,9 +146,9 @@ class TextInput(Component):
                 # check if ctrl and v are pressed
                 if pygame.K_LCTRL in self._keys_pressed and event.key == pygame.K_v:
                     # get the text from the clipboard
-                    win32clipboard.OpenClipboard()
-                    self.text += win32clipboard.GetClipboardData()
-                    win32clipboard.CloseClipboard()
+                    # win32clipboard.OpenClipboard()
+                    # self.text += win32clipboard.GetClipboardData()
+                    # win32clipboard.CloseClipboard()
                     if self.max_length != -1 and len(self.text) > self.max_length:
                         self.text = self.text[:self.max_length]
                 elif event.key == pygame.K_BACKSPACE:

@@ -2,3 +2,5 @@ pygame-ce
 colorama
 pywin32
 PyQt6
+numba
+#pyinstaller
