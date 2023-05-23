@@ -2,7 +2,6 @@ import pygame, math
 from util.myenvironment import Environment
 from game.entities.enemy import Enemy
 from util.utils import Util
-from game.save.world import TILE_SIZE
 
 class TestPathfinderEnemy(Enemy):
     def __init__(self, location: tuple[int, int], parent):

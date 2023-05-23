@@ -5,7 +5,7 @@ from components.componentsystem import Component
 from game.misc.keybinding import Bindings
 from game.player.playerstorage import PlayerStorage
 from game.save.tiles import Tiles
-from game.save.world import TEXTURE_MAPPINGS, TILE_SIZE, TileIDS
+from game.save.world import TEXTURE_MAPPINGS, TileIDS
 from util.utils import Util
 from game.misc.sounds import Sounds
 from _types.item import Item

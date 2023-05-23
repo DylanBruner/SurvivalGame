@@ -1,6 +1,5 @@
 import pygame, json
-from game.misc.keybinding import Bindings
-from game.save.world import TileIDS, TEXTURE_MAPPINGS
+from game.save.world import TEXTURE_MAPPINGS
 from util.utils import Util
 import game.display.particlesystem as pSys
 from _types.item import Item

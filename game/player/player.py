@@ -1,6 +1,5 @@
 import math, pygame, os, time, json
 from game.misc.keybinding import Bindings
-from game.save.world import TILE_SIZE
 from util.utils import Util
 
 CHARACTERS = list(os.listdir("data/assets/character/characters_pack_extended/Heroes"))

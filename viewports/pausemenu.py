@@ -1,5 +1,3 @@
-import pygame, time
-
 from components.components import *
 from components.componentsystem import Viewport
 from util.myenvironment import Environment

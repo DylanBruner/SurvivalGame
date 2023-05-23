@@ -1,6 +1,6 @@
 import pygame
 from components.componentsystem import Component
-from game.save.world import TILE_SIZE, TEXTURE_MAPPINGS, TileIDS
+from game.save.world import TileIDS
 from util.utils import Util
 
 COLORS = {
