@@ -23,7 +23,7 @@
 - make item lore cache so we don't need to re-generate it every time (kills FPS a bit) [DONE]
 
 [TODO LIST] (somewhat in order of priority)
-- fix chests not saving their contents
+- fix chests not saving their contents if they were placed by the player
 - fix chests not loading the first time they are clicked, (it works if you re-open the chest)
 - surviors that randomly spawn in the world
   - they can be hostile or friendly
@@ -32,7 +32,7 @@
 - add items (weapons, armor, tools, consumables, etc)
 - collisions
 - make the minimap not suck FPS wise
-- add ennemies
+- add enemies
 - fix main menus not resizing when the window is resized
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - manage saves from in game: delete, upgrade/repair*, rename, copy
@@ -46,9 +46,10 @@
 - more sounds
 - make tiles have the propper size inside the hotbar
 - add a way to resize the world tiles & player character during runtime
-- better block break sound
+- better block break sound/different sounds for different blocks
 - settings menu
   - rebinding of keys, the game already supports this but there's no interface for it yet
+  - changing the language
   - volume sliders
   - particle quality
 - custom world size selectable when creating a new world

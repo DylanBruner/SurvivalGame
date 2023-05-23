@@ -1,4 +1,4 @@
-import pygame, util.myenvironment as myenvironment, util.utils as utils, time
+import pygame, util.myenvironment as myenvironment, util.utils as utils, time, sys, importlib
 from util.timer import DebugTimer
 import tasks.backgroundsave as backgroundsave
 from tasks.taskmanager import TaskManager
@@ -32,6 +32,17 @@ world.postLoad() # some more asset processing that needs to be done after pygame
 
 # Register background tasks ================================================
 environment.taskManager.register(backgroundsave.task, environment).setInterval(60) # Autosave every 60 seconds
+
+if "--dev" in sys.argv:
+    DEV_MODE = True
+
+for arg in sys.argv:
+    if arg.startswith("--debug-scripts="):
+        for script in arg.split("=")[1].split(","):
+            try:
+                importlib.import_module(script)
+            except ModuleNotFoundError:
+                ...
 
 while True:
     for event in pygame.event.get():
