@@ -13,18 +13,3 @@ class Cheatil:
         patched_class = type(class_name, (_class,), class_attributes) # <--- thanks ChatGPT for this witchcraft
         
         return patched_class
-
-    @staticmethod
-    def patchExistingClass(_class: object, overrides: dict) -> object:
-        class_attributes = {**_class.__class__.__dict__}
-        for key, value in overrides.items():
-            if key in class_attributes:
-                class_attributes[f"original_{key}"] = class_attributes[key]
-            class_attributes[key] = value
-        
-        # Create a new class using the type() function
-        patched_class = type(_class.__class__.__name__, (_class.__class__,), class_attributes)
-        patched_class.__dict__ = _class.__class__.__dict__
-        patched_class.__dict__.update(class_attributes)
-
-        return patched_class
