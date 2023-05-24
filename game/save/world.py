@@ -3,7 +3,7 @@ from util.utils import Util
 
 TILE_SIZE = 32
 
-class TileIDS:
+class TileIDS: # Tile IDS for quick reference
     EMPTY = 0 # Really shouldn't be used
     GRASS = 1
     WATER = 2
@@ -16,7 +16,7 @@ class TileIDS:
     CHEST   = 9
     SAND    = 10
 
-TEXTURE_MAPPINGS = {
+TEXTURE_MAPPINGS = { # TileID -> Texture Mapping
     TileIDS.EMPTY: pygame.Surface((TILE_SIZE, TILE_SIZE)),
     TileIDS.GRASS: pygame.transform.scale(pygame.image.load('data/assets/world/grass/1.jpg'), (TILE_SIZE, TILE_SIZE)),
     TileIDS.STONE: pygame.transform.scale(pygame.image.load('data/assets/world/stones/Tileable1k.png'), (TILE_SIZE, TILE_SIZE)),
@@ -72,5 +72,6 @@ class World:
 
     @Util.MonkeyUtils.autoErrorHandling
     def generateMap(self, seed: int = None):
+        # this code is pointless because we never actually use the seed
         random.seed((random.randint(0, 100000) if seed == None else seed))
         self.map['seed'] = seed

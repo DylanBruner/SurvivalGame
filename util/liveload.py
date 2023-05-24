@@ -1,5 +1,8 @@
 import inspect, os, importlib, colorama, time
-#POC that doesn't quite work yet
+
+"""
+Some code that i was toying around with, it would basically reload the function every time it was called
+"""
 
 _data = {
     "LiveLoad": {

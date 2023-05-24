@@ -3,6 +3,9 @@ from util.myenvironment import Environment
 from util.utils import Util
 
 class Enemy:
+    """
+    Never got around to implementing this because AI is hard
+    """
     def __init__(self, location: tuple[int, int], health: int = 100):
         self.location = location
         self.health   = health

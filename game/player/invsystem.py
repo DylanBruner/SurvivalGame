@@ -49,6 +49,10 @@ class HotbarComponent(Component):
 
     @Util.MonkeyUtils.autoErrorHandling
     def addToInventory(self, item: Item):
+        """
+        Adds an item to the inventory, if the item is already in the inventory, it will stack
+        and saves the inventory
+        """
         # check if the item is already in the inventory
         for i in range(len(self._items)):
             if self._items[i] and self._items[i].item_id == item.item_id:
@@ -68,6 +72,9 @@ class HotbarComponent(Component):
 
     @Util.MonkeyUtils.autoErrorHandling
     def draw(self, surface: pygame.Surface, environment: dict):
+        """
+        Draws the hotbar
+        """
         for i in range(len(self._items)):
             pygame.draw.rect(surface, (255, 255, 255), (self.location[0] + i * (Config.SLOT_SIZE + self.SLOT_SPACING), self.location[1], Config.SLOT_SIZE, Config.SLOT_SIZE), border_radius=(4 if i == self._selected_slot else 0))
             # draw item
@@ -97,7 +104,7 @@ class HotbarComponent(Component):
                 return
             self.breaking_percent += ((self._breaking_power * 10) / Tiles.getTile(self.breaking_id).durability) * environment['time_delta']
 
-            if self.breaking_percent >= 100:
+            if self.breaking_percent >= 100: # block broken
                 Sounds.playSound(Sounds.BLOCK_BREAK)
                 self.parent.player.stamina -= Util.calculateStaminaCost(self._breaking_power, self.parent.player.xp)
                 self.parent.player.xp += 5 # xp system needs to be worked out
@@ -115,6 +122,7 @@ class HotbarComponent(Component):
                 self.breaking_id = None
                 self.parent.save.save_data['world']['map_data'][self.parent.player.selected_tile[0]][self.parent.player.selected_tile[1]] = TileIDS.GRASS
                 
+                # Play the particle effect
                 p = pSys.ParticleDisplay(start=pygame.mouse.get_pos(), color=Config.BREAK_COLOR, 
                             shape=pSys.Shape.RANDOM_POLYGON, count=125,
                             speed=10, lifetime=200, size=1)
@@ -130,10 +138,7 @@ class HotbarComponent(Component):
     def save(self):
         self.parent.save.save_data['player']['inventory'] = [[0, 0] for i in range(9)]
         for item in self._items:
-            self.parent.save.save_data['player']['inventory'][self._items.index(item)] = item#[item.item_id, item.count]
-            # if item:
-            # else:
-                # self.parent.save.save_data['player']['inventory'][self._items.index(item)] = [0, 0]
+            self.parent.save.save_data['player']['inventory'][self._items.index(item)] = item
     
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):

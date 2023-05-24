@@ -1,7 +1,10 @@
-# all functions must be inside a class to avoid cluttering the global namespace because of the way we are forced to load scripts
+# all functions must be inside a class to avoid cluttering the global namespace because of the way i am loading scripts during injection
 class Cheatil:
     @staticmethod
     def patchClass(_class: type, overrides: dict) -> type:
+        """
+        Patch values within a class and return the modified class
+        """
         class_name = f"Patched{_class.__name__}"
         class_attributes = {**_class.__dict__}
         for key, value in overrides.items():

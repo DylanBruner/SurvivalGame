@@ -5,6 +5,7 @@ class Cache:
     def cache(maxLength: int = 100):
         """
         Decorator that caches the return value of a function for a given set of arguments.
+        maxLength = the maximum number of cached values
         """
         def wrapper(func):
             def inner(*args, **kwargs):

@@ -29,6 +29,9 @@ class Text:
 
 
 class Lore:
+    """
+    Class for generating lore boxes for items
+    """
     @staticmethod
     def _autoWordWrap(lines: list[Text]):
         # split any lines that need splitting for the width of the lore box
@@ -78,7 +81,8 @@ class Lore:
             loreStart += 16
 
         return surface
-
+    
+# Storing the lore here is stupid, it should be within the item config file but whatever
 BASE_ITEM_LORE = {
     "1": {"name": "Grass", "rarity": RARITY_COMMON, "lore": []},
     "2": {"name": "Water", "rarity": RARITY_COMMON, "lore": []},

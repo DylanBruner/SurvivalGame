@@ -21,13 +21,13 @@ class Tile:
         self.background_id = background_id
         self.drops = drops
     
-    def __repr__(self):
+    def __repr__(self): # gets called when you print(Tile)
         return f"Tile(name={self.name}, id={self.id}, texture={self.texture}, durability={self.durability}, breaking_power={self.breaking_power}, collidable={self.collidable}, breakable={self.breakable}, background_id={self.background_id}, drops={self.drops})"
 
 class Tiles:
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
-    def getTile(id_name: int or str) -> Tile:
+    def getTile(id_name: int or str) -> Tile: # id or name
         if isinstance(id_name, int):
             for key, tile in TILE_DATA.items():
                 if key == 'QUICK_MAPPINGS': continue
@@ -39,16 +39,19 @@ class Tiles:
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
     def calculateHitPercent(breaking_power: int, req_power: int, durability: int) -> int:
+        """
+        Calculate how much damage a tile will take with the given stats.
+        """
         base = 100 / durability
         if breaking_power >= req_power:
             return base * breaking_power
     
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
-    def getTexture(id_name: int or str) -> str:
-        if isinstance(id_name, int):
+    def getTexture(id_name: int or str) -> str: # id or name
+        if isinstance(id_name, int): # if is number
             for tile in TILE_DATA.values():
                 if tile["id"] == id_name:
                     return tile["texture"]
-        elif isinstance(id_name, str):
+        elif isinstance(id_name, str): # if is string
             return TILE_DATA[id_name]["texture"]

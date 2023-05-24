@@ -4,8 +4,10 @@ class DebugTimer:
     def __init__(self):
         self._timeData = {}
     
-    # Function wrapper that will time a function
     def trackFunc(self, func):
+        """
+        Decorator that will time a function and store the time in the _timeData dictionary
+        """
         def wrapper(*args, **kwargs):
             start = time.time()
             result = func(*args, **kwargs)
@@ -15,4 +17,7 @@ class DebugTimer:
         return wrapper
 
     def manualTime(self, name: str, time: float or int) -> None:
+        """
+        Manually add a log for a function
+        """
         self._timeData[name] = time

@@ -1,6 +1,10 @@
 import pygame#, win32clipboard
 from components.componentsystem import Component
 
+"""
+I feel like all this code is kinda boring and self-explanatory, so I'm not gonna comment it. (Good luck :D)
+"""
+
 pygame.font.init()
 DEFAULT_FONT = pygame.font.SysFont("Arial", 20)
 

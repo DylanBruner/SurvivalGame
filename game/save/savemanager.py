@@ -4,6 +4,7 @@ from _types.structure import Structure, LootSpawn
 from _types.item import Item
 from util.utils import Util
 
+# Base save data, could be moved to a class now that im using pickle to save instead of json
 BLANK_SAVE = {
     "save_name": None,
     "player": {
@@ -40,14 +41,10 @@ class SaveGame:
 
     @Util.MonkeyUtils.autoErrorHandling
     def save(self) -> None:
-        # with open(f"data/saves/{self.save_file}", 'w') as f:
-            # json.dump(self.save_data, f)
         pickle.dump(self.save_data, open(f"data/saves/{self.save_file}", 'wb'))
 
     @Util.MonkeyUtils.autoErrorHandling
     def loadSave(self, save_file: str):
-        # with open(f"data/saves/{save_file}", 'r') as f:
-            # self.save_data = json.load(f)
         self.save_data = pickle.load(open(f"data/saves/{save_file}", 'rb'))
 
     @Util.MonkeyUtils.autoErrorHandling
@@ -97,7 +94,9 @@ class SaveGame:
         save_data['world'] = World().save()
 
         _map = save_data['world']['map_data']
-        # World generation =====================================================
+
+        
+        # World generation ==============================================================
         # fill it with grass
         _map = [[TileIDS.GRASS for _ in range(1500)] for _ in range(1500)]
         POI_COUNT  = len(_map[0]) * len(_map) // 1000

@@ -12,8 +12,8 @@ class Shape:
 
 class Color:
     def __init__(self, base: tuple[int, int, int], mod_r: int = 0):
-        self.base = base
-        self.mod_r  = mod_r
+        self.base  = base
+        self.mod_r = mod_r
     
     @Util.MonkeyUtils.autoErrorHandling
     def get(self) -> tuple[int, int, int]:
@@ -23,6 +23,9 @@ class Color:
         return (max(0, min(255, c[0])), max(0, min(255, c[1])), max(0, min(255, c[2])))
 
 class ParticleDisplay:
+    """
+    This code is awful i planned to rewrite it but i never got around to it seeing as it worked well enough
+    """
     def __init__(self, start: tuple[int, int], color: Color, shape: int, 
                  count: int, speed: int, size: int = 2, lifetime: int = 700, lifetime_variance: int = 250):
         self.start = start
@@ -114,6 +117,7 @@ class ParticleDisplay:
                 ...
         self.particles = self.mod_particles
 
+# Code for testing the particle system, only runs if this file is run directly
 if __name__ == '__main__':
     pygame.init()
     window = pygame.display.set_mode((800, 600))

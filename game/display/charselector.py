@@ -9,9 +9,12 @@ from util.myenvironment import Environment
 # 128, 128
 
 class CharacterSelector(Component):
+    """
+    Character selector menu that allows the player to select their character.
+    """
     def __init__(self, location: tuple[int, int]):
         super().__init__(location, (0, 0)) # size = tbd
-        self.EVENT_SYSTEM_HOOKED = True
+        self.EVENT_SYSTEM_HOOKED = True # tell the game to send us events
 
         with open('data/config/settings.json', 'r') as f:
             self.selected_character: int = json.load(f)['player']['selected_character']
@@ -55,6 +58,9 @@ class CharacterSelector(Component):
 
     @Util.MonkeyUtils.autoErrorHandling
     def onEvent(self, event: pygame.event.Event):
+        """
+        If the player clicks on the left or right arrow, change the selected character.
+        """
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.LEFT_ARROW.get_rect(topleft = (self.location[0] - self.LEFT_ARROW.get_width(), self.location[1] + (self.currentCharacter.get_height() // 1.4) - self.LEFT_ARROW.get_height())).collidepoint(event.pos):

@@ -1,6 +1,10 @@
 import time, threading, ctypes
 
 class StoppableThread(threading.Thread):
+    """
+    StoppableThread class that i either stole / wrote like a year ago.
+    I keep using it though because it actually works really well.
+    """
     def __init__(self, func: callable):
         threading.Thread.__init__(self)
         self.func = func
@@ -41,6 +45,12 @@ class Task:
         self._oneTimeUse = True
 
 class TaskManager:
+    """
+    Example Usage:
+    t = TaskManager()
+    t.register(lambda: print("Hello, world!")).setInterval(1)
+    t.start()
+    """
     def __init__(self):
         self._registered = []
     

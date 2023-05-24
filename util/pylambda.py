@@ -1,4 +1,7 @@
 class _if:
+    """
+    Kinda just wrote this class for fun, it lets you write some interesting if statements
+    """
     def __init__(self, condition: bool, true_value: callable):
         self._condition   = condition
         self._true_value  = true_value

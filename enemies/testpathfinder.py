@@ -4,6 +4,10 @@ from game.entities.enemy import Enemy
 from util.utils import Util
 
 class TestPathfinderEnemy(Enemy):
+    """
+    Some code i wrote as a test hence the name,
+    it doesn't work very well.
+    """
     def __init__(self, location: tuple[int, int], parent):
         super().__init__(location, 100)
         self.parent = parent # reference to the gameview viewport

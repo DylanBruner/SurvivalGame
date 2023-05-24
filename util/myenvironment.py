@@ -18,6 +18,7 @@ class Environment:
         self.taskManager: TaskManager
 
         self.__dict__.update(kwargs)
+        
     def __getitem__(self, key):
         return self.__dict__[key]
     def __setitem__(self, key, value):

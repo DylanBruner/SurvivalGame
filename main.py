@@ -1,4 +1,4 @@
-import pygame, util.myenvironment as myenvironment, util.utils as utils, time, sys, importlib
+import pygame, util.myenvironment as myenvironment, util.utils as utils, time, sys
 from util.timer import DebugTimer
 import tasks.backgroundsave as backgroundsave
 from tasks.taskmanager import TaskManager

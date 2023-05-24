@@ -1,6 +1,9 @@
 import pygame
 
 class Component:
+    """
+    Base class for all components, no code to really comment here
+    """
     def __init__(self, location: tuple[int, int], size: tuple[int, int]):
         self.location = location
         self.size     = size
@@ -14,6 +17,9 @@ class Component:
         pass
 
 class Viewport:
+    """
+    Base class for all viewports, should be inherited from and not used directly
+    """
     def __init__(self, size: tuple[int, int], environment):
         self.size = size
         self.environment = environment
@@ -59,17 +65,25 @@ class Viewport:
         self.customCursor = surf
     
     def setCustomCursorEnabled(self, enabled: bool):
+        """
+        Toggle the custom cursor
+        """
         self._customCursorEnabled = enabled
         pygame.mouse.set_visible(not enabled)
     
     def draw(self, environment: dict):
         for component in self.components['components']:
             component.draw(environment["window"], environment)
-        if self._customCursorEnabled:
+
+        if self._customCursorEnabled: # draw the custom cursor if it's enabled
             environment["window"].blit(self.customCursor, pygame.mouse.get_pos())
         
     def setup(self) -> None:
-        ... # Should be where the components are registered
+        """
+        Should be where the components are registered, not in __init__ because setup is
+        called when the viewport is reloaded / resized
+        """
+        ...
     
     def reload(self) -> None:
         self.components['components'] = []
@@ -88,9 +102,12 @@ class Viewport:
             component.onEvent(event)
         
 class Theme:
+    """
+    System for applying themes to components instead of individually setting attributes
+    """
     def __init__(self):
         self.THEME_TREE = {
-            'ProgressBar': {
+            'ProgressBar': { # <=== Class Name, v=== Attributes
                 'background_color': (44, 51, 51),
                 'border_color': (44, 51, 51),
                 'border_radius': 4,
@@ -112,6 +129,9 @@ class Theme:
         }
         
     def apply(self, component: Component) -> None:
+        """
+        Litterally just applies the theme to the component, not much else to say
+        """
         if component.__class__.__name__ in self.THEME_TREE:
             for key in self.THEME_TREE[component.__class__.__name__]:
                 if hasattr(component, key):
@@ -121,6 +141,10 @@ class Theme:
 
     @staticmethod
     def cApply(component: Component, tree: dict[str, any]) -> None:
+        """
+        I belive this stood for custom apply, 
+        but I'm not sure as I'm commenting this a few weeks after writing it
+        """
         for key in tree:
             if hasattr(component, key):
                 setattr(component, key, tree[key])

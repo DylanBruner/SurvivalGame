@@ -6,6 +6,9 @@ with open(KEYBIND_FILE, "r") as f:
     KEYBINDS: dict = json.load(f)
 
 class Bindings:
+    """
+    Class for managing keybinds
+    """
     @staticmethod
     @Util.MonkeyUtils.autoErrorHandling
     def check(event: pygame.event.Event, action: str) -> bool:

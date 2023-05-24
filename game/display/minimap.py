@@ -10,6 +10,9 @@ COLORS = {
 }
 
 class MiniMap(Component):
+    """
+    Crappy minimap that im not even using because it uses like 20 FPS
+    """
     def __init__(self, parent: Component = None):
         self.parent = parent
         self.SIZE   = 200
