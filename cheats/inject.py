@@ -1,4 +1,4 @@
-import inspect, os, sys, threading, time
+import inspect, os, sys, threading, time, pygame
 
 def loadPackage(filename: str, globs: dict) -> None:
     with open(filename, 'r') as f:
@@ -15,32 +15,51 @@ if not inspect.currentframe().f_back: # if we're not being called from within th
 frame = inspect.currentframe().f_back
 frame.f_globals["DEV_MODE"] = True # force dev mode
 
-# def setup(self, **kwargs):
-#     self.original_setup()
-#     self.menu_text.color = (255, 0, 0)
-
-# patched = Cheatil.patchClass(frame.f_globals["environment"].viewport.__class__, 
-#                                   {"setup": setup})
-# frame.f_globals["environment"].viewport = patched((800, 600), frame.f_globals["environment"])
-
-def myThread():
+def gameViewOnDraw():
     inGame = False
     while not inGame:
-        if frame.f_globals["environment"].viewport.__class__.__name__ == "GameView":
+        if frame.f_globals['environment'].viewport.__class__.__name__ == "GameView":
             inGame = True
-        else:
-            time.sleep(1)
+        else: time.sleep(1)
     print("Detected game view, sleeping 10 seconds...")
     time.sleep(10)
-    player = frame.f_globals["environment"].viewport.player
-    def tick(self, keys_pressed, environment, *args, **kwargs):
+
+    cheats = {
+        'speedHack':   {'enabled': False, 'value': 10, 'key': 'NUM7', 'code': pygame.K_KP7},
+        'fastStamina': {'enabled': True,  'value': 10, 'key': 'NUM8', 'code': pygame.K_KP8},
+        'fastBreak':   {'enabled': False, 'value': 10, 'key': 'NUM9', 'code': pygame.K_KP9},
+    }
+
+    # ==================== Viewport Hooking ====================
+    def draw(self, environment: dict):
+        tempSurface = pygame.Surface(environment['window'].get_size())
+        old = environment['window']
+        environment['window'] = tempSurface
+        self.original_draw(environment)
+        environment['window'] = old
+
+        if environment['viewport'].paused:
+            environment['window'].blit(tempSurface, (0, 0))
+            return
         
-        environment['time_delta'] = environment['time_delta'] * 10
-        self.original_tick(keys_pressed, environment, *args, **kwargs)
-        environment['time_delta'] = environment['time_delta'] / 10
+        tempSurface.blit(pygame.font.SysFont('Arial', 20).render("Cheats:", True, (255, 255, 255)), (10, 10))
+        for i, cheat in enumerate(cheats):
+            color = (255, 0, 0) if not cheats[cheat]['enabled'] else (0, 255, 0)
+            tempSurface.blit(pygame.font.SysFont('Arial', 20).render(f"{cheats[cheat]['key']}) {cheat}: {cheats[cheat]['value']}", True, color), (20, 10 + (i + 1) * 20))
 
-    speedHackPlayer = Cheatil.patchClass(player.__class__, {"tick": tick})
-    player = speedHackPlayer(frame.f_globals["environment"].viewport.save.save_data)
-    frame.f_globals["environment"].viewport.player = player
 
-threading.Thread(target=myThread).start()
+        environment['window'].blit(tempSurface, (0, 0))
+
+    def onEvent(self, event: pygame.event.Event):
+        self.original_onEvent(event)
+
+        if event.type == pygame.KEYDOWN:
+            for cheat in cheats:
+                if event.key == cheats[cheat]['code']:
+                    cheats[cheat]['enabled'] = not cheats[cheat]['enabled']
+
+    patched = Cheatil.patchClass(frame.f_globals['environment'].viewport.__class__, {"draw": draw, "onEvent": onEvent})
+    frame.f_globals['environment'].viewport = patched((800, 600), frame.f_globals['environment'], frame.f_globals['environment'].viewport.save)
+    print("Patched game view")
+
+threading.Thread(target=gameViewOnDraw).start()
