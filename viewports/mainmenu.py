@@ -20,7 +20,6 @@ class MainMenu(Viewport):
 
     @Util.MonkeyUtils.autoErrorHandling
     def setup(self):
-        raise ValueError("test")
         self.lang = Lang()
         
         pygame.display.set_caption(f"{self.environment.GAME_NAME} - Main Menu")
