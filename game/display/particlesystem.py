@@ -1,6 +1,7 @@
 import math
 import random
 import time
+import sys
 
 import pygame
 
@@ -134,7 +135,7 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 particleDisplays.append(ParticleDisplay(event.pos, Color((205, 0, 255), 5), Shape.RANDOM_POLYGON, 100, 20, 5))
         window.fill((255, 255, 255))

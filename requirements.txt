@@ -1,6 +1,6 @@
 pygame-ce
 colorama
-# pywin32
+# pywin32 # removed because it doesn't work when converted to a exe and wouldn't even work on OSX/Linux
 PyQt6
 numba
-#pyinstaller
+pyinstaller
