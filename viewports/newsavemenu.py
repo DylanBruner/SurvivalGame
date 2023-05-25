@@ -9,6 +9,9 @@ from game.misc.sounds import Sounds
 from game.misc.lang import Lang
 
 class NewSaveMenu(Viewport):
+    """
+    Menu for creating new save games
+    """
     def __init__(self, size: tuple[int, int], environment: Environment):
         super().__init__(size, environment)
         self.setup()
@@ -17,6 +20,7 @@ class NewSaveMenu(Viewport):
     def setup(self):
         self.lang = Lang()
 
+        # Cursor and window title. Same as all other viewports pretty much
         pygame.display.set_caption(f"{self.environment.GAME_NAME} - {self.lang.get(Lang.GAME_DISPLAY_NEW_SAVE)}")
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)

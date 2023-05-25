@@ -6,6 +6,9 @@ from game.misc.sounds import Sounds
 from game.misc.lang import Lang
 
 class PauseMenu(Viewport):
+    """
+    Just a super barebones pause menu, I dont think a lot of commenting is really needed here
+    """
     def __init__(self, size: tuple[int, int], environment: Environment):
         super().__init__(size, environment)
         self.setup()
