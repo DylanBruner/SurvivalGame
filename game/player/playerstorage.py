@@ -1,9 +1,12 @@
-import pygame, json
-from game.save.world import TEXTURE_MAPPINGS
-from util.utils import Util
+import json
+
+import pygame
+
 import game.display.particlesystem as pSys
 from _types.item import Item
-from game.display.loresys import Lore, BASE_ITEM_LORE
+from game.display.loresys import BASE_ITEM_LORE, Lore
+from game.save.world import TEXTURE_MAPPINGS
+from util.utils import Util
 
 SLOT_TEXTURE: pygame.Surface = None
 

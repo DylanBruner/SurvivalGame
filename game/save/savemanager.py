@@ -1,7 +1,10 @@
-import json, random, pickle
-from game.save.world import World, TileIDS
-from _types.structure import Structure, LootSpawn
+import json
+import pickle
+import random
+
 from _types.item import Item
+from _types.structure import LootSpawn, Structure
+from game.save.world import TileIDS, World
 from util.utils import Util
 
 # Base save data, could be moved to a class now that im using pickle to save instead of json

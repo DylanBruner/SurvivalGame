@@ -1,9 +1,11 @@
-import pygame, json
+import json
+
+import pygame
 
 from components.componentsystem import Component
-from util.utils import Util
 from game.player.player import CHARACTERS
 from util.myenvironment import Environment
+from util.utils import Util
 
 #94, 128 (192x192)
 # 128, 128

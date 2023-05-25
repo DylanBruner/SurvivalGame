@@ -1,4 +1,6 @@
-import json, os
+import json
+import os
+
 
 class Lang:
     # These constants are just so I don't have to remember the keys for the json file and so I can change them easily

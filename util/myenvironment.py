@@ -1,7 +1,9 @@
 import pygame
+
 from components.componentsystem import Viewport
-from util.timer import DebugTimer
 from tasks.taskmanager import TaskManager
+from util.timer import DebugTimer
+
 
 class Environment:
     def __init__(self, **kwargs):

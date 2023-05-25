@@ -1,4 +1,5 @@
 import json
+
 from util.utils import Util
 
 TILE_CFG_FILE = "data/config/tiles.json"

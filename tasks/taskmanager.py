@@ -1,4 +1,7 @@
-import time, threading, ctypes
+import ctypes
+import threading
+import time
+
 
 class StoppableThread(threading.Thread):
     """

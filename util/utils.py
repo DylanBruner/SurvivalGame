@@ -1,5 +1,14 @@
-import pygame, importlib, inspect, sys, traceback, colorama, os, time
+import importlib
+import inspect
+import os
+import sys
+import time
+import traceback
+
+import colorama
+import pygame
 from numba import njit
+
 from components.componentsystem import Viewport
 from util.myenvironment import Environment
 

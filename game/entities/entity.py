@@ -1,5 +1,6 @@
 import pygame
 
+
 class Entity:
     """
     Just a class for entities to inherit from

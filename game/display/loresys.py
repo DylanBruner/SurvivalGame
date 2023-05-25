@@ -1,4 +1,5 @@
 import pygame
+
 from util.funccache import Cache
 
 rarities = [

@@ -1,4 +1,7 @@
-import pygame, json
+import json
+
+import pygame
+
 from util.utils import Util
 
 KEYBIND_FILE = "data/config/keybinds.json"

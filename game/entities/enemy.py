@@ -1,6 +1,8 @@
 import pygame
+
 from util.myenvironment import Environment
 from util.utils import Util
+
 
 class Enemy:
     """

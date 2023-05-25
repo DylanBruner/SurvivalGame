@@ -1,4 +1,9 @@
-import inspect, os, importlib, colorama, time
+import importlib
+import inspect
+import os
+import time
+
+import colorama
 
 """
 Some code that i was toying around with, it would basically reload the function every time it was called

@@ -1,5 +1,11 @@
-import pygame, random, math, time
+import math
+import random
+import time
+
+import pygame
+
 from util.utils import Util
+
 
 class Shape:
     CIRCLE    = 0

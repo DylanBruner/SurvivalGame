@@ -1,4 +1,5 @@
-import pygame#, win32clipboard
+import pygame  # , win32clipboard
+
 from components.componentsystem import Component
 
 """

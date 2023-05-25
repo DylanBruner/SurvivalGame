@@ -10,7 +10,7 @@ from game.misc.lang import Lang
 
 class NewSaveMenu(Viewport):
     """
-    Menu for creating new save games
+    Menu for creating new save games, it's really basic so I dont think in-depth commenting is needed
     """
     def __init__(self, size: tuple[int, int], environment: Environment):
         super().__init__(size, environment)

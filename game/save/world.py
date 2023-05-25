@@ -1,4 +1,7 @@
-import pygame, random
+import random
+
+import pygame
+
 from util.utils import Util
 
 TILE_SIZE = 32

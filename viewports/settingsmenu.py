@@ -1,9 +1,10 @@
 from components.components import *
 from components.componentsystem import Viewport
+from game.misc.lang import Lang
+from game.misc.sounds import Sounds
 from util.myenvironment import Environment
 from util.utils import Util
-from game.misc.sounds import Sounds
-from game.misc.lang import Lang
+
 
 class SettingsMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):

@@ -1,20 +1,22 @@
-import time, pygame
+import time
+
+import pygame
 
 from components.components import *
 from components.componentsystem import Viewport
-from game.entities.enemy import Enemy
-from game.player.invsystem import HotbarComponent
+from enemies.testpathfinder import TestPathfinderEnemy
 from game.display.minimap import MiniMap
 from game.display.particlesystem import ParticleDisplay
+from game.entities.enemy import Enemy
+from game.misc.lang import Lang
+from game.player.invsystem import HotbarComponent
 from game.player.player import Player
 from game.save.savemanager import SaveGame
 from game.save.tiles import Tiles
 from game.save.world import TEXTURE_MAPPINGS, TILE_SIZE
-from game.misc.lang import Lang
 from util.myenvironment import Environment
 from util.utils import Util
 from viewports.pausemenu import PauseMenu
-from enemies.testpathfinder import TestPathfinderEnemy
 
 # 1 one day in game is 20 minutes irl
 REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds

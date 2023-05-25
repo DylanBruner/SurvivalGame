@@ -1,14 +1,15 @@
 import pygame
 
 import game.display.particlesystem as pSys
+from _types.item import Item
 from components.componentsystem import Component
 from game.misc.keybinding import Bindings
+from game.misc.sounds import Sounds
 from game.player.playerstorage import PlayerStorage
 from game.save.tiles import Tiles
 from game.save.world import TEXTURE_MAPPINGS, TileIDS
 from util.utils import Util
-from game.misc.sounds import Sounds
-from _types.item import Item
+
 
 class Config:
     # Visual

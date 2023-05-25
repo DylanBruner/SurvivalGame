@@ -1,10 +1,16 @@
-import pygame, util.myenvironment as myenvironment, util.utils as utils, time, sys
-from util.timer import DebugTimer
+import sys
+import time
+
+import pygame
+
+import game.save.world as world
 import tasks.backgroundsave as backgroundsave
+import util.myenvironment as myenvironment
+import util.utils as utils
+import viewports.mainmenu as mainmenu
 from tasks.taskmanager import TaskManager
 from util.pylambda import _if
-import game.save.world as world
-import viewports.mainmenu as mainmenu
+from util.timer import DebugTimer
 
 #opengameart.org - lots of art taken from here
 

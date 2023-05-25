@@ -1,4 +1,6 @@
-import json, random
+import json
+import random
+
 
 class LootTable:
     def __init__(self, items: dict):

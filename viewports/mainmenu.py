@@ -1,13 +1,16 @@
+import sys
+
 import pygame
 
 from components.components import *
 from components.componentsystem import Viewport
+from game.misc.lang import Lang
+from game.misc.sounds import Sounds
 from util.myenvironment import Environment
 from util.utils import Util
 from viewports.playgame import PlayGame
 from viewports.settingsmenu import SettingsMenu
-from game.misc.sounds import Sounds
-from game.misc.lang import Lang
+
 
 class MainMenu(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment):
@@ -28,8 +31,9 @@ class MainMenu(Viewport):
         self.play_button = Button((self.size[0] / 2 - 100, 150 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_PLAY))
         self.options_button = Button((self.size[0] / 2 - 100, 200 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_OPTIONS))
         self.quit_button = Button((self.size[0] / 2 - 100, 250 + y_offset), (200, 40), self.lang.get(Lang.MENU_ACTION_QUIT))
-
-        self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), self.environment.taskManager.stop(), quit())
+        
+        # Button callbacks
+        self.quit_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), pygame.quit(), self.environment.taskManager.stop(), sys.exit())
         self.options_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, SettingsMenu(self.size, self.environment), self.environment))
         self.play_button.on_click = lambda: (Sounds.playSound(Sounds.MENU_CLICK), Util.launchViewport(self, PlayGame(self.size, self.environment), self.environment))
 

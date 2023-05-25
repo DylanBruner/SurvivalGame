@@ -1,4 +1,5 @@
 import pygame
+
 from util.utils import Util
 
 pygame.mixer.init()

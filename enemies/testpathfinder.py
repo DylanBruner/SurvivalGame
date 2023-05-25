@@ -1,7 +1,11 @@
-import pygame, math
-from util.myenvironment import Environment
+import math
+
+import pygame
+
 from game.entities.enemy import Enemy
+from util.myenvironment import Environment
 from util.utils import Util
+
 
 class TestPathfinderEnemy(Enemy):
     """

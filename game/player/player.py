@@ -1,4 +1,10 @@
-import math, pygame, os, time, json
+import json
+import math
+import os
+import time
+
+import pygame
+
 from game.misc.keybinding import Bindings
 from util.utils import Util
 
