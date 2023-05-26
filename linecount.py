@@ -1,5 +1,9 @@
 import os
 
+"""
+Just some code I wrote in two minutes to get the line count
+"""
+
 linecount = 0
 folders   = ['_types', 'cheats', 'components', 'data', 'enemies', 'game', 'tasks', 'util', 'viewports']
 for folder in folders:

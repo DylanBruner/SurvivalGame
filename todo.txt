@@ -33,6 +33,7 @@
 - collisions
 - make the minimap not suck FPS wise
 - add enemies
+- torches
 - fix main menus not resizing when the window is resized
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - manage saves from in game: delete, upgrade/repair*, rename, copy
