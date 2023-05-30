@@ -21,6 +21,7 @@
 - better random generation [DONE]
 - item lore [DONE]
 - make item lore cache so we don't need to re-generate it every time (kills FPS a bit) [DONE]
+- torches [DONE]
 
 [TODO LIST] (somewhat in order of priority)
 - fix chests not saving their contents if they were placed by the player
@@ -33,7 +34,6 @@
 - collisions
 - make the minimap not suck FPS wise
 - add enemies
-- torches
 - fix main menus not resizing when the window is resized
 - more efficient particle system, calculate a random velocity/heading for each particle once at the start and stick with that
 - manage saves from in game: delete, upgrade/repair*, rename, copy
