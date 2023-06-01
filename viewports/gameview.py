@@ -23,6 +23,9 @@ from viewports.pausemenu import PauseMenu
 REAL2GAME = (1 / 60 * 1500)
 
 class Lighting:
+    """
+    Helpers for drawing rectangles / circles for lighting
+    """
     @staticmethod
     def circle(radius: int, color: tuple[int, int, int]) -> pygame.Surface:
         surf = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
@@ -74,6 +77,7 @@ class GameView(Viewport):
         self.ui_layer   = pygame.Surface(self.size, pygame.SRCALPHA)
         self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
 
+        # Setup the components ==============================================
         self.FPS_DISPLAY = TextDisplay(location=(self.size[0] - 80, 10), text="FPS: ???", color=(255, 255, 255))
         self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
@@ -103,25 +107,30 @@ class GameView(Viewport):
         self.coin_image = ImageDisplay(location=(8, 212), image=Images.COIN_IMAGE)
         self.coins_display = TextDisplay(location=(36, 212), text="???", color=(255, 255, 255))
 
-        self.registerComponents([
+        self.registerComponents([# Same as registerComponent but cooler
             self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar,
             self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
             self.XP_DISPLAY, self.XP_LEVEL_DISPLAY,
             self.coins_display, self.coin_image
         ])
 
+        # Custom curser code
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
         self.setCustomCursorEnabled(True)
 
     @Util.MonkeyUtils.autoErrorHandling
     def doGameLogic(self, environment: dict):
-        self.player.tick(self.keys_pressed, environment)
+        self.player.tick(self.keys_pressed, environment) # What used to be a large chunk of code here
+                                                         # was just moved into the player class
 
+        # update the player location within the save
         self.save.save_data['player']['x'] = self.player.location[0]
         self.save.save_data['player']['y'] = self.player.location[1]
     
     @Util.MonkeyUtils.autoErrorHandling
-    def drawLighting(self, light_points: list[tuple[int, int]]):
+    def drawLighting(self):
+        # makes the game darker/lighter/(reder <== 100% a word)
+
         # night color
         color = [0, 0, 0]
         if self.game_time < 400:
@@ -148,7 +157,7 @@ class GameView(Viewport):
 
     @Util.MonkeyUtils.autoErrorHandling
     def draw(self, environment: dict):
-        if self.paused:
+        if self.paused: # Pause menu
             if self.paused_overlay.closed:
                 self.paused = False
                 self.paused_overlay = None
@@ -156,16 +165,17 @@ class GameView(Viewport):
             self.paused_overlay.draw(environment)
             return
         
-        self.doGameLogic(environment)
+        self.doGameLogic(environment) # <== Used to point to a large chunk of code, now it's part
+                                      #     of the player class
 
-        if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05:
+        if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05: # These could be merged into DISPLAY_TIME
             self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.FPS_DISPLAY.setText(f"FPS: {environment['clock'].get_fps():.0f}")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"{self.lang.get(Lang.GAME_DISPLAY_TIME)}: {Util.gameTimeToNice(self.game_time)} ({self.lang.get(Lang.GAME_DISPLAY_DAY)} {self.day_count})")
 
-            # update the game time
+            # update the game time ==========================================
             timeChange = time.time() - self.last_time_update
             self.game_time += (REAL2GAME * timeChange)
             self.last_time_update = time.time()
@@ -183,7 +193,9 @@ class GameView(Viewport):
                     self.TIME_DISPLAY.color = (255, 255, 255)
 
             self.save.save_data['game_time'] = self.game_time
+            # ===============================================================
         
+        # update component values ===========================================
         self.coins_display.setText(f"{self.player.coins:,}")
         
         self.HEALTH_DISPLAY.value  = self.player.health
@@ -192,10 +204,12 @@ class GameView(Viewport):
         self.XP_LEVEL_DISPLAY.setText(str(self.player.xp // 100))
         self.XP_LEVEL_DISPLAY.location = (self.size[0] // 2 - (DEFAULT_FONT.size(str(self.player.xp // 100))[0] // 2), self.XP_DISPLAY.location[1] - 24)
 
+        # ===================================================================
+
         self.game_layer.fill((0, 0, 0))
         self.ui_layer.fill((0, 0, 0, 0))
 
-        # draw the map
+        # draw the map ======================================================
         map_data: list[list[int]] = self.save.save_data['world']['map_data']
 
         # Define the size of the visible area around the player
@@ -234,7 +248,7 @@ class GameView(Viewport):
                             self.game_layer.blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
 
                         self.game_layer.blit(texture, (screen_x, screen_y))
-                        # draw black border around the tile
+                        # draw the tile grid
                         # pygame.draw.rect(self.game_layer, (0, 0, 0), (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
 
                         # check if the mouse is hovering over the tile
@@ -243,8 +257,11 @@ class GameView(Viewport):
 
                             color = (255, 0, 0) if Util.distance(self.player.selected_tile, self.player.location) > 5 else (255, 255, 255)
                             pygame.draw.rect(self.ui_layer, color, (screen_x, screen_y, TILE_SIZE, TILE_SIZE), 1)
+        # ===================================================================
 
+        # draw the rest of the game =========================================
         for enemy in self.enemies:
+            # Only do the enemy logic if their within 100 tiles of the player
             if Util.distance(enemy.location, self.player.location) < 100:
                 ex = (enemy.location[0] - left_plane) * TILE_SIZE
                 ey = (enemy.location[1] - bottom_plane) * TILE_SIZE
@@ -255,6 +272,8 @@ class GameView(Viewport):
         for particle_disp in self.particle_displays:
             particle_disp.draw(self.game_layer, delta_time = environment['time_delta'])
 
+        # really should only sort when a component is a new registered... 
+        # but oh well the FPS hit isn't noticable
         self.components['components'].sort(key = lambda component: component.priority, reverse = False)
         for component in self.components['components']:
             start = time.time()
@@ -293,13 +312,13 @@ class GameView(Viewport):
         
         if event.type == pygame.KEYDOWN:
             self.keys_pressed[event.key] = True
-            if event.key == pygame.K_ESCAPE:
+            if event.key == pygame.K_ESCAPE: # Pause menu
                 self.paused = True
                 self.paused_overlay = PauseMenu(self.size, self.environment)
                 self.environment['overlays'].append(self.paused_overlay)
                 return
             
-            elif event.key == pygame.K_j:
+            elif event.key == pygame.K_j and False: # Spawn a test enemy, disabled
                 self.enemies.append(TestPathfinderEnemy((
                     self.player.selected_tile[0],
                     self.player.selected_tile[1]
