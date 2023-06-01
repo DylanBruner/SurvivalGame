@@ -19,7 +19,8 @@ from util.utils import Util
 from viewports.pausemenu import PauseMenu
 
 # 1 one day in game is 20 minutes irl
-REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
+# REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
+REAL2GAME = (1 / 60 * 1500)
 
 class Lighting:
     @staticmethod
@@ -35,7 +36,9 @@ class Lighting:
         pygame.draw.rect(surf, color, (0, 0, *size))
         surf.set_colorkey((0, 0, 0))
         return surf
-
+    
+LIGHT_POINT = Lighting.circle(75, (255, 255, 255))
+    
 class Images:
     COIN_IMAGE = pygame.image.load("data/assets/coin.png")
 
@@ -118,7 +121,7 @@ class GameView(Viewport):
         self.save.save_data['player']['y'] = self.player.location[1]
     
     @Util.MonkeyUtils.autoErrorHandling
-    def drawLighting(self):
+    def drawLighting(self, light_points: list[tuple[int, int]]):
         # night color
         color = [0, 0, 0]
         if self.game_time < 400:
@@ -133,7 +136,14 @@ class GameView(Viewport):
 
         color = [int(max(70, min(255, c))) for c in color]
 
-        surf = Lighting.rect(self.size, color)
+        surf = pygame.Surface(self.size, pygame.SRCALPHA)
+        rect = Lighting.rect(surf.get_size(), color)
+        surf.blit(rect, (0, 0))
+        for point in light_points:
+            surf.blit(LIGHT_POINT,
+                                 (point[0] - 75 // 1.3, point[1] - 75 // 1.3))
+
+    
         self.game_layer.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_MULT)
 
     @Util.MonkeyUtils.autoErrorHandling
@@ -201,6 +211,7 @@ class GameView(Viewport):
         bottom_plane = player_y - visible_height // 2
         top_plane = bottom_plane + visible_height
 
+        light_points = []
         # Iterate only over the tiles that are visible
         for x in range(int(left_plane), int(right_plane)):
             for y in range(int(bottom_plane), int(top_plane)):
@@ -214,8 +225,11 @@ class GameView(Viewport):
                         screen_x = (x - left_plane) * TILE_SIZE
                         screen_y = (y - bottom_plane) * TILE_SIZE
                         tile = Tiles.getTile(tile_id)
-                        if tile_id == 0 or tile_id == 1:
+                        if tile_id == 0 or tile_id == 1 or tile_id == 11:
                             self.game_layer.blit(TEXTURE_MAPPINGS[1], (screen_x, screen_y))
+                            if tile_id == 11:
+                                light_points.append((screen_x, screen_y))
+                                
                         elif tile is not None and tile.background_id is not None:
                             self.game_layer.blit(TEXTURE_MAPPINGS[Tiles.getTile(tile_id).background_id], (screen_x, screen_y))
 
@@ -250,7 +264,7 @@ class GameView(Viewport):
         if self._customCursorEnabled:
             self.ui_layer.blit(self.customCursor, pygame.mouse.get_pos())
 
-        self.drawLighting()
+        self.drawLighting(light_points)
         
         self.environment['window'].blit(self.game_layer, (0, 0))
         self.environment['window'].blit(self.ui_layer, (0, 0))

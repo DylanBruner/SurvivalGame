@@ -95,4 +95,5 @@ BASE_ITEM_LORE = {
     "8": {"name": "Wood", "rarity": RARITY_COMMON, "lore": []},
     "9": {"name": "Chest", "rarity": RARITY_COMMON, "lore": []},
     "10": {"name": "Sand", "rarity": RARITY_COMMON, "lore": []},
+    "11": {"name": "Torch", "rarity": RARITY_COMMON, "lore": []},
 }

@@ -18,6 +18,7 @@ class TileIDS: # Tile IDS for quick reference
     WOOD    = 8
     CHEST   = 9
     SAND    = 10
+    TORCH   = 11
 
 TEXTURE_MAPPINGS = { # TileID -> Texture Mapping
     TileIDS.EMPTY: pygame.Surface((TILE_SIZE, TILE_SIZE)),
@@ -33,6 +34,7 @@ TEXTURE_MAPPINGS = { # TileID -> Texture Mapping
     TileIDS.WOOD: pygame.transform.scale(pygame.image.load('data/assets/world/light_wood.png'), (TILE_SIZE, TILE_SIZE)),
     TileIDS.CHEST: pygame.transform.scale(pygame.image.load('data/assets/world/chest.png'), (TILE_SIZE, TILE_SIZE)),
     TileIDS.SAND: pygame.transform.scale(pygame.image.load('data/assets/world/sand.jpg'), (TILE_SIZE, TILE_SIZE)),
+    TileIDS.TORCH: pygame.transform.scale(pygame.image.load('data/assets/torch.png'), (TILE_SIZE, TILE_SIZE))
 }
 
 def postLoad():

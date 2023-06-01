@@ -77,7 +77,7 @@ class Player:
     def tick(self, keys_pressed: dict, environment: dict) -> None:
         if self.freeze: return
         self.parent = environment['viewport']
-        speed = 0.001 * environment['time_delta'] 
+        speed = 0.001 * environment['time_delta'] * 20
         self.velocity = [0, 0]
         if keys_pressed.get(Bindings.get("LEFT"), False):
             self.velocity[0] = -speed

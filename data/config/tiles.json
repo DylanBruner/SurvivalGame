@@ -97,6 +97,15 @@
         "collidable": true,
         "breakable": true
     },
+    "TORCH": {
+        "id": 11,
+        "name": "Torch",
+        "texture": "data/assets/world/torch.png",
+        "durability": 50,
+        "breaking_power": 1,
+        "collidable": false,
+        "breakable": true
+    },
     "QUICK_MAPPINGS": {
         "1": "GRASS",
         "2": "WATER",
@@ -107,6 +116,7 @@
         "7": "TREE_V4",
         "8": "WOOD",
         "9": "CHEST",
-        "10": "SAND"
+        "10": "SAND",
+        "11": "TORCH"
     }
 }
