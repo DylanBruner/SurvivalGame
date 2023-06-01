@@ -19,8 +19,8 @@ from util.utils import Util
 from viewports.pausemenu import PauseMenu
 
 # 1 one day in game is 20 minutes irl
-# REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
-REAL2GAME = (1 / 60 * 1500)
+REAL2GAME = (1 / 60 * 20) # 1 real second is 20 game seconds
+# REAL2GAME = (1 / 60 * 1500)
 
 class Lighting:
     """
@@ -48,6 +48,9 @@ class Images:
 class GameView(Viewport):
     def __init__(self, size: tuple[int, int], environment: Environment,
                  save: SaveGame = None):
+
+        self.DRAW_FPS = False
+
         super().__init__(size, environment)
         self.save: SaveGame = save
         if self.save == None: raise Exception("No save file specified")
@@ -78,8 +81,9 @@ class GameView(Viewport):
         self.game_layer = pygame.Surface(self.size, pygame.SRCALPHA)
 
         # Setup the components ==============================================
-        self.FPS_DISPLAY = TextDisplay(location=(self.size[0] - 80, 10), text="FPS: ???", color=(255, 255, 255))
-        self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
+        if self.DRAW_FPS:
+            self.FPS_DISPLAY = TextDisplay(location=(self.size[0] - 80, 10), text="FPS: ???", color=(255, 255, 255))
+            self.FPS_DISPLAY._LAST_UPDATE_FRAME = 0
 
         self.TIME_DISPLAY = TextDisplay(location=(10, 232), text=f"{self.lang.get(Lang.GAME_DISPLAY_TIME)}: ???", color=(255, 255, 255))
         self.TIME_DISPLAY._LAST_UPDATE_FRAME = 0
@@ -108,11 +112,11 @@ class GameView(Viewport):
         self.coins_display = TextDisplay(location=(36, 212), text="???", color=(255, 255, 255))
 
         self.registerComponents([# Same as registerComponent but cooler
-            self.FPS_DISPLAY, self.TIME_DISPLAY, self.hotbar,
+            self.TIME_DISPLAY, self.hotbar,
             self.HEALTH_DISPLAY, self.STAMINA_DISPLAY,
             self.XP_DISPLAY, self.XP_LEVEL_DISPLAY,
             self.coins_display, self.coin_image
-        ])
+        ] + ([self.FPS_DISPLAY] if self.DRAW_FPS else []))
 
         # Custom curser code
         self.setCursor(Util.loadSpritesheet("data/assets/pointer.bmp", (18, 18), 1, transparentColor=(69, 78, 91))[0])
@@ -128,7 +132,7 @@ class GameView(Viewport):
         self.save.save_data['player']['y'] = self.player.location[1]
     
     @Util.MonkeyUtils.autoErrorHandling
-    def drawLighting(self):
+    def drawLighting(self, light_points):
         # makes the game darker/lighter/(reder <== 100% a word)
 
         # night color
@@ -168,9 +172,10 @@ class GameView(Viewport):
         self.doGameLogic(environment) # <== Used to point to a large chunk of code, now it's part
                                       #     of the player class
 
-        if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05: # These could be merged into DISPLAY_TIME
-            self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
-            self.FPS_DISPLAY.setText(f"FPS: {environment['clock'].get_fps():.0f}")
+        if self.DRAW_FPS:
+            if time.time() - self.FPS_DISPLAY._LAST_UPDATE_FRAME > 0.05: # These could be merged into DISPLAY_TIME
+                self.FPS_DISPLAY._LAST_UPDATE_FRAME = time.time()
+                self.FPS_DISPLAY.setText(f"FPS: {environment['clock'].get_fps():.0f}")
         if time.time() - self.TIME_DISPLAY._LAST_UPDATE_FRAME > 0.05:
             self.TIME_DISPLAY._LAST_UPDATE_FRAME = time.time()
             self.TIME_DISPLAY.setText(f"{self.lang.get(Lang.GAME_DISPLAY_TIME)}: {Util.gameTimeToNice(self.game_time)} ({self.lang.get(Lang.GAME_DISPLAY_DAY)} {self.day_count})")

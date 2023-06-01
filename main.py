@@ -1,4 +1,5 @@
 import sys
+import os
 import time
 
 import pygame
@@ -11,6 +12,10 @@ import viewports.mainmenu as mainmenu
 from tasks.taskmanager import TaskManager
 from util.pylambda import _if
 from util.timer import DebugTimer
+
+if not os.path.exists('data'):
+    print("Error: data folder not found, please make sure you have extracted the game correctly")
+    sys.exit(1)
 
 #opengameart.org - lots of art taken from here
 
@@ -117,8 +122,8 @@ while True:
             if not overlay.closed:
                 start = time.time()
                 overlay.onEvent(event)
-                _if(DEV_MODE,
-                    lambda: environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.onEvent", time.time() - start))()
+                if DEV_MODE:
+                    environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.onEvent", time.time() - start)
     """                
     Code for stepping, the queue would really never go above 1 step unless something is take a
     LONG time to run
@@ -139,8 +144,8 @@ while True:
         if not overlay.closed:
             start = time.time()
             overlay.draw(environment)
-            _if(DEV_MODE, 
-                lambda: environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.draw", time.time() - start))()
+            if DEV_MODE:
+                environment.debugTimer.manualTime(f"{overlay.__class__.__name__}.draw", time.time() - start)
                 
     pygame.display.update()
     """

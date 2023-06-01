@@ -20,7 +20,7 @@ pygame.init()
 loreFont = pygame.font.SysFont("Arial", 14)
 
 class Text:
-    def __init__(self, text: str, 
+    def __init__(self, text: str = "", 
                  BOLD: bool = False, ITALIC: bool = False, COLOR: tuple[int, int, int] = (255, 255, 255)):
         
         self.text: str       = text
@@ -87,7 +87,11 @@ class Lore:
 BASE_ITEM_LORE = {
     "1": {"name": "Grass", "rarity": RARITY_COMMON, "lore": []},
     "2": {"name": "Water", "rarity": RARITY_COMMON, "lore": []},
-    "3": {"name": "Stone", "rarity": RARITY_COMMON, "lore": []},
+    "3": {"name": "Stone", "rarity": RARITY_COMMON, "lore": [
+        Text(""),
+        Text("Some example text that shows automatic text formatting", BOLD=True),
+        Text("Some more example text", ITALIC=True, COLOR=(255, 0, 0)),
+    ]},
     "4": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
     "5": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},
     "6": {"name": "Tree", "rarity": RARITY_COMMON, "lore": []},

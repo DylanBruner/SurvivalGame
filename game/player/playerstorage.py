@@ -83,7 +83,7 @@ class PlayerStorage:
         self.craftingSlots: list[Slot] = []
         self.storageSlots: list[Slot]  = []
         self.hotbarSlots: list[Slot]   = []
-        self.outputSlot: Slot          = Slot((265, 152), CAN_STORE=False) #TODO: Position
+        self.outputSlot: Slot          = Slot((self.top_left[0] + 150, self.top_left[1] + 92), CAN_STORE=False) #TODO: Position
         self.outputSlot.customOnClick = self.itemCrafted
 
         xMod, yMod = 7, 225

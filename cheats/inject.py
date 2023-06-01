@@ -10,7 +10,7 @@ except ModuleNotFoundError:
     loadPackage('cheats\\cheatil.py', globals())
 
 if not inspect.currentframe().f_back: # if we're not being called from within the game
-    sys.exit(os.system("bin\\main-v1.0.1.exe --debug-scripts=cheats\\inject.py"))
+    sys.exit(os.system("python main.py --debug-scripts=cheats\\inject.py"))
 
 frame = inspect.currentframe().f_back
 frame.f_globals["DEV_MODE"] = True # force dev mode
